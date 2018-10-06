@@ -1,31 +1,29 @@
 <pre class='metadata'>
-   Title: Input range adaptors
-   Shortname: D1035
-   Level: 0
-   Status: D
-   Group: wg21
-   Editor: Christopher Di Bella, cjdb.ns@gmail.com
-   URL: https://wg21.link/p1035
-   Abstract: P1035 proposes to introduce seven additional range adaptors in the C++20 timeframe.
-   Audience: LEWG
-   Markup Shorthands: markdown yes
-   Default Highlight: CPP
-   Line Numbers: no
-   Date: 2018-10-08
+Title: Input range adaptors
+Shortname: D1035
+Level: 0
+Status: D
+Group: wg21
+Editor: Christopher Di Bella, cjdb.ns@gmail.com
+URL: https://wg21.link/p1035
+Abstract: P1035 proposes to introduce seven additional range adaptors in the C++20 timeframe.
+Audience: LEWG
+Markup Shorthands: markdown yes
+Default Highlight: CPP
+Line Numbers: no
+Date: 2018-10-08
 </pre>
 
-## Acknowledgements
+# Acknowledgements
 
 I would like to acknowledge the following people for their assistance with this proposal:
 
-1. Casey Carter, for reviewing all submissions to [cmcstl2][cmcstl2] and providing feedback that
-   enabled the proposed range adaptors to have high-quality implementations.
-2. Eric Niebler, for providing [range-v3][range-v3] as a reference implementation for the reference
-   implementation.
+1. Casey Carter, for reviewing all submissions to [cmcstl2] and providing feedback that enabled the proposed range adaptors to have high-quality implementations. 
+2. Eric Niebler, for providing [range-v3] as a reference implementation for the reference implementation. 
 
-## Motivation
+# Motivation
 
-[P0789][P0789] introduces the notion of a range adaptor and twelve pioneering range adaptors that
+\[P0789] introduces the notion of a range adaptor and twelve pioneering range adaptors that
 improve declarative, range-based programming. For example, it is possible to perform an inline,
 in-place, lazy reverse like so:
 
@@ -45,7 +43,7 @@ P1035 recognises that P0789 introduces only a few of the widely experimented-wit
 [range-v3], and would like to add a few more to complete the C++20 phase of range adaptors. To this
 end, P1035 discusses range adaptors that are related to those in P0789.
 
-## Proposals
+# Proposals
 
 Unless otherwise requested, each sub-subsection below should be polled individually from other
 sub-subsections. Two major questions are to be asked per range adaptor. It is up to LEWG to decide
@@ -58,9 +56,9 @@ the exact phrasing, but the author's intentions are listed below.
    1. As-is?
    2. With modificaitons, as suggested by LEWG?
 
-### `take_while_view`
+## `take_while_view`
 
-#### Motivation
+### Motivation
 
 P0789 introduces `take_view`, which rangifies the iterator pair
 `{ranges::begin(r), ranges::next(ranges::begin(r), n, ranges::end(r))}`. As an example:
@@ -83,69 +81,56 @@ checks if a certain predicate is satisfied.
    <tr>
    <td>
    <code>
-
-    #include <experimental/ranges/algorithm>
-    #include <experimental/ranges/iterator>
-    #include <iostream>
-    #include <vector>
-
-    namespace ranges = std::experimental::ranges;
-
-    template <ranges::Integral I>
-    constexpr bool is_odd(I const i) noexcept
-    {
-       return i % 2;
-    }
-
-    struct is_odd_sentinel {
-       template <ranges::Iterator I>
-       constexpr friend bool operator==(I const& a,
-          is_odd_sentinel) noexcept
-       {
-          return is_odd(*a);
-       }
-
-       template <ranges::Iterator I>
-       constexpr friend bool operator==(is_odd_sentinel const a,
-          I const& b) noexcept
-       {
-          return b == a;
-       }
-
-       template <ranges::Iterator I>
-       constexpr friend bool operator!=(I const& a,
-          is_odd_sentinel const b) noexcept
-       {
-          return not (a == b);
-       }
-
-       template <ranges::Iterator I>
-       constexpr friend bool operator!=(is_odd_sentinel const a,
-          I const& b) noexcept
-       {
-          return not (b == a);
-       }
-    };
-
-    int main()
-    {
-       auto v = std::vector{0, 6, 8, 9, 10, 16};
-       ranges::copy(
-         ranges::begin(v),
-         is_odd_sentinel{},
-         ranges::ostream_iterator<int>(std::cout, "\n"));
-    }
+    namespace ranges = std::experimental::ranges;<br />
+<br />
+    template &lt;ranges::Integral I&gt;<br />
+    constexpr bool is_odd(I const i) noexcept<br />
+    {<br />
+       return i % 2;<br />
+    }<br />
+<br />
+    struct is_odd_sentinel {<br />
+       template &lt;ranges::Iterator I&gt;<br />
+       constexpr friend bool operator==(I const&amp; a,<br />
+          is_odd_sentinel) noexcept<br />
+       {<br />
+          return is_odd(*a);<br />
+       }<br />
+<br />
+       template &lt;ranges::Iterator I&gt;<br />
+       constexpr friend bool operator==(is_odd_sentinel const a,<br />
+          I const&amp; b) noexcept<br />
+       {<br />
+          return b == a;<br />
+       }<br />
+<br />
+       template &lt;ranges::Iterator I&gt;<br />
+       constexpr friend bool operator!=(I const&amp; a,<br />
+          is_odd_sentinel const b) noexcept<br />
+       {<br />
+          return not (a == b);<br />
+       }<br />
+<br />
+       template &lt;ranges::Iterator I&gt;<br />
+       constexpr friend bool operator!=(is_odd_sentinel const a,<br />
+          I const&amp; b) noexcept<br />
+       {<br />
+          return not (b == a);<br />
+       }<br />
+    };<br />
+<br />
+    int main()<br />
+    {<br />
+       auto v = std::vector{0, 6, 8, 9, 10, 16};<br />
+       ranges::copy(<br />
+         ranges::begin(v),<br />
+         is_odd_sentinel{},<br />
+         ranges::ostream_iterator&lt;int&gt;(std::cout, "\n"));<br />
+    }<br />
    </code>
    </td>
    <td>
    <code>
-
-    #include <experimental/ranges/algorithm>
-    #include <experimental/ranges/iterator>
-    #include <experimental/ranges/range>
-    #include <iostream>
-    #include <vector>
-
     namespace ranges = std::experimental::ranges;
 
     template <ranges::Integral I>
@@ -172,12 +157,8 @@ checks if a certain predicate is satisfied.
    </td>
    </tr>
    <tr>
-      <td>
-         <a href="https://wandbox.org/permlink/7UXazMHnbxfOfODQ">Wandbox demo</a>
-      </td>
-      <td>
-         <a href="https://wandbox.org/permlink/2nS3bzVuQX1DR0yJ">Wandbox demo</a>
-      </td>
+      <td><a href="https://wandbox.org/permlink/7UXazMHnbxfOfODQ">Wandbox demo</a></td>
+      <td><a href="https://wandbox.org/permlink/2nS3bzVuQX1DR0yJ">Wandbox demo</a></td>
    </tr>
 </table>
 
@@ -186,15 +167,15 @@ expert-friendly, is yet to be established as a widespread idiom in C++, and prov
 range adaptor for this purpose will help programmers determine when a sentinel is _not_
 necessary.
 
-#### Notes
-* There is a slight programmer overhead in the naming: the author felt that both 
-  `is_odd_sentinel` and `is_even_sentinel` were applicable names: ultimately, the name
-  `is_odd_sentinel` was chosen because it describes the delimiting condition. An equally
-  valid reason could probably be made for `is_even_sentinel`.
-* A sentinel that takes a lambda may be of interest to LEWG. If there is interest in 
-  this, a proposal could be made in the C++23 timeframe.
+### Notes
+* There is a slight programmer overhead in the naming: the author felt that both
+    `is_odd_sentinel` and `is_even_sentinel` were applicable names: ultimately, the name
+    `is_odd_sentinel` was chosen because it describes the delimiting condition. An equally
+    valid reason could probably be made for `is_even_sentinel`.
+* A sentinel that takes a lambda may be of interest to LEWG. If there is interest in
+    this, a proposal could be made in the C++23 timeframe.
 
-#### Interface and specification
+### Interface and specification
 
 ```cpp
 template <View R, class Pred>
@@ -229,7 +210,7 @@ template<class R, class Pred>
 take_while_view(R&&, Pred) -> take_while_view<all_view<R>, Pred>;
 ```
 
-##### `take_while_view` constructors
+#### `take_while_view` constructors
 
 ```cpp
 constexpr take_while_view(R base, Pred pred);
@@ -244,9 +225,9 @@ constexpr take_while_view(O&& o, Pred pred);
 ```
 
 2. _Effects_: Initialises `base_` with `view::all(std::forward<O>(o))` and initialises
-   `pred_` with `pred`.
+    `pred_` with `pred`.
 
-##### `take_while_view` conversion
+#### `take_while_view` conversion
 
 ```cpp
 constexpr R base() const;
@@ -260,7 +241,7 @@ constexpr const Pred& pred() const;
 
 2. _Returns_: `pred_`.
 
-##### `take_while_view` range begin
+#### `take_while_view` range begin
 
 ```cpp
 constexpr auto begin() requires !SimpleView<R>;
@@ -269,7 +250,7 @@ constexpr auto begin() const requries Range<const R>
 
 1. _Effects_: Equivalent to `return ranges::begin(base_);`.
 
-##### `take_while_view` range end
+#### `take_while_view` range end
 
 ```cpp
 constexpr auto end() requires !SimpleView<R>;
@@ -278,7 +259,7 @@ constexpr auto end() const requires Range<const R>;
 
 1. _Effects_: Equivalent to `return __sentinel<is_const_v<decltype(*this)>>(&pred());`.
 
-#### `take_while_view::__sentinel`
+### `take_while_view::__sentinel`
 
 ```cpp
 template<class R, class Pred>
@@ -303,7 +284,7 @@ public:
 };
 ```
 
-#### `take_while_view::__sentinel` constructor
+### `take_while_view::__sentinel` constructor
 
 ```cpp
 constexpr explicit __sentinel(sentinel_t<Base> end, const Pred* pred);
@@ -318,7 +299,7 @@ constexpr __sentinel(__sentinel<!Const> s)
 
 2. _Effects_ Initialises `end_` with `s.end_` and `pred_` with `s.pred_`.
 
-#### `take_while_view::__sentinel` conversion
+### `take_while_view::__sentinel` conversion
 
 ```cpp
 constexpr sentinel_t<Base> base() const;
@@ -326,7 +307,7 @@ constexpr sentinel_t<Base> base() const;
 
 3. _Effects_: Equivalent to `return end_;`
 
-#### `take_while_view::__sentinel` comparisons
+### `take_while_view::__sentinel` comparisons
 
 ```cpp
 friend constexpr bool operator==(const __sentinel& x, const iterator_t<Base>& y)
@@ -352,19 +333,19 @@ friend constexpr bool operator!=(const iterator_t<Base>& x, const __sentinel& y)
 
 7. _Effects_: Equivalent to `!(y == x);`.
 
-### `view::take_while`
+## `view::take_while`
 
 The name `view::take_while` denotes a range adaptor object. Let `E` and `F`
 be expressions such that type `T` is `decltype((E))`. Then, the expression 
 `view::take_while(E, F)`is expression-equivalent to:
 
 1. `take_while_view{E, F}` if `T` models `InputRange` and if `F` is an object, and
-   models `IndirectUnaryPredicate`.
+    models `IndirectUnaryPredicate`.
 2. Otherwise `std::ranges::view::take_while(E, F)` is ill-formed.
 
-### `drop_view`
+## `drop_view`
 
-#### Motivation
+### Motivation
 
 `drop_view` is the complement to `take_view`: instead of providing the user with the
 first _n_ elements, it provides the user with all _but_ the first _n_ elements.
@@ -376,22 +357,18 @@ first _n_ elements, it provides the user with all _but_ the first _n_ elements.
    </tr>
    <tr>
       <td><code>
-
     namespace ranges = std::ranges;
     auto i = ranges::next(ranges::begin(employees), 5, ranges::end(employees));
     auto j = ranges::find(i, ranges::end(employees), "Lovelace", &employees::surname);
-
-   </code></td>
-   <td><code>
-
+      </code></td>
+      <td><code>
     namespace view = ranges::view;
     auto j = ranges::find(employees | view::drop(5), "Lovelace", &employees::surname);
-
-   </code></td>
+      </code></td>
    </tr>
 </table>
 
-#### Interface
+### Interface
 
 ```cpp
 template<View R>
@@ -423,7 +400,7 @@ template<Range R>
 drop_view(R&&, iter_difference_t<iterator_t<R>>) -> drop_view<all_view<R>>;
 ```
 
-##### `drop_view` constructor
+#### `drop_view` constructor
 
 ```cpp
 constexpr drop_view(R base, D count);
@@ -438,9 +415,9 @@ constexpr drop_view(O&& o, D count);
 ```
 
 2. _Effects_: Initialises `base_` with `view::all(std::forward<O>(o))` and `count_` with
-   `count`.
+    `count`.
 
-##### `drop_view` conversion
+#### `drop_view` conversion
 
 ```cpp
 constexpr R base() const;
@@ -448,7 +425,7 @@ constexpr R base() const;
 
 3. _Effects_: Equivalent to `return base_`.
 
-##### `drop_view` range begin
+#### `drop_view` range begin
 
 ```cpp
 constexpr auto begin() requires !(SimpleView<R> && RandomAccessRange<R>);
@@ -457,10 +434,10 @@ constexpr auto begin() const requires Range<const R> && RandomAccessRange<const 
 
 4. _Effects_: Equivalent to `return ranges::next(ranges::begin(base_), count_, ranges::end(base_));`.
 5. _Remarks_: In order to provide the amortized constant time complexity required by the
-   Range concept, this function caches the result within the `drop_view` for use on
-   subsequent calls.
+    Range concept, this function caches the result within the `drop_view` for use on
+    subsequent calls.
 
-##### `drop_view` range end
+#### `drop_view` range end
 
 ```cpp
 constexpr auto end() requires !(SimpleView<R>);
@@ -469,7 +446,7 @@ constexpr auto end() const requires Range<const R>;
 
 6. _Effects_: Equivalent to `return ranges::end(base_);`.
 
-##### `drop_view` size
+#### `drop_view` size
 
 ```cpp
 constexpr auto size() requires !SimpleView<R> && SizedRange<R>;
@@ -484,18 +461,18 @@ auto const count = static_cast<decltype(size)>(count_);
 return size < count ? 0 : size - count;
 ```
 
-### `view::drop`
+## `view::drop`
 
 The name `view::drop` denotes a range adaptor object. Let `E` and `F` be expressions such that type
 `T` is `decltype((E))`. Then, the expression  `view::drop(E, F)`is expression-equivalent to:
 
 1. `drop_view{E, F}` if `T` models `InputRange` and `F` is implicitly convertible to
-   `iter_difference_t<iterator_t<T>>`.
+    `iter_difference_t<iterator_t<T>>`.
 2. Otherwise `view::drop(E, F)` is ill-formed.
 
-### `drop_while_view`
+## `drop_while_view`
 
-#### Motivation
+### Motivation
 
 The motivation for `drop_while_view` is the union of `drop_view` and `take_while_view`.
 Unlike the others, there are two demonstrations of `drop_while_view` below.
@@ -504,24 +481,24 @@ Unlike the others, there are two demonstrations of `drop_while_view` below.
   <tr><th>Current (C++17)</th><th>Proposed (C++20) v1</th></tr>
   <tr>
     <td>
-
+      <code>
     auto begin = ranges::find_if_not(employees, [](auto const holidays){ return holidays < 20; }, &employee::holidays);
     ranges::transform(begin, ranges::end(employees), ranges::ostream_iterator<std::string>(std::cout, "\n"), [](auto const& e) {
        return e.given_name() + e.surname(); });
-
+      </code>
   </td>
-  <td>
-
+      <td>
+         <code>
     auto too_many_holidays = employees | view::drop_while([](auto const e) { return e.holidays() < 20; });
     ranges::transform(too_many_holidays,
        ranges::ostream_iterator<std::string>(std::cout, "\n"),
        [](auto const& e) { return e.given_name() + e.surname(); });
-
-  </td>
+         </code>
+      </td>
   </tr>
 </table>
 
-#### Interface
+### Interface
 
 ```cpp
 template<View R, IndirectPredicate<iterator_t<R>> Pred>
@@ -552,7 +529,7 @@ template<class R, class Pred>
 drop_while_view(R&&, Pred) -> drop_while_view<all_view<R>, Pred>;
 ```
 
-##### `drop_while_view` constructors
+#### `drop_while_view` constructors
 
 ```cpp
 constexpr drop_while_view(R base, Pred pred);
@@ -567,9 +544,9 @@ constexpr drop_while_view(O&& o, Pred pred)
 ```
 
 2. _Effects_: Initialises `base_` with `view::all(std::forward<O>(o))`, and intialises
-   `pred_` with `pred`.
+    `pred_` with `pred`.
 
-##### `drop_while_view` conversion
+#### `drop_while_view` conversion
 
 ```cpp
 constexpr R base() const;
@@ -583,7 +560,7 @@ constexpr Pred pred() const;
 
 4. _Returns_: `pred_`.
 
-##### `drop_while_view` begin
+#### `drop_while_view` begin
 
 ```cpp
 constexpr auto begin();
@@ -591,26 +568,26 @@ constexpr auto begin();
 
 5. _Effects_: Equivalent to `return ranges::find_if_not(base_, std::ref(pred_));`.
 6. _Remarks_: In order to provide the amortized constant time complexity required by the `Range`
-   concept, this function caches the result within the `drop_while_view` for use on subsequent
-   calls.
+    concept, this function caches the result within the `drop_while_view` for use on subsequent
+    calls.
 
-##### `drop_while_view` end
+#### `drop_while_view` end
 
 7. _Effects_: Equivalent to `return ranges::end(base_);`.
 
-### `view::drop_while`
+## `view::drop_while`
 
 The name `view::drop_while` denotes a range adaptor object. Let `E` and `F` be expressions such that
 type `T` is `decltype((E))`. Then, the expression  `view::drop_while(E, F)`is expression-equivalent
 to:
 
 1. `drop_while_view{E, F}` if `T` models `InputRange`, and `F` is both an object and models
-   `IndirectUnaryPredicate`.
+    `IndirectUnaryPredicate`.
 2. Otherwise `view::drop(E, F)` is ill-formed.
 
-### `istream_view`
+## `istream_view`
 
-#### Motivation
+### Motivation
 
 `istream_iterator` is an abstraction over a `basic_istream` object, so that it may be used as though
 it were an input iterator. It is a great way to populate a container from the get-go, or fill a
@@ -622,7 +599,6 @@ author does not need to care how things are inserted at the end of `v`, only tha
 <table>
   <tr><th>Without <code>istream_iterator</code></th><th>With <code>istream_iterator</code></th></tr>
   <tr><td><code>
-
     auto v = []{
        auto result = std::vector<int>{};
        for (auto i = 0; std::cin >> i;) {
@@ -633,7 +609,6 @@ author does not need to care how things are inserted at the end of `v`, only tha
     for (auto i = 0; std::cin >> i;) {
        result.push_back(i);
     }
-
   </code></td>
   <td><code>
 
@@ -664,7 +639,7 @@ copy(view::istream<int>{std::cin}, back_inserter(v));
 This code is cleaner: we are implicitly saying "until our `basic_istream` object fails, insert our
 input into the back of `v`". There is less to read (and type!), and the code is simpler for it.
 
-#### Interface
+### Interface
 
 ```cpp
 template<Semiregular Val, class CharT, class Traits = char_traits<CharT>>
@@ -684,7 +659,7 @@ private:
 };
 ```
 
-##### `basic_istream_view` constructor
+#### `basic_istream_view` constructor
 
 ```cpp
 explicit constexpr basic_istream_view(std::basic_istream<CharT, Traits>& stream);
@@ -692,7 +667,7 @@ explicit constexpr basic_istream_view(std::basic_istream<CharT, Traits>& stream)
 
 1. _Effects_: Initialises `stream_` to `std::addressof(stream)`.
 
-##### `basic_istream_view` begin
+#### `basic_istream_view` begin
 
 ```cpp
 constexpr auto begin();
@@ -705,7 +680,7 @@ constexpr auto begin();
 return __iterator{*this};
 ```
 
-##### `basic_istream_view` end
+#### `basic_istream_view` end
 
 ```cpp
 constexpr default_sentinel end() const noexcept;
@@ -713,7 +688,7 @@ constexpr default_sentinel end() const noexcept;
 
 3. _Returns_: `default_sentinel{}`.
 
-##### `basic_istream_view::__iterator`
+#### `basic_istream_view::__iterator`
 
 ```cpp
 template<class Val, class CharT, class Traits>
@@ -741,7 +716,7 @@ private:
 };
 ```
 
-##### `basic_istream_view::__iterator` constructor
+#### `basic_istream_view::__iterator` constructor
 
 ```cpp
 explicit constexpr __iterator(istream_view<Val>& parent) noexcept;
@@ -749,7 +724,7 @@ explicit constexpr __iterator(istream_view<Val>& parent) noexcept;
 
 4. _Effects_: Initialises `parent_` with `std::addressof(parent_)`.
 
-##### `basic_istream_view::__iterator` next
+#### `basic_istream_view::__iterator` next
 
 ```cpp
 __iterator& operator++();
@@ -762,7 +737,7 @@ void operator++(int);
 *parent_->stream_ >> parent_->object_;
 ```
 
-##### `basic_istream_view::__iterator` value
+#### `basic_istream_view::__iterator` value
 
 ```cpp
 Val& operator*() const;
@@ -770,7 +745,7 @@ Val& operator*() const;
 
 6. _Effects_: Equivalent to `return parent_->value_;`
 
-##### `basic_istream_view::__iterator` comparison functions
+#### `basic_istream_view::__iterator` comparison functions
 
 ```cpp
 friend bool operator==(__iterator x, default_sentinel);
@@ -796,7 +771,7 @@ friend bool operator!=(default_sentinel y, __iterator x);
 
 10. _Returns_: `!(x == y)`.
 
-### `basic_istream_view` range adaptor objects
+## `basic_istream_view` range adaptor objects
 
 The names `view::istream`, `view::wistream`, `view::u16istream`, and `view::u32istream` denote range
 adaptor objects. Let `E` be an expression and `T` be a type distinct from `decltype((E))`.
@@ -818,20 +793,20 @@ adaptor objects. Let `E` be an expression and `T` be a type distinct from `declt
       `DerivedFrom<basic_istream<char32_t>>` and `T` models `StreamExtractable`.
    2. Otherwise `view::u32istream<T>(E)` is ill-formed.
 
-### `zip_with_view`
+## `zip_with_view`
 
-### `view::zip`
+## `view::zip`
 
-### `view::zip_with`
+## `view::zip_with`
 
-### `key_view`
+## `key_view`
 
-### `view::keys`
+## `view::keys`
 
-### `value_view`
+## `value_view`
 
-### `view::values`
+## `view::values`
 
-[P0789]: https://wg21.link/p0789
+\[P0789]: https://wg21.link/p0789
 [cmcstl2]: https://github.com/CaseyCarter/cmcstl2
 [range-v3]: https://github.com/ericniebler/range-v3
