@@ -18,12 +18,12 @@ Date: 2018-10-08
 
 I would like to acknowledge the following people for their assistance with this proposal:
 
-1. Casey Carter, for reviewing all submissions to [cmcstl2] and providing feedback that enabled the proposed range adaptors to have high-quality implementations. 
-2. Eric Niebler, for providing [range-v3] as a reference implementation for the reference implementation. 
+1. Casey Carter, for reviewing all submissions to [[cmcstl2]] and providing feedback that enabled the proposed range adaptors to have high-quality implementations.
+2. Eric Niebler, for providing [[range-v3]] as a reference implementation for the reference implementation.
 
 # Motivation
 
-\[P0789] introduces the notion of a range adaptor and twelve pioneering range adaptors that
+[[P0789]] introduces the notion of a range adaptor and twelve pioneering range adaptors that
 improve declarative, range-based programming. For example, it is possible to perform an inline,
 in-place, lazy reverse like so:
 
@@ -32,16 +32,19 @@ namespace ranges = std::ranges;
 namespace view = std::ranges::view;
 
 // Old
-auto i = ranges::find(ranges::rbegin(employees), ranges::rend(employees), "Lovelace", &employee::surname);
+auto i = ranges::find( ranges::rbegin(employees),
+                       ranges::rend(employees),
+                       "Lovelace", &employee::surname);
 
 // New
-auto j = ranges::find(employees | view::reverse, "Lovelace", &employee::surname);
+auto j = ranges::find(employees | view::reverse,
+                      "Lovelace", &employee::surname);
 [[assert: i == j]];
 ```
 
-P1035 recognises that P0789 introduces only a few of the widely experimented-with range adaptors in
-[range-v3], and would like to add a few more to complete the C++20 phase of range adaptors. To this
-end, P1035 discusses range adaptors that are related to those in P0789.
+P1035 recognises that [[P0789]] introduces only a few of the widely experimented-with range adaptors in
+[[range-v3]], and would like to add a few more to complete the C++20 phase of range adaptors. To this
+end, P1035 discusses range adaptors that are related to those in [[P0789]].
 
 # Proposals
 
@@ -80,80 +83,64 @@ checks if a certain predicate is satisfied.
    </tr>
    <tr>
    <td>
-   <code>
-    namespace ranges = std::experimental::ranges;<br />
-<br />
-    template &lt;ranges::Integral I&gt;<br />
-    constexpr bool is_odd(I const i) noexcept<br />
-    {<br />
-       return i % 2;<br />
-    }<br />
-<br />
-    struct is_odd_sentinel {<br />
-       template &lt;ranges::Iterator I&gt;<br />
-       constexpr friend bool operator==(I const&amp; a,<br />
-          is_odd_sentinel) noexcept<br />
-       {<br />
-          return is_odd(*a);<br />
-       }<br />
-<br />
-       template &lt;ranges::Iterator I&gt;<br />
-       constexpr friend bool operator==(is_odd_sentinel const a,<br />
-          I const&amp; b) noexcept<br />
-       {<br />
-          return b == a;<br />
-       }<br />
-<br />
-       template &lt;ranges::Iterator I&gt;<br />
-       constexpr friend bool operator!=(I const&amp; a,<br />
-          is_odd_sentinel const b) noexcept<br />
-       {<br />
-          return not (a == b);<br />
-       }<br />
-<br />
-       template &lt;ranges::Iterator I&gt;<br />
-       constexpr friend bool operator!=(is_odd_sentinel const a,<br />
-          I const&amp; b) noexcept<br />
-       {<br />
-          return not (b == a);<br />
-       }<br />
-    };<br />
-<br />
-    int main()<br />
-    {<br />
-       auto v = std::vector{0, 6, 8, 9, 10, 16};<br />
-       ranges::copy(<br />
-         ranges::begin(v),<br />
-         is_odd_sentinel{},<br />
-         ranges::ostream_iterator&lt;int&gt;(std::cout, "\n"));<br />
-    }<br />
-   </code>
+   <xmp>
+namespace ranges = std::experimental::ranges;
+
+template <ranges::Integral I>
+constexpr bool is_odd(I const i) noexcept {
+    return i % 2;
+}
+
+struct is_odd_sentinel {
+template <ranges::Iterator I>
+constexpr friend bool operator==(I const& a,
+is_odd_sentinel) noexcept {
+    return is_odd(*a);
+}
+
+template <ranges::Iterator I>
+constexpr friend bool operator==(is_odd_sentinel const a,
+I const& b) noexcept {
+    return b == a;
+}
+
+template <ranges::Iterator I>
+constexpr friend bool operator!=(I const& a,
+is_odd_sentinel const b) noexcept {
+    return not (a == b);
+}
+
+template <ranges::Iterator I>
+constexpr friend bool operator!=(is_odd_sentinel const a,
+I const& b) noexcept {
+    return not (b == a);
+}
+};
+
+int main() {
+    auto v = std::vector{0, 6, 8, 9, 10, 16};
+    ranges::copy(
+    ranges::begin(v),
+    is_odd_sentinel{},
+    ranges::ostream_iterator<int>(std::cout, "\n"));
+}
+   </xmp>
    </td>
    <td>
-   <code>
-    namespace ranges = std::experimental::ranges;
+   <xmp>
+namespace ranges = std::experimental::ranges;
+template<auto I>
+constexpr bool is_odd(I const i) noexcept { return i % 2; }
 
-    template <ranges::Integral I>
-    constexpr bool is_odd(I const i) noexcept
-    {
-       return i % 2;
-    }
+template<auto I>
+constexpr bool is_even(I const i) noexcept { return not is_odd(i); }
 
-    template <ranges::Integral I>
-    constexpr bool is_even(I const i) noexcept
-    {
-       return not is_odd(i);
-    }
-
-    int main()
-    {
-       namespace view = ranges::view;
-       auto v = std::vector{0, 6, 8, 9, 10, 16};
-       ranges::copy(
-          v | view::take_while(is_even<int>),
-          ranges::ostream_iterator<int>(std::cout, "\n"));
-    }
-   </code>
+int main() {
+    namespace view = ranges::view;
+    auto v = std::vector{0, 6, 8, 9, 10, 16};
+    ranges::copy( v | view::take_while(is_evenn, ranges::ostream_iterator(std::cout, "\n"));
+}
+   </xmp>
    </td>
    </tr>
    <tr>
@@ -336,7 +323,7 @@ friend constexpr bool operator!=(const iterator_t<Base>& x, const __sentinel& y)
 ## `view::take_while`
 
 The name `view::take_while` denotes a range adaptor object. Let `E` and `F`
-be expressions such that type `T` is `decltype((E))`. Then, the expression 
+be expressions such that type `T` is `decltype((E))`. Then, the expression
 `view::take_while(E, F)`is expression-equivalent to:
 
 1. `take_while_view{E, F}` if `T` models `InputRange` and if `F` is an object, and
@@ -356,15 +343,15 @@ first _n_ elements, it provides the user with all _but_ the first _n_ elements.
       <th>Proposed (C++20)</th>
    </tr>
    <tr>
-      <td><code>
+      <td><xmp>
     namespace ranges = std::ranges;
     auto i = ranges::next(ranges::begin(employees), 5, ranges::end(employees));
     auto j = ranges::find(i, ranges::end(employees), "Lovelace", &employees::surname);
-      </code></td>
-      <td><code>
+      </xmp></td>
+      <td><xmp>
     namespace view = ranges::view;
     auto j = ranges::find(employees | view::drop(5), "Lovelace", &employees::surname);
-      </code></td>
+      </xmp></td>
    </tr>
 </table>
 
@@ -481,19 +468,30 @@ Unlike the others, there are two demonstrations of `drop_while_view` below.
   <tr><th>Current (C++17)</th><th>Proposed (C++20) v1</th></tr>
   <tr>
     <td>
-      <code>
-    auto begin = ranges::find_if_not(employees, [](auto const holidays){ return holidays < 20; }, &employee::holidays);
-    ranges::transform(begin, ranges::end(employees), ranges::ostream_iterator<std::string>(std::cout, "\n"), [](auto const& e) {
-       return e.given_name() + e.surname(); });
-      </code>
+      <xmp>
+    auto begin = ranges::find_if_not(employees,
+        [](auto const holidays){ return holidays < 20; }, &employee::holidays);
+    ranges::transform(begin,
+                      ranges::end(employees),
+                      ranges::ostream_iterator<std::string>(std::cout, "\n"),
+                      [](auto const& e) {
+                          return e.given_name() + e.surname();
+                       }
+                    );
+      </xmp>
   </td>
       <td>
-         <code>
-    auto too_many_holidays = employees | view::drop_while([](auto const e) { return e.holidays() < 20; });
+         <xmp>
+    auto too_many_holidays = employees |
+                             view::drop_while([](auto const e) {
+                                return e.holidays() < 20;
+                             });
     ranges::transform(too_many_holidays,
-       ranges::ostream_iterator<std::string>(std::cout, "\n"),
-       [](auto const& e) { return e.given_name() + e.surname(); });
-         </code>
+                      ranges::ostream_iterator<std::string>(std::cout, "\n"),
+                      [](auto const& e) {
+                            return e.given_name() + e.surname();
+                      });
+         </xmp>
       </td>
   </tr>
 </table>
@@ -598,7 +596,7 @@ author does not need to care how things are inserted at the end of `v`, only tha
 
 <table>
   <tr><th>Without <code>istream_iterator</code></th><th>With <code>istream_iterator</code></th></tr>
-  <tr><td><code>
+  <tr><td><xmp>
     auto v = []{
        auto result = std::vector<int>{};
        for (auto i = 0; std::cin >> i;) {
@@ -609,14 +607,13 @@ author does not need to care how things are inserted at the end of `v`, only tha
     for (auto i = 0; std::cin >> i;) {
        result.push_back(i);
     }
-  </code></td>
-  <td><code>
-
+  </xmp></td>
+  <td><xmp>
     auto v = std::vector(istream_iterator<int>{std::cin}, istream_iterator<int>{});
     // ...
     copy(istream_iterator<int>{std::cin}, istream_iterator<int>{}, back_inserter(v));
 
-  </code></td>
+  </xmp></td>
   </tr>
 </table>
 
@@ -805,8 +802,26 @@ adaptor objects. Let `E` be an expression and `T` be a type distinct from `declt
 
 ## `value_view`
 
+
 ## `view::values`
 
-\[P0789]: https://wg21.link/p0789
-[cmcstl2]: https://github.com/CaseyCarter/cmcstl2
-[range-v3]: https://github.com/ericniebler/range-v3
+
+<pre class=biblio>
+{
+"P0789": {
+    "title": "Range Adaptors and Utilities",
+    "authors": ["Eric Niebler"],
+    "href": "https://wg21.link/p0789"
+},
+"range-v3": {
+    "title": "ranges-v3 C++ library",
+    "authors": ["Eric Niebler & others"],
+    "href": "https://github.com/ericniebler/range-v3"
+},
+"cmcstl2": {
+    "title": "cmcstl2 C++ library",
+    "authors": ["Casey Carter & others"],
+    "href": " https://github.com/CaseyCarter/cmcstl2"
+}
+}
+</pre>
