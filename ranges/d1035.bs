@@ -796,14 +796,91 @@ adaptor objects. Let `E` be an expression and `T` be a type distinct from `declt
 
 ## `view::zip_with`
 
-## `key_view`
+## `elements_view`, `view::elements`, `key_view`, `view::keys`, `value_view`, `view::values`;
 
-## `view::keys`
+It is frequent to want to iterate over the keys, or the values of an associative container.
+There is currently no easy way to do that.
+It can be approximated using `ranges::view::transform`, given how frequently such operation is needed we think their
+addition would make manipulation of associative containers easier by more clearly expressing the intent.
 
-## `value_view`
+<table>
+   <tr>
+      <th>Current</th>
+      <th>Proposed</th>
+   </tr>
+   <tr>
+   <td>
+   <xmp>
+   for(auto && name : map | view::transform(&std::pair<const int,int>::first)) {
+        std::format("Hello {}", name);
+   }
+   </xmp>
+   </td>
+   <td>
+   <xmp>
+    for(auto && name :  map | view::keys) {
+        std::format("Hello {}", name);
+    }
+   </xmp>
+   </tr>
+</table>
+
+The authors considered these views important enough to present them to to LEWG at the San Diego.
+Unfortunately, we do not have, at the time of the publication of this paper a complete wording.
+We hope to have a complete wording either by San Diego 2018 or Kona 2018.
+
+These views have been part of `ranges-v3` and we also have implented them in `cmcstl2`.
+A lot of languages and frameworks ( notably JS, python, Qt, Java, `boost::adaptors::map_values`) offer methods to extract the keys or values of an associative containers,
+often through `.keys()` and `.values()` method respectively (these methods are rarely lazy).
+
+For the sake of genericity and completeness, we propose a set of three views:
+
+ * `elements_view` and the corresponding adaptor `view::elements<N>` iterate over the `N`-th elements of a sequence of tuple-like objects,
+    which includes all types for which `std::tuple_size` is defined, including `std::tuple`, `std::pair` and `std::array`.
+
+<xmp>
+std::vector<std::tuple<int, int, int>> vector_of_tuple = {
+    {0, 1, 2 },
+    {3, 4, 5 },
+    {6, 7, 8 },
+    {9, 10, 11 }
+};
+
+lst = view::elements<2>(vector_of_tuple);
+//lst == {2, 5, 8, 11}
+</xmp>
+
+ * `keys_view` and the corresponding adaptor `view::keys` iterate over the first elements of a sequence of tuple-like objects of size 2
+    (tuple of size other than two cannot be considered as representing a key-value pair).
+
+It can be defined as:
+
+<xmp>
+template <InputRange R>
+requires std::tuple_size_v<iter_value_t<iterator_t<R>>> == 2
+using keys_view = elements_view<R, 0>;
+</xmp>
+
+ * `values_view` and the corresponding adaptor `view::values` iterate over the second elements of a sequence of tuple-like objects of size 2
+    (tuple of size other than two cannot be considered as representing a key-value pair).
+
+It can be defined as:
+
+<xmp>
+template <InputRange R>
+requires std::tuple_size_v<iter_value_t<iterator_t<R>>> == 2
+using values_view = elements_view<R, 1>;
+</xmp>
+
+And used as:
+
+<xmp>
+auto total = ranges::accumulate(map | ranges::view::values );
+</xmp>
 
 
-## `view::values`
+Note: In the absence of partial Class Template Argument Deduction [[P1021]], we do not propose to add deduction guides for neither `elements_view`, `keys_view` or `values_view`.
+We found `elements_view` would benefit greatly from partial CTAD.
 
 
 <pre class=biblio>
@@ -822,6 +899,11 @@ adaptor objects. Let `E` be an expression and `T` be a type distinct from `declt
     "title": "cmcstl2 C++ library",
     "authors": ["Casey Carter & others"],
     "href": " https://github.com/CaseyCarter/cmcstl2"
+},
+"P1021": {
+    "title": "Extensions to Class Template Argument Deduction",
+    "authors": ["Mike Spertus", "Timur Doumer"],
+    "href": "https://wg21.link/p1021"
 }
 }
 </pre>
