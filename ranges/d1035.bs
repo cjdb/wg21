@@ -798,7 +798,7 @@ adaptor objects. Let `E` be an expression and `T` be a type distinct from `declt
 
 ## `elements_view`, `view::elements`, `key_view`, `view::keys`, `value_view`, `view::values`;
 
-It is frequent to want to iterate over the keys, or the values of an associative container.
+It is frequent to want to iterate over the keys or the values of an associative container.
 There is currently no easy way to do that.
 It can be approximated using `ranges::view::transform`, given how frequently such operation is needed we think their
 addition would make manipulation of associative containers easier by more clearly expressing the intent.
@@ -825,12 +825,12 @@ addition would make manipulation of associative containers easier by more clearl
    </tr>
 </table>
 
-The authors considered these views important enough to present them to to LEWG at the San Diego.
+The authors considered these views important enough to present them to LEWG at the San Diego.
 Unfortunately, we do not have, at the time of the publication of this paper a complete wording.
 We hope to have a complete wording either by San Diego 2018 or Kona 2018.
 
-These views have been part of `ranges-v3` and we also have implented them in `cmcstl2`.
-A lot of languages and frameworks ( notably JS, python, Qt, Java, `boost::adaptors::map_values`) offer methods to extract the keys or values of an associative containers,
+These views have been part of `ranges-v3` and we also have implemented them in `cmcstl2`.
+A lot of languages and frameworks ( notably JS, Python, Qt, Java, `boost::adaptors::map_values`) offer methods to extract the keys or values of an associative container,
 often through `.keys()` and `.values()` method respectively (these methods are rarely lazy).
 
 For the sake of genericity and completeness, we propose a set of three views:
@@ -861,8 +861,13 @@ requires std::tuple_size_v<iter_value_t<iterator_t<R>>> == 2
 using keys_view = elements_view<R, 0>;
 </xmp>
 
+<<<<<<< HEAD
  * `values_view` and the corresponding adaptor `view::values` iterate over the second elements of a sequence of tuple-like objects of size 2
     (tuple of size other than two cannot be considered as representing a key-value pair).
+=======
+ * `values_view` and the corresponding adaptor `view::values` iterate over the second element of a sequence of tuple-like objects of size 2
+(tuple of size other than two cannot be considered as representing a key-value pair).
+>>>>>>> typos
 
 It can be defined as:
 
@@ -879,6 +884,7 @@ auto total = ranges::accumulate(map | ranges::view::values );
 </xmp>
 
 
+<<<<<<< HEAD
 Note: In the absence of partial Class Template Argument Deduction [[P1021]], we do not propose to add deduction guides for neither `elements_view`, `keys_view` or `values_view`.
 We found `elements_view` would benefit greatly from partial CTAD.
 
