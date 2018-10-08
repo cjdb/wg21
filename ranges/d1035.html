@@ -1230,7 +1230,7 @@ Possible extra rowspan handling
   <meta content="Bikeshed version e9290f0f6bc01459c8b7bdfa2bb91f6985fc5c67" name="generator">
   <link href="https://wg21.link/p1035" rel="canonical">
   <link href="https://isocpp.org/favicon.ico" rel="icon">
-  <meta content="f43c115e1760a259842f02b0623739cf01520bdf" name="document-revision">
+  <meta content="0903a03e9b1535ff7fe1f45233ab11b0bd27a2fd" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1518,23 +1518,25 @@ pre .property::before, pre .property::after {
        </ol>
       <li><a href="#viewdrop_while"><span class="secno">3.6</span> <span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>drop_while</c-></code></span></a>
       <li>
-       <a href="#istream_view"><span class="secno">3.7</span> <span class="content"><code class="highlight"><c- n>istream_view</c-></code></span></a>
+       <a href="#basic_istream_view"><span class="secno">3.7</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code></span></a>
        <ol class="toc">
         <li><a href="#motivation④"><span class="secno">3.7.1</span> <span class="content">Motivation</span></a>
         <li>
          <a href="#interface②"><span class="secno">3.7.2</span> <span class="content">Interface</span></a>
          <ol class="toc">
-          <li><a href="#basic_istream_view-constructor"><span class="secno">3.7.2.1</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code> constructor</span></a>
-          <li><a href="#basic_istream_view-begin"><span class="secno">3.7.2.2</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code> begin</span></a>
-          <li><a href="#basic_istream_view-end"><span class="secno">3.7.2.3</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code> end</span></a>
-          <li><a href="#basic_istream_view__iterator"><span class="secno">3.7.2.4</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code></span></a>
-          <li><a href="#basic_istream_view__iterator-constructor"><span class="secno">3.7.2.5</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code> constructor</span></a>
-          <li><a href="#basic_istream_view__iterator-next"><span class="secno">3.7.2.6</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code> next</span></a>
-          <li><a href="#basic_istream_view__iterator-value"><span class="secno">3.7.2.7</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code> value</span></a>
-          <li><a href="#basic_istream_view__iterator-comparison-functions"><span class="secno">3.7.2.8</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code> comparison functions</span></a>
+          <li><a href="#concept-streamextractable"><span class="secno">3.7.2.1</span> <span class="content">Concept <code class="highlight"><c- n>StreamExtractable</c-></code></span></a>
+          <li><a href="#concept-streaminsertable"><span class="secno">3.7.2.2</span> <span class="content">Concept <code class="highlight"><c- n>StreamInsertable</c-></code></span></a>
+          <li><a href="#basic_istream_view-constructor"><span class="secno">3.7.2.3</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code> constructor</span></a>
+          <li><a href="#basic_istream_view-begin"><span class="secno">3.7.2.4</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code> begin</span></a>
+          <li><a href="#basic_istream_view-end"><span class="secno">3.7.2.5</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code> end</span></a>
+          <li><a href="#basic_istream_view__iterator"><span class="secno">3.7.2.6</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code></span></a>
+          <li><a href="#basic_istream_view__iterator-constructor"><span class="secno">3.7.2.7</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code> constructor</span></a>
+          <li><a href="#basic_istream_view__iterator-next"><span class="secno">3.7.2.8</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code> next</span></a>
+          <li><a href="#basic_istream_view__iterator-value"><span class="secno">3.7.2.9</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code> value</span></a>
+          <li><a href="#basic_istream_view__iterator-comparison-functions"><span class="secno">3.7.2.10</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code> comparison functions</span></a>
          </ol>
        </ol>
-      <li><a href="#basic_istream_view-range-adaptor-objects"><span class="secno">3.8</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code> range adaptor objects</span></a>
+      <li><a href="#basic_istream_view-range-adaptors"><span class="secno">3.8</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code> range adaptors</span></a>
       <li><a href="#zip_with_view"><span class="secno">3.9</span> <span class="content"><code class="highlight"><c- n>zip_with_view</c-></code></span></a>
       <li><a href="#viewzip"><span class="secno">3.10</span> <span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip</c-></code></span></a>
       <li><a href="#viewzip_with"><span class="secno">3.11</span> <span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip_with</c-></code></span></a>
@@ -1543,6 +1545,11 @@ pre .property::before, pre .property::after {
       <li><a href="#value_view"><span class="secno">3.14</span> <span class="content"><code class="highlight"><c- n>value_view</c-></code></span></a>
       <li><a href="#viewvalues"><span class="secno">3.15</span> <span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>values</c-></code></span></a>
      </ol>
+    <li>
+     <a href="#references"><span class="secno"></span> <span class="content">References</span></a>
+     <ol class="toc">
+      <li><a href="#informative"><span class="secno"></span> <span class="content">Informative References</span></a>
+     </ol>
    </ol>
   </nav>
   <main>
@@ -1550,12 +1557,12 @@ pre .property::before, pre .property::after {
    <p>I would like to acknowledge the following people for their assistance with this proposal:</p>
    <ol>
     <li data-md>
-     <p>Casey Carter, for reviewing all submissions to [cmcstl2] and providing feedback that enabled the proposed range adaptors to have high-quality implementations.</p>
+     <p>Casey Carter, for reviewing all submissions to <a data-link-type="biblio" href="#biblio-cmcstl2">[cmcstl2]</a> and providing feedback that enabled the proposed range adaptors to have high-quality implementations.</p>
     <li data-md>
-     <p>Eric Niebler, for providing [range-v3] as a reference implementation for the reference implementation.</p>
+     <p>Eric Niebler, for providing <a data-link-type="biblio" href="#biblio-range-v3">[range-v3]</a> as a reference implementation.</p>
    </ol>
    <h2 class="heading settled" data-level="2" id="motivation"><span class="secno">2. </span><span class="content">Motivation</span><a class="self-link" href="#motivation"></a></h2>
-   <p>[P0789] introduces the notion of a range adaptor and twelve pioneering range adaptors that
+   <p><a data-link-type="biblio" href="#biblio-p0789">[P0789]</a> introduces the notion of a range adaptor and twelve pioneering range adaptors that
 improve declarative, range-based programming. For example, it is possible to perform an inline,
 in-place, lazy reverse like so:</p>
 <pre class="language-cpp highlight"><c- k>namespace</c-> <c- n>ranges</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>ranges</c-><c- p>;</c->
@@ -1568,9 +1575,8 @@ in-place, lazy reverse like so:</p>
 <c- k>auto</c-> <c- n>j</c-> <c- o>=</c-> <c- n>ranges</c-><c- o>::</c-><c- n>find</c-><c- p>(</c-><c- n>employees</c-> <c- o>|</c-> <c- n>view</c-><c- o>::</c-><c- n>reverse</c-><c- p>,</c-> <c- s>"Lovelace"</c-><c- p>,</c-> <c- o>&amp;</c-><c- n>employee</c-><c- o>::</c-><c- n>surname</c-><c- p>);</c->
 <c- p>[[</c-><c- nl>assert</c-><c- p>:</c-> <c- n>i</c-> <c- o>==</c-> <c- n>j</c-><c- p>]];</c->
 </pre>
-   <p>P1035 recognises that P0789 introduces only a few of the widely experimented-with range adaptors in
-[range-v3], and would like to add a few more to complete the C++20 phase of range adaptors. To this
-end, P1035 discusses range adaptors that are related to those in P0789.</p>
+   <p>P1035 recognises that P0789 introduces only a few of the widely experimented-with range adaptors in <a data-link-type="biblio" href="#biblio-range-v3">[range-v3]</a>, and would like to add a few more to complete the C++20 phase of range adaptors. To
+this end, P1035 discusses range adaptors that are related to those in P0789.</p>
    <h2 class="heading settled" data-level="3" id="proposals"><span class="secno">3. </span><span class="content">Proposals</span><a class="self-link" href="#proposals"></a></h2>
    <p>Unless otherwise requested, each sub-subsection below should be polled individually from other
 sub-subsections. Two major questions are to be asked per range adaptor. It is up to LEWG to decide
@@ -1605,8 +1611,78 @@ checks if a certain predicate is satisfied.</p>
       <th>Current
       <th>Proposed
      <tr>
-      <td> <code class="highlight"> <c- k>namespace</c-> <c- n>ranges</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>experimental</c-><c- o>::</c-><c- n>ranges</c-><c- p>;</c-> <br> <br> <c- k>template</c-> <c- o>&lt;</c-><c- n>ranges</c-><c- o>::</c-><c- n>Integral</c-> <c- n>I</c-><c- o>></c-> <br> <c- k>constexpr</c-> <c- b>bool</c-> <c- n>is_odd</c-><c- p>(</c-><c- n>I</c-> <c- k>const</c-> <c- n>i</c-><c- p>)</c-> <c- k>noexcept</c-> <br> <c- p>{</c-> <br> <c- k>return</c-> <c- n>i</c-> <c- o>%</c-> <c- mi>2</c-><c- p>;</c-> <br> <c- p>}</c-> <br> <br> <c- k>struct</c-> <c- n>is_odd_sentinel</c-> <c- p>{</c-> <br> <c- k>template</c-> <c- o>&lt;</c-><c- n>ranges</c-><c- o>::</c-><c- n>Iterator</c-> <c- n>I</c-><c- o>></c-> <br> <c- k>constexpr</c-> <c- k>friend</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>==</c-><c- p>(</c-><c- n>I</c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>a</c-><c- p>,</c-> <br> <c- n>is_odd_sentinel</c-><c- p>)</c-> <c- k>noexcept</c-> <br> <c- p>{</c-> <br> <c- k>return</c-> <c- n>is_odd</c-><c- p>(</c-><c- o>*</c-><c- n>a</c-><c- p>);</c-> <br> <c- p>}</c-> <br> <br> <c- k>template</c-> <c- o>&lt;</c-><c- n>ranges</c-><c- o>::</c-><c- n>Iterator</c-> <c- n>I</c-><c- o>></c-> <br> <c- k>constexpr</c-> <c- k>friend</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>==</c-><c- p>(</c-><c- n>is_odd_sentinel</c-> <c- k>const</c-> <c- n>a</c-><c- p>,</c-> <br> <c- n>I</c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>b</c-><c- p>)</c-> <c- k>noexcept</c-> <br> <c- p>{</c-> <br> <c- k>return</c-> <c- n>b</c-> <c- o>==</c-> <c- n>a</c-><c- p>;</c-> <br> <c- p>}</c-> <br> <br> <c- k>template</c-> <c- o>&lt;</c-><c- n>ranges</c-><c- o>::</c-><c- n>Iterator</c-> <c- n>I</c-><c- o>></c-> <br> <c- k>constexpr</c-> <c- k>friend</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>!=</c-><c- p>(</c-><c- n>I</c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>a</c-><c- p>,</c-> <br> <c- n>is_odd_sentinel</c-> <c- k>const</c-> <c- n>b</c-><c- p>)</c-> <c- k>noexcept</c-> <br> <c- p>{</c-> <br> <c- k>return</c-> <c- n>not</c-> <c- p>(</c-><c- n>a</c-> <c- o>==</c-> <c- n>b</c-><c- p>);</c-> <br> <c- p>}</c-> <br> <br> <c- k>template</c-> <c- o>&lt;</c-><c- n>ranges</c-><c- o>::</c-><c- n>Iterator</c-> <c- n>I</c-><c- o>></c-> <br> <c- k>constexpr</c-> <c- k>friend</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>!=</c-><c- p>(</c-><c- n>is_odd_sentinel</c-> <c- k>const</c-> <c- n>a</c-><c- p>,</c-> <br> <c- n>I</c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>b</c-><c- p>)</c-> <c- k>noexcept</c-> <br> <c- p>{</c-> <br> <c- k>return</c-> <c- n>not</c-> <c- p>(</c-><c- n>b</c-> <c- o>==</c-> <c- n>a</c-><c- p>);</c-> <br> <c- p>}</c-> <br> <c- p>};</c-> <br> <br> <c- b>int</c-> <c- nf>main</c-><c- p>()</c-> <br> <c- p>{</c-> <br> <c- k>auto</c-> <c- n>v</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>vector</c-><c- p>{</c-><c- mi>0</c-><c- p>,</c-> <c- mi>6</c-><c- p>,</c-> <c- mi>8</c-><c- p>,</c-> <c- mi>9</c-><c- p>,</c-> <c- mi>10</c-><c- p>,</c-> <c- mi>16</c-><c- p>};</c-> <br> <c- n>ranges</c-><c- o>::</c-><c- n>copy</c-><c- p>(</c-> <br> <c- n>ranges</c-><c- o>::</c-><c- n>begin</c-><c- p>(</c-><c- n>v</c-><c- p>),</c-> <br> <c- n>is_odd_sentinel</c-><c- p>{},</c-> <br> <c- n>ranges</c-><c- o>::</c-><c- n>ostream_iterator</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>cout</c-><c- p>,</c-> <c- s>"</c-><c- se>\n</c-><c- s>"</c-><c- p>));</c-> <br> <c- p>}</c-> <br> </code> 
-      <td> <code class="highlight"> <c- k>namespace</c-> <c- n>ranges</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>experimental</c-><c- o>::</c-><c- n>ranges</c-><c- p>;</c-> <c- k> </c-><p><c- k>emplate</c-> <rangesU0003AU0003Aintegral i> <c- k>constexpr</c-> <c- b>bool</c-> <c- nf>is_odd</c-><c- p>(</c-><c- n>I</c-> <c- k>const</c-> <c- n>i</c-><c- p>)</c-> <c- k>noexcept</c-> <c- p>{</c-> <c- k>return</c-> <c- n>i</c-> <c- o>%</c-> <c- mi>2</c-><c- p>;</c-> <c- p>}</c-> </rangesU0003AU0003Aintegral></p> <c- k> </c-><p><c- k>emplate</c-> <rangesU0003AU0003Aintegral i> <c- k>constexpr</c-> <c- b>bool</c-> <c- nf>is_even</c-><c- p>(</c-><c- n>I</c-> <c- k>const</c-> <c- n>i</c-><c- p>)</c-> <c- k>noexcept</c-> <c- p>{</c-> <c- k>return</c-> <c- n>not</c-> <c- n>is_odd</c-><c- p>(</c-><c- n>i</c-><c- p>);</c-> <c- p>}</c-> </rangesU0003AU0003Aintegral></p> <c- b> </c-><p><c- b>nt</c-> <c- nf>main</c-><c- p>()</c-> <c- p>{</c-> <c- k>namespace</c-> <c- n>view</c-> <c- o>=</c-> <c- n>ranges</c-><c- o>::</c-><c- n>view</c-><c- p>;</c-> <c- k>auto</c-> <c- n>v</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>vector</c-><c- p>{</c-><c- mi>0</c-><c- p>,</c-> <c- mi>6</c-><c- p>,</c-> <c- mi>8</c-><c- p>,</c-> <c- mi>9</c-><c- p>,</c-> <c- mi>10</c-><c- p>,</c-> <c- mi>16</c-><c- p>};</c-> <c- n>ranges</c-><c- o>::</c-><c- n>copy</c-><c- p>(</c-> <c- n>v</c-> <c- o>|</c-> <c- n>view</c-><c- o>::</c-><c- n>take_while</c-><c- p>(</c-><c- n>is_even</c-><c- p>n</c-><int><c- p>,</c-> <c- n>ranges</c-><c- o>::</c-><c- n>ostream_iterator</c-><c- p>(</c-><int><c- n>std</c-><c- o>::</c-><c- n>cout</c-><c- p>,</c-> <c- s>"</c-><c- se>\n</c-><c- s>"</c-><c- p>));</c-> <c- p>}</c-> </int></int></p> </code> 
+      <td>
+<pre class="highlight"><c- k>namespace</c-> <c- n>ranges</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>experimental</c-><c- o>::</c-><c- n>ranges</c-><c- p>;</c->
+
+<c- k>template</c-> <c- o>&lt;</c-><c- n>ranges</c-><c- o>::</c-><c- n>Integral</c-> <c- n>I</c-><c- o>></c->
+<c- k>constexpr</c-> <c- b>bool</c-> <c- n>is_odd</c-><c- p>(</c-><c- n>I</c-> <c- k>const</c-> <c- n>i</c-><c- p>)</c-> <c- k>noexcept</c->
+<c- p>{</c->
+   <c- k>return</c-> <c- n>i</c-> <c- o>%</c-> <c- mi>2</c-><c- p>;</c->
+<c- p>}</c->
+
+<c- k>struct</c-> <c- n>is_odd_sentinel</c-> <c- p>{</c->
+   <c- k>template</c-> <c- o>&lt;</c-><c- n>ranges</c-><c- o>::</c-><c- n>Iterator</c-> <c- n>I</c-><c- o>></c->
+   <c- k>constexpr</c-> <c- k>friend</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>==</c-><c- p>(</c-><c- n>I</c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>a</c-><c- p>,</c->
+      <c- n>is_odd_sentinel</c-><c- p>)</c-> <c- k>noexcept</c->
+   <c- p>{</c->
+      <c- k>return</c-> <c- n>is_odd</c-><c- p>(</c-><c- o>*</c-><c- n>a</c-><c- p>);</c->
+   <c- p>}</c->
+
+   <c- k>template</c-> <c- o>&lt;</c-><c- n>ranges</c-><c- o>::</c-><c- n>Iterator</c-> <c- n>I</c-><c- o>></c->
+   <c- k>constexpr</c-> <c- k>friend</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>==</c-><c- p>(</c-><c- n>is_odd_sentinel</c-> <c- k>const</c-> <c- n>a</c-><c- p>,</c->
+      <c- n>I</c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>b</c-><c- p>)</c-> <c- k>noexcept</c->
+   <c- p>{</c->
+      <c- k>return</c-> <c- n>b</c-> <c- o>==</c-> <c- n>a</c-><c- p>;</c->
+   <c- p>}</c->
+
+   <c- k>template</c-> <c- o>&lt;</c-><c- n>ranges</c-><c- o>::</c-><c- n>Iterator</c-> <c- n>I</c-><c- o>></c->
+   <c- k>constexpr</c-> <c- k>friend</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>!=</c-><c- p>(</c-><c- n>I</c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>a</c-><c- p>,</c->
+      <c- n>is_odd_sentinel</c-> <c- k>const</c-> <c- n>b</c-><c- p>)</c-> <c- k>noexcept</c->
+   <c- p>{</c->
+      <c- k>return</c-> <c- n>not</c-> <c- p>(</c-><c- n>a</c-> <c- o>==</c-> <c- n>b</c-><c- p>);</c->
+   <c- p>}</c->
+
+   <c- k>template</c-> <c- o>&lt;</c-><c- n>ranges</c-><c- o>::</c-><c- n>Iterator</c-> <c- n>I</c-><c- o>></c->
+   <c- k>constexpr</c-> <c- k>friend</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>!=</c-><c- p>(</c-><c- n>is_odd_sentinel</c-> <c- k>const</c-> <c- n>a</c-><c- p>,</c->
+      <c- n>I</c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>b</c-><c- p>)</c-> <c- k>noexcept</c->
+   <c- p>{</c->
+      <c- k>return</c-> <c- n>not</c-> <c- p>(</c-><c- n>b</c-> <c- o>==</c-> <c- n>a</c-><c- p>);</c->
+   <c- p>}</c->
+<c- p>};</c->
+
+<c- b>int</c-> <c- nf>main</c-><c- p>()</c->
+<c- p>{</c->
+   <c- k>auto</c-> <c- n>v</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>vector</c-><c- p>{</c-><c- mi>0</c-><c- p>,</c-> <c- mi>6</c-><c- p>,</c-> <c- mi>8</c-><c- p>,</c-> <c- mi>9</c-><c- p>,</c-> <c- mi>10</c-><c- p>,</c-> <c- mi>16</c-><c- p>};</c->
+   <c- n>ranges</c-><c- o>::</c-><c- n>copy</c-><c- p>(</c->
+     <c- n>ranges</c-><c- o>::</c-><c- n>begin</c-><c- p>(</c-><c- n>v</c-><c- p>),</c->
+     <c- n>is_odd_sentinel</c-><c- p>{},</c->
+     <c- n>ranges</c-><c- o>::</c-><c- n>ostream_iterator</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>cout</c-><c- p>,</c-> <c- s>"</c-><c- se>\n</c-><c- s>"</c-><c- p>));</c->
+<c- p>}</c->
+</pre>
+      <td>
+<pre class="highlight"><c- k>namespace</c-> <c- n>ranges</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>experimental</c-><c- o>::</c-><c- n>ranges</c-><c- p>;</c->
+
+<c- k>template</c-> <c- o>&lt;</c-><c- n>ranges</c-><c- o>::</c-><c- n>Integral</c-> <c- n>I</c-><c- o>></c->
+<c- k>constexpr</c-> <c- b>bool</c-> <c- n>is_odd</c-><c- p>(</c-><c- n>I</c-> <c- k>const</c-> <c- n>i</c-><c- p>)</c-> <c- k>noexcept</c->
+<c- p>{</c->
+   <c- k>return</c-> <c- n>i</c-> <c- o>%</c-> <c- mi>2</c-><c- p>;</c->
+<c- p>}</c->
+
+<c- k>template</c-> <c- o>&lt;</c-><c- n>ranges</c-><c- o>::</c-><c- n>Integral</c-> <c- n>I</c-><c- o>></c->
+<c- k>constexpr</c-> <c- b>bool</c-> <c- n>is_even</c-><c- p>(</c-><c- n>I</c-> <c- k>const</c-> <c- n>i</c-><c- p>)</c-> <c- k>noexcept</c->
+<c- p>{</c->
+   <c- k>return</c-> <c- n>not</c-> <c- n>is_odd</c-><c- p>(</c-><c- n>i</c-><c- p>);</c->
+<c- p>}</c->
+
+<c- b>int</c-> <c- n>main</c-><c- p>()</c->
+<c- p>{</c->
+   <c- k>namespace</c-> <c- n>view</c-> <c- o>=</c-> <c- n>ranges</c-><c- o>::</c-><c- n>view</c-><c- p>;</c->
+   <c- k>auto</c-> <c- n>v</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>vector</c-><c- p>{</c-><c- mi>0</c-><c- p>,</c-> <c- mi>6</c-><c- p>,</c-> <c- mi>8</c-><c- p>,</c-> <c- mi>9</c-><c- p>,</c-> <c- mi>10</c-><c- p>,</c-> <c- mi>16</c-><c- p>};</c->
+   <c- n>ranges</c-><c- o>::</c-><c- n>copy</c-><c- p>(</c->
+      <c- n>v</c-> <c- o>|</c-> <c- n>view</c-><c- o>::</c-><c- n>take_while</c-><c- p>(</c-><c- n>is_even</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>),</c->
+      <c- n>ranges</c-><c- o>::</c-><c- n>ostream_iterator</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>cout</c-><c- p>,</c-> <c- s>"</c-><c- se>\n</c-><c- s>"</c-><c- p>));</c->
+<c- p>}</c->
+</pre>
      <tr>
       <td><a href="https://wandbox.org/permlink/7UXazMHnbxfOfODQ">Wandbox demo</a>
       <td><a href="https://wandbox.org/permlink/2nS3bzVuQX1DR0yJ">Wandbox demo</a>
@@ -1629,7 +1705,7 @@ this, a proposal could be made in the C++23 timeframe.</p>
 <c- n>requires</c->
    <c- n>InputRange</c-><c- o>&lt;</c-><c- n>R</c-><c- o>></c-> <c- o>&amp;&amp;</c->
    <c- n>std</c-><c- o>::</c-><c- n>is_object_v</c-><c- o>&lt;</c-><c- n>Pred</c-><c- o>></c-> <c- o>&amp;&amp;</c->
-   <c- n>IndirectUnaryPredicate</c-><c- o>&lt;</c-><c- n>Pred</c-><c- o>></c->
+   <c- n>IndirectUnaryPredicate</c-><c- o>&lt;</c-><c- k>const</c-> <c- n>Pred</c-><c- p>,</c-> <c- n>iterator_t</c-><c- o>&lt;</c-><c- n>R</c-><c- o>></c->
 <c- k>class</c-> <c- nc>take_while_view</c-> <c- o>:</c-> <c- k>public</c-> <c- n>view_interface</c-><c- o>&lt;</c-><c- n>take_while_view</c-><c- o>&lt;</c-><c- n>R</c-><c- p>,</c-> <c- n>Pred</c-><c- o>>></c-> <c- p>{</c->
    <c- k>template</c-> <c- o>&lt;</c-><c- b>bool</c-><c- o>></c-> <c- k>class</c-> <c- nc>__sentinel</c-><c- p>;</c-> <c- c1>// exposition-only</c->
 <c- k>public</c-><c- o>:</c->
@@ -1661,7 +1737,7 @@ this, a proposal could be made in the C++23 timeframe.</p>
 </pre>
    <ol>
     <li data-md>
-     <p>_Effects_: Initialises <code class="highlight"><c- n>base_</c-></code> with <code class="highlight"><c- n>base</c-></code> and initialises <code class="highlight"><c- n>pred_</c-></code> with <code class="highlight"><c- n>pred</c-></code>.</p>
+     <p><i>Effects</i>: Initialises <code class="highlight"><c- n>base_</c-></code> with <code class="highlight"><c- n>base</c-></code> and initialises <code class="highlight"><c- n>pred_</c-></code> with <code class="highlight"><c- n>pred</c-></code>.</p>
    </ol>
 <pre class="language-cpp highlight"><c- k>template</c-> <c- o>&lt;</c-><c- n>ViewableRange</c-> <c- n>O</c-><c- o>></c->
 <c- n>requires</c-> <c- n>constructible</c-><c- o>-</c-><c- n>from</c-><c- o>-</c-><c- n>range</c-><c- o>&lt;</c-><c- n>R</c-><c- p>,</c-> <c- n>O</c-><c- o>></c->
@@ -1669,20 +1745,20 @@ this, a proposal could be made in the C++23 timeframe.</p>
 </pre>
    <ol start="2">
     <li data-md>
-     <p>_Effects_: Initialises <code class="highlight"><c- n>base_</c-></code> with <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>all</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>O</c-><c- o>></c-><c- p>(</c-><c- n>o</c-><c- p>))</c-></code> and initialises <code class="highlight"><c- n>pred_</c-></code> with <code class="highlight"><c- n>pred</c-></code>.</p>
+     <p><i>Effects</i>: Initialises <code class="highlight"><c- n>base_</c-></code> with <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>all</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>O</c-><c- o>></c-><c- p>(</c-><c- n>o</c-><c- p>))</c-></code> and initialises <code class="highlight"><c- n>pred_</c-></code> with <code class="highlight"><c- n>pred</c-></code>.</p>
    </ol>
    <h5 class="heading settled" data-level="3.1.3.2" id="take_while_view-conversion"><span class="secno">3.1.3.2. </span><span class="content"><code class="highlight"><c- n>take_while_view</c-></code> conversion</span><a class="self-link" href="#take_while_view-conversion"></a></h5>
 <pre class="language-cpp highlight"><c- k>constexpr</c-> <c- n>R</c-> <c- nf>base</c-><c- p>()</c-> <c- k>const</c-><c- p>;</c->
 </pre>
    <ol>
     <li data-md>
-     <p>_Returns_: <code class="highlight"><c- n>base_</c-></code>.</p>
+     <p><i>Returns</i>: <code class="highlight"><c- n>base_</c-></code>.</p>
    </ol>
 <pre class="language-cpp highlight"><c- k>constexpr</c-> <c- k>const</c-> <c- n>Pred</c-><c- o>&amp;</c-> <c- n>pred</c-><c- p>()</c-> <c- k>const</c-><c- p>;</c->
 </pre>
    <ol start="2">
     <li data-md>
-     <p>_Returns_: <code class="highlight"><c- n>pred_</c-></code>.</p>
+     <p><i>Returns</i>: <code class="highlight"><c- n>pred_</c-></code>.</p>
    </ol>
    <h5 class="heading settled" data-level="3.1.3.3" id="take_while_view-range-begin"><span class="secno">3.1.3.3. </span><span class="content"><code class="highlight"><c- n>take_while_view</c-></code> range begin</span><a class="self-link" href="#take_while_view-range-begin"></a></h5>
 <pre class="language-cpp highlight"><c- k>constexpr</c-> <c- k>auto</c-> <c- nf>begin</c-><c- p>()</c-> <c- n>requires</c-> <c- o>!</c-><c- n>SimpleView</c-><c- o>&lt;</c-><c- n>R</c-><c- o>></c-><c- p>;</c->
@@ -1690,7 +1766,7 @@ this, a proposal could be made in the C++23 timeframe.</p>
 </pre>
    <ol>
     <li data-md>
-     <p>_Effects_: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>ranges</c-><c- o>::</c-><c- n>begin</c-><c- p>(</c-><c- n>base_</c-><c- p>);</c-></code>.</p>
+     <p><i>Effects</i>: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>ranges</c-><c- o>::</c-><c- n>begin</c-><c- p>(</c-><c- n>base_</c-><c- p>);</c-></code>.</p>
    </ol>
    <h5 class="heading settled" data-level="3.1.3.4" id="take_while_view-range-end"><span class="secno">3.1.3.4. </span><span class="content"><code class="highlight"><c- n>take_while_view</c-></code> range end</span><a class="self-link" href="#take_while_view-range-end"></a></h5>
 <pre class="language-cpp highlight"><c- k>constexpr</c-> <c- k>auto</c-> <c- nf>end</c-><c- p>()</c-> <c- n>requires</c-> <c- o>!</c-><c- n>SimpleView</c-><c- o>&lt;</c-><c- n>R</c-><c- o>></c-><c- p>;</c->
@@ -1698,7 +1774,7 @@ this, a proposal could be made in the C++23 timeframe.</p>
 </pre>
    <ol>
     <li data-md>
-     <p>_Effects_: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>__sentinel</c-><c- o>&lt;</c-><c- n>is_const_v</c-><c- o>&lt;</c-><c- k>decltype</c-><c- p>(</c-><c- o>*</c-><c- k>this</c-><c- p>)</c-><c- o>>></c-><c- p>(</c-><c- o>&amp;</c-><c- n>pred</c-><c- p>());</c-></code>.</p>
+     <p><i>Effects</i>: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>__sentinel</c-><c- o>&lt;</c-><c- n>is_const_v</c-><c- o>&lt;</c-><c- k>decltype</c-><c- p>(</c-><c- o>*</c-><c- k>this</c-><c- p>)</c-><c- o>>></c-><c- p>(</c-><c- o>&amp;</c-><c- n>pred</c-><c- p>());</c-></code>.</p>
    </ol>
    <h4 class="heading settled" data-level="3.1.4" id="take_while_view__sentinel"><span class="secno">3.1.4. </span><span class="content"><code class="highlight"><c- n>take_while_view</c-><c- o>::</c-><c- n>__sentinel</c-></code></span><a class="self-link" href="#take_while_view__sentinel"></a></h4>
 <pre class="language-cpp highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>R</c-><c- p>,</c-> <c- k>class</c-> <c- nc>Pred</c-><c- o>></c->
@@ -1727,46 +1803,46 @@ this, a proposal could be made in the C++23 timeframe.</p>
 </pre>
    <ol>
     <li data-md>
-     <p>_Effects_: Initialises <code class="highlight"><c- n>end_</c-></code> with <code class="highlight"><c- n>end</c-></code>, and <code class="highlight"><c- n>pred_</c-></code> with <code class="highlight"><c- n>pred</c-></code>.</p>
+     <p><i>Effects</i>: Initialises <code class="highlight"><c- n>end_</c-></code> with <code class="highlight"><c- n>end</c-></code>, and <code class="highlight"><c- n>pred_</c-></code> with <code class="highlight"><c- n>pred</c-></code>.</p>
    </ol>
 <pre class="language-cpp highlight"><c- k>constexpr</c-> <c- nf>__sentinel</c-><c- p>(</c-><c- n>__sentinel</c-><c- o>&lt;!</c-><c- n>Const</c-><c- o>></c-> <c- n>s</c-><c- p>)</c->
    <c- n>requires</c-> <c- n>Const</c-> <c- o>&amp;&amp;</c-> <c- n>ConvertibleTo</c-><c- o>&lt;</c-><c- n>sentinel_t</c-><c- o>&lt;</c-><c- n>R</c-><c- o>></c-><c- p>,</c-> <c- n>sentinel_t</c-><c- o>&lt;</c-><c- n>Base</c-><c- o>>></c-><c- p>;</c->
 </pre>
    <ol start="2">
     <li data-md>
-     <p>_Effects_ Initialises <code class="highlight"><c- n>end_</c-></code> with <code class="highlight"><c- n>s</c-><c- p>.</c-><c- n>end_</c-></code> and <code class="highlight"><c- n>pred_</c-></code> with <code class="highlight"><c- n>s</c-><c- p>.</c-><c- n>pred_</c-></code>.</p>
+     <p><i>Effects</i> Initialises <code class="highlight"><c- n>end_</c-></code> with <code class="highlight"><c- n>s</c-><c- p>.</c-><c- n>end_</c-></code> and <code class="highlight"><c- n>pred_</c-></code> with <code class="highlight"><c- n>s</c-><c- p>.</c-><c- n>pred_</c-></code>.</p>
    </ol>
    <h4 class="heading settled" data-level="3.1.6" id="take_while_view__sentinel-conversion"><span class="secno">3.1.6. </span><span class="content"><code class="highlight"><c- n>take_while_view</c-><c- o>::</c-><c- n>__sentinel</c-></code> conversion</span><a class="self-link" href="#take_while_view__sentinel-conversion"></a></h4>
 <pre class="language-cpp highlight"><c- k>constexpr</c-> <c- n>sentinel_t</c-><c- o>&lt;</c-><c- n>Base</c-><c- o>></c-> <c- n>base</c-><c- p>()</c-> <c- k>const</c-><c- p>;</c->
 </pre>
    <ol start="3">
     <li data-md>
-     <p>_Effects_: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>end_</c-><c- p>;</c-></code></p>
+     <p><i>Effects</i>: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>end_</c-><c- p>;</c-></code></p>
    </ol>
    <h4 class="heading settled" data-level="3.1.7" id="take_while_view__sentinel-comparisons"><span class="secno">3.1.7. </span><span class="content"><code class="highlight"><c- n>take_while_view</c-><c- o>::</c-><c- n>__sentinel</c-></code> comparisons</span><a class="self-link" href="#take_while_view__sentinel-comparisons"></a></h4>
 <pre class="language-cpp highlight"><c- k>friend</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>==</c-><c- p>(</c-><c- k>const</c-> <c- n>__sentinel</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>,</c-> <c- k>const</c-> <c- n>iterator_t</c-><c- o>&lt;</c-><c- n>Base</c-><c- o>>&amp;</c-> <c- n>y</c-><c- p>)</c->
 </pre>
    <ol start="4">
     <li data-md>
-     <p>_Effects_: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>x</c-><c- p>.</c-><c- n>end_</c-> <c- o>!=</c-> <c- n>y</c-> <c- o>&amp;&amp;</c-> <c- o>!</c-><c- p>(</c-><c- o>*</c-><c- n>x</c-><c- p>.</c-><c- n>pred_</c-><c- p>)(</c-><c- o>*</c-><c- n>y</c-><c- p>);</c-></code>.</p>
+     <p><i>Effects</i>: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>x</c-><c- p>.</c-><c- n>end_</c-> <c- o>!=</c-> <c- n>y</c-> <c- o>&amp;&amp;</c-> <c- o>!</c-><c- p>(</c-><c- o>*</c-><c- n>x</c-><c- p>.</c-><c- n>pred_</c-><c- p>)(</c-><c- o>*</c-><c- n>y</c-><c- p>);</c-></code>.</p>
    </ol>
 <pre class="language-cpp highlight"><c- k>friend</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>==</c-><c- p>(</c-><c- k>const</c-> <c- n>iterator_t</c-><c- o>&lt;</c-><c- n>Base</c-><c- o>>&amp;</c-> <c- n>x</c-><c- p>,</c-> <c- k>const</c-> <c- n>__sentinel</c-><c- o>&amp;</c-> <c- n>y</c-><c- p>);</c->
 </pre>
    <ol start="5">
     <li data-md>
-     <p>_Effects_: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>y</c-> <c- o>==</c-> <c- n>x</c-><c- p>;</c-></code>.</p>
+     <p><i>Effects</i>: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>y</c-> <c- o>==</c-> <c- n>x</c-><c- p>;</c-></code>.</p>
    </ol>
 <pre class="language-cpp highlight"><c- k>friend</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>!=</c-><c- p>(</c-><c- k>const</c-> <c- n>__sentinel</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>,</c-> <c- k>const</c-> <c- n>iterator_t</c-><c- o>&lt;</c-><c- n>Base</c-><c- o>>&amp;</c-> <c- n>y</c-><c- p>);</c->
 </pre>
    <ol start="6">
     <li data-md>
-     <p>_Effects_: Equivalent to <code class="highlight"><c- o>!</c-><c- p>(</c-><c- n>x</c-> <c- o>==</c-> <c- n>y</c-><c- p>);</c-></code>.</p>
+     <p><i>Effects</i>: Equivalent to <code class="highlight"><c- o>!</c-><c- p>(</c-><c- n>x</c-> <c- o>==</c-> <c- n>y</c-><c- p>);</c-></code>.</p>
    </ol>
 <pre class="language-cpp highlight"><c- k>friend</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>!=</c-><c- p>(</c-><c- k>const</c-> <c- n>iterator_t</c-><c- o>&lt;</c-><c- n>Base</c-><c- o>>&amp;</c-> <c- n>x</c-><c- p>,</c-> <c- k>const</c-> <c- n>__sentinel</c-><c- o>&amp;</c-> <c- n>y</c-><c- p>);</c->
 </pre>
    <ol start="7">
     <li data-md>
-     <p>_Effects_: Equivalent to <code class="highlight"><c- o>!</c-><c- p>(</c-><c- n>y</c-> <c- o>==</c-> <c- n>x</c-><c- p>);</c-></code>.</p>
+     <p><i>Effects</i>: Equivalent to <code class="highlight"><c- o>!</c-><c- p>(</c-><c- n>y</c-> <c- o>==</c-> <c- n>x</c-><c- p>);</c-></code>.</p>
    </ol>
    <h3 class="heading settled" data-level="3.2" id="viewtake_while"><span class="secno">3.2. </span><span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>take_while</c-></code></span><a class="self-link" href="#viewtake_while"></a></h3>
    <p>The name <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>take_while</c-></code> denotes a range adaptor object. Let <code class="highlight"><c- n>E</c-></code> and <code class="highlight"><c- n>F</c-></code> be expressions such that type <code class="highlight"><c- n>T</c-></code> is <code class="highlight"><c- k>decltype</c-><c- p>((</c-><c- n>E</c-><c- p>))</c-></code>. Then, the expression <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>take_while</c-><c- p>(</c-><c- n>E</c-><c- p>,</c-> <c- n>F</c-><c- p>)</c-></code>is expression-equivalent to:</p>
@@ -1787,8 +1863,17 @@ first _n_ elements, it provides the user with all _but_ the first _n_ elements.<
       <th>Current (C++17)
       <th>Proposed (C++20)
      <tr>
-      <td><code class="highlight"> <c- k>namespace</c-> <c- n>ranges</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>ranges</c-><c- p>;</c-> <c- k>auto</c-> <c- n>i</c-> <c- o>=</c-> <c- n>ranges</c-><c- o>::</c-><c- n>next</c-><c- p>(</c-><c- n>ranges</c-><c- o>::</c-><c- n>begin</c-><c- p>(</c-><c- n>employees</c-><c- p>),</c-> <c- mi>5</c-><c- p>,</c-> <c- n>ranges</c-><c- o>::</c-><c- n>end</c-><c- p>(</c-><c- n>employees</c-><c- p>));</c-> <c- k>auto</c-> <c- n>j</c-> <c- o>=</c-> <c- n>ranges</c-><c- o>::</c-><c- n>find</c-><c- p>(</c-><c- n>i</c-><c- p>,</c-> <c- n>ranges</c-><c- o>::</c-><c- n>end</c-><c- p>(</c-><c- n>employees</c-><c- p>),</c-> <c- s>"Lovelace"</c-><c- p>,</c-> <c- o>&amp;</c-><c- n>employees</c-><c- o>::</c-><c- n>surname</c-><c- p>);</c-> </code>
-      <td><code class="highlight"> <c- k>namespace</c-> <c- n>view</c-> <c- o>=</c-> <c- n>ranges</c-><c- o>::</c-><c- n>view</c-><c- p>;</c-> <c- k>auto</c-> <c- n>j</c-> <c- o>=</c-> <c- n>ranges</c-><c- o>::</c-><c- n>find</c-><c- p>(</c-><c- n>employees</c-> <c- o>|</c-> <c- n>view</c-><c- o>::</c-><c- n>drop</c-><c- p>(</c-><c- mi>5</c-><c- p>),</c-> <c- s>"Lovelace"</c-><c- p>,</c-> <c- o>&amp;</c-><c- n>employees</c-><c- o>::</c-><c- n>surname</c-><c- p>);</c-> </code>
+      <td>
+<pre class="highlight">    <c- k>namespace</c-> <c- n>ranges</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>ranges</c-><c- p>;</c->
+    <c- k>auto</c-> <c- n>i</c-> <c- o>=</c-> <c- n>ranges</c-><c- o>::</c-><c- n>next</c-><c- p>(</c-><c- n>ranges</c-><c- o>::</c-><c- n>begin</c-><c- p>(</c-><c- n>employees</c-><c- p>),</c-> <c- mi>5</c-><c- p>,</c-> <c- n>ranges</c-><c- o>::</c-><c- n>end</c-><c- p>(</c-><c- n>employees</c-><c- p>));</c->
+    <c- k>auto</c-> <c- n>j</c-> <c- o>=</c-> <c- n>ranges</c-><c- o>::</c-><c- n>find</c-><c- p>(</c-><c- n>i</c-><c- p>,</c-> <c- n>ranges</c-><c- o>::</c-><c- n>end</c-><c- p>(</c-><c- n>employees</c-><c- p>),</c-> <c- s>"Lovelace"</c-><c- p>,</c-> <c- o>&amp;</c-><c- n>employees</c-><c- o>::</c-><c- n>surname</c-><c- p>);</c->
+      
+</pre>
+      <td>
+<pre class="highlight">    <c- k>namespace</c-> <c- n>view</c-> <c- o>=</c-> <c- n>ranges</c-><c- o>::</c-><c- n>view</c-><c- p>;</c->
+    <c- k>auto</c-> <c- n>j</c-> <c- o>=</c-> <c- n>ranges</c-><c- o>::</c-><c- n>find</c-><c- p>(</c-><c- n>employees</c-> <c- o>|</c-> <c- n>view</c-><c- o>::</c-><c- n>drop</c-><c- p>(</c-><c- mi>5</c-><c- p>),</c-> <c- s>"Lovelace"</c-><c- p>,</c-> <c- o>&amp;</c-><c- n>employees</c-><c- o>::</c-><c- n>surname</c-><c- p>);</c->
+      
+</pre>
    </table>
    <h4 class="heading settled" data-level="3.3.2" id="interface"><span class="secno">3.3.2. </span><span class="content">Interface</span><a class="self-link" href="#interface"></a></h4>
 <pre class="language-cpp highlight"><c- k>template</c-><c- o>&lt;</c-><c- n>View</c-> <c- n>R</c-><c- o>></c->
@@ -1824,7 +1909,7 @@ first _n_ elements, it provides the user with all _but_ the first _n_ elements.<
 </pre>
    <ol>
     <li data-md>
-     <p>_Effects_: Initialises <code class="highlight"><c- n>base_</c-></code> with <code class="highlight"><c- n>base</c-></code> and <code class="highlight"><c- n>count_</c-></code> with <code class="highlight"><c- n>count</c-></code>.</p>
+     <p><i>Effects</i>: Initialises <code class="highlight"><c- n>base_</c-></code> with <code class="highlight"><c- n>base</c-></code> and <code class="highlight"><c- n>count_</c-></code> with <code class="highlight"><c- n>count</c-></code>.</p>
    </ol>
 <pre class="language-cpp highlight"><c- k>template</c-><c- o>&lt;</c-><c- n>ViewableRange</c-> <c- n>O</c-><c- o>></c->
 <c- n>requires</c-> <c- n>constructible</c-><c- o>-</c-><c- n>from</c-><c- o>-</c-><c- n>range</c-><c- o>&lt;</c-><c- n>R</c-><c- p>,</c-> <c- n>O</c-><c- o>></c->
@@ -1832,14 +1917,14 @@ first _n_ elements, it provides the user with all _but_ the first _n_ elements.<
 </pre>
    <ol start="2">
     <li data-md>
-     <p>_Effects_: Initialises <code class="highlight"><c- n>base_</c-></code> with <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>all</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>O</c-><c- o>></c-><c- p>(</c-><c- n>o</c-><c- p>))</c-></code> and <code class="highlight"><c- n>count_</c-></code> with <code class="highlight"><c- n>count</c-></code>.</p>
+     <p><i>Effects</i>: Initialises <code class="highlight"><c- n>base_</c-></code> with <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>all</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>O</c-><c- o>></c-><c- p>(</c-><c- n>o</c-><c- p>))</c-></code> and <code class="highlight"><c- n>count_</c-></code> with <code class="highlight"><c- n>count</c-></code>.</p>
    </ol>
    <h5 class="heading settled" data-level="3.3.2.2" id="drop_view-conversion"><span class="secno">3.3.2.2. </span><span class="content"><code class="highlight"><c- n>drop_view</c-></code> conversion</span><a class="self-link" href="#drop_view-conversion"></a></h5>
 <pre class="language-cpp highlight"><c- k>constexpr</c-> <c- n>R</c-> <c- nf>base</c-><c- p>()</c-> <c- k>const</c-><c- p>;</c->
 </pre>
    <ol start="3">
     <li data-md>
-     <p>_Effects_: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>base_</c-></code>.</p>
+     <p><i>Effects</i>: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>base_</c-></code>.</p>
    </ol>
    <h5 class="heading settled" data-level="3.3.2.3" id="drop_view-range-begin"><span class="secno">3.3.2.3. </span><span class="content"><code class="highlight"><c- n>drop_view</c-></code> range begin</span><a class="self-link" href="#drop_view-range-begin"></a></h5>
 <pre class="language-cpp highlight"><c- k>constexpr</c-> <c- k>auto</c-> <c- nf>begin</c-><c- p>()</c-> <c- n>requires</c-> <c- o>!</c-><c- p>(</c-><c- n>SimpleView</c-><c- o>&lt;</c-><c- n>R</c-><c- o>></c-> <c- o>&amp;&amp;</c-> <c- n>RandomAccessRange</c-><c- o>&lt;</c-><c- n>R</c-><c- o>></c-><c- p>);</c->
@@ -1847,7 +1932,7 @@ first _n_ elements, it provides the user with all _but_ the first _n_ elements.<
 </pre>
    <ol start="4">
     <li data-md>
-     <p>_Effects_: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>ranges</c-><c- o>::</c-><c- n>next</c-><c- p>(</c-><c- n>ranges</c-><c- o>::</c-><c- n>begin</c-><c- p>(</c-><c- n>base_</c-><c- p>),</c-> <c- n>count_</c-><c- p>,</c-> <c- n>ranges</c-><c- o>::</c-><c- n>end</c-><c- p>(</c-><c- n>base_</c-><c- p>));</c-></code>.</p>
+     <p><i>Effects</i>: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>ranges</c-><c- o>::</c-><c- n>next</c-><c- p>(</c-><c- n>ranges</c-><c- o>::</c-><c- n>begin</c-><c- p>(</c-><c- n>base_</c-><c- p>),</c-> <c- n>count_</c-><c- p>,</c-> <c- n>ranges</c-><c- o>::</c-><c- n>end</c-><c- p>(</c-><c- n>base_</c-><c- p>));</c-></code>.</p>
     <li data-md>
      <p>_Remarks_: In order to provide the amortized constant time complexity required by the
 Range concept, this function caches the result within the <code class="highlight"><c- n>drop_view</c-></code> for use on
@@ -1859,7 +1944,7 @@ subsequent calls.</p>
 </pre>
    <ol start="6">
     <li data-md>
-     <p>_Effects_: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>ranges</c-><c- o>::</c-><c- n>end</c-><c- p>(</c-><c- n>base_</c-><c- p>);</c-></code>.</p>
+     <p><i>Effects</i>: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>ranges</c-><c- o>::</c-><c- n>end</c-><c- p>(</c-><c- n>base_</c-><c- p>);</c-></code>.</p>
    </ol>
    <h5 class="heading settled" data-level="3.3.2.5" id="drop_view-size"><span class="secno">3.3.2.5. </span><span class="content"><code class="highlight"><c- n>drop_view</c-></code> size</span><a class="self-link" href="#drop_view-size"></a></h5>
 <pre class="language-cpp highlight"><c- k>constexpr</c-> <c- k>auto</c-> <c- nf>size</c-><c- p>()</c-> <c- n>requires</c-> <c- o>!</c-><c- n>SimpleView</c-><c- o>&lt;</c-><c- n>R</c-><c- o>></c-> <c- o>&amp;&amp;</c-> <c- n>SizedRange</c-><c- o>&lt;</c-><c- n>R</c-><c- o>></c-><c- p>;</c->
@@ -1891,14 +1976,24 @@ Unlike the others, there are two demonstrations of <code class="highlight"><c- n
       <th>Current (C++17)
       <th>Proposed (C++20) v1
      <tr>
-      <td> <code class="highlight"> <c- k>auto</c-> <c- n>begin</c-> <c- o>=</c-> <c- n>ranges</c-><c- o>::</c-><c- n>find_if_not</c-><c- p>(</c-><c- n>employees</c-><c- p>,</c-> <c- p>[](</c-><c- k>auto</c-> <c- k>const</c-> <c- n>holidays</c-><c- p>){</c-> <c- k>return</c-> <c- n>holidays</c-> <c- o>&lt;</c-> <c- mi>20</c-><c- p>;</c-> <c- p>},</c-> <c- o>&amp;</c-><c- n>employee</c-><c- o>::</c-><c- n>holidays</c-><c- p>);</c-> <c- n>ranges</c-><c- o>::</c-><c- n>transform</c-><c- p>(</c-><c- n>begin</c-><c- p>,</c-> <c- n>ranges</c-><c- o>::</c-><c- n>end</c-><c- p>(</c-><c- n>employees</c-><c- p>),</c-> <c- n>ranges</c-><c- o>::</c-><c- n>ostream_iterator</c-><c- p>(</c-><stdU0003AU0003Astring><c- n>std</c-><c- o>::</c-><c- n>cout</c-><c- p>,</c-> <c- s>"</c-><c- se>\n</c-><c- s>"</c-><c- p>),</c-> <c- p>[](</c-><c- k>auto</c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>e</c-><c- p>)</c-> <c- p>{</c-> <c- k>return</c-> <c- n>e</c-><c- p>.</c-><c- n>given_name</c-><c- p>()</c-> <c- o>+</c-> <c- n>e</c-><c- p>.</c-><c- n>surname</c-><c- p>();</c-> <c- p>});</c-> </stdU0003AU0003Astring></code> 
-      <td> <code class="highlight"> <c- k>auto</c-> <c- n>too_many_holidays</c-> <c- o>=</c-> <c- n>employees</c-> <c- o>|</c-> <c- n>view</c-><c- o>::</c-><c- n>drop_while</c-><c- p>([](</c-><c- k>auto</c-> <c- k>const</c-> <c- n>e</c-><c- p>)</c-> <c- p>{</c-> <c- k>return</c-> <c- n>e</c-><c- p>.</c-><c- n>holidays</c-><c- p>()</c-> <c- o>&lt;</c-> <c- mi>20</c-><c- p>;</c-> <c- p>});</c-> <c- n>ranges</c-><c- o>::</c-><c- n>transform</c-><c- p>(</c-><c- n>too_many_holidays</c-><c- p>,</c-> <c- n>ranges</c-><c- o>::</c-><c- n>ostream_iterator</c-><c- p>(</c-><stdU0003AU0003Astring><c- n>std</c-><c- o>::</c-><c- n>cout</c-><c- p>,</c-> <c- s>"</c-><c- se>\n</c-><c- s>"</c-><c- p>),</c-> <c- p>[](</c-><c- k>auto</c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>e</c-><c- p>)</c-> <c- p>{</c-> <c- k>return</c-> <c- n>e</c-><c- p>.</c-><c- n>given_name</c-><c- p>()</c-> <c- o>+</c-> <c- n>e</c-><c- p>.</c-><c- n>surname</c-><c- p>();</c-> <c- p>});</c-> </stdU0003AU0003Astring></code> 
+      <td>
+<pre class="highlight"><c- k>auto</c-> <c- n>begin</c-> <c- o>=</c-> <c- n>ranges</c-><c- o>::</c-><c- n>find_if_not</c-><c- p>(</c-><c- n>employees</c-><c- p>,</c-> <c- p>[](</c-><c- k>auto</c-> <c- k>const</c-> <c- n>holidays</c-><c- p>){</c-> <c- k>return</c-> <c- n>holidays</c-> <c- o>&lt;</c-> <c- mi>20</c-><c- p>;</c-> <c- p>},</c-> <c- o>&amp;</c-><c- n>employee</c-><c- o>::</c-><c- n>holidays</c-><c- p>);</c->
+<c- n>ranges</c-><c- o>::</c-><c- n>transform</c-><c- p>(</c-><c- n>begin</c-><c- p>,</c-> <c- n>ranges</c-><c- o>::</c-><c- n>end</c-><c- p>(</c-><c- n>employees</c-><c- p>),</c-> <c- n>ranges</c-><c- o>::</c-><c- n>ostream_iterator</c-><c- o>&lt;</c-><c- n>std</c-><c- o>::</c-><c- n>string</c-><c- o>></c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>cout</c-><c- p>,</c-> <c- s>"</c-><c- se>\n</c-><c- s>"</c-><c- p>),</c-> <c- p>[](</c-><c- k>auto</c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>e</c-><c- p>)</c-> <c- p>{</c->
+   <c- k>return</c-> <c- n>e</c-><c- p>.</c-><c- n>given_name</c-><c- p>()</c-> <c- o>+</c-> <c- n>e</c-><c- p>.</c-><c- n>surname</c-><c- p>();</c-> <c- p>});</c->
+</pre>
+      <td>
+<pre class="highlight"><c- k>auto</c-> <c- n>too_many_holidays</c-> <c- o>=</c-> <c- n>employees</c-> <c- o>|</c-> <c- n>view</c-><c- o>::</c-><c- n>drop_while</c-><c- p>([](</c-><c- k>auto</c-> <c- k>const</c-> <c- n>e</c-><c- p>)</c-> <c- p>{</c-> <c- k>return</c-> <c- n>e</c-><c- p>.</c-><c- n>holidays</c-><c- p>()</c-> <c- o>&lt;</c-> <c- mi>20</c-><c- p>;</c-> <c- p>});</c->
+<c- n>ranges</c-><c- o>::</c-><c- n>transform</c-><c- p>(</c-><c- n>too_many_holidays</c-><c- p>,</c->
+   <c- n>ranges</c-><c- o>::</c-><c- n>ostream_iterator</c-><c- o>&lt;</c-><c- n>std</c-><c- o>::</c-><c- n>string</c-><c- o>></c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>cout</c-><c- p>,</c-> <c- s>"</c-><c- se>\n</c-><c- s>"</c-><c- p>),</c->
+   <c- p>[](</c-><c- k>auto</c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>e</c-><c- p>)</c-> <c- p>{</c-> <c- k>return</c-> <c- n>e</c-><c- p>.</c-><c- n>given_name</c-><c- p>()</c-> <c- o>+</c-> <c- n>e</c-><c- p>.</c-><c- n>surname</c-><c- p>();</c-> <c- p>});</c->
+</pre>
    </table>
    <h4 class="heading settled" data-level="3.5.2" id="interface①"><span class="secno">3.5.2. </span><span class="content">Interface</span><a class="self-link" href="#interface①"></a></h4>
-<pre class="language-cpp highlight"><c- k>template</c-><c- o>&lt;</c-><c- n>View</c-> <c- n>R</c-><c- p>,</c-> <c- n>IndirectPredicate</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>R</c-><c- o>>></c-> <c- n>Pred</c-><c- o>></c->
+<pre class="language-cpp highlight"><c- k>template</c-><c- o>&lt;</c-><c- n>View</c-> <c- n>R</c-><c- p>,</c-> <c- k>class</c-> <c- nc>Pred</c-><c- o>></c->
 <c- n>requires</c->
   <c- n>InputRange</c-><c- o>&lt;</c-><c- n>R</c-><c- o>></c-> <c- o>&amp;&amp;</c->
-  <c- n>std</c-><c- o>::</c-><c- n>is_object_v</c-><c- o>&lt;</c-><c- n>Pred</c-><c- o>></c->
+  <c- n>std</c-><c- o>::</c-><c- n>is_object_v</c-><c- o>&lt;</c-><c- n>Pred</c-><c- o>></c-> <c- o>&amp;&amp;</c->
+  <c- n>IndirectPredicate</c-><c- o>&lt;</c-><c- k>const</c-> <c- n>Pred</c-><c- p>,</c-> <c- n>iterator_t</c-><c- o>&lt;</c-><c- n>R</c-><c- o>>></c->
 <c- k>class</c-> <c- nc>drop_while_view</c-> <c- o>:</c-> <c- k>public</c-> <c- n>view_interface</c-><c- o>&lt;</c-><c- n>drop_while_view</c-><c- o>&lt;</c-><c- n>R</c-><c- p>,</c-> <c- n>Pred</c-><c- o>>></c-> <c- p>{</c->
 <c- k>public</c-><c- o>:</c->
    <c- n>drop_while_view</c-><c- p>()</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
@@ -1927,7 +2022,7 @@ Unlike the others, there are two demonstrations of <code class="highlight"><c- n
 </pre>
    <ol>
     <li data-md>
-     <p>_Effects_: Initialises <code class="highlight"><c- n>base_</c-></code> with <code class="highlight"><c- n>base</c-></code> and initialises <code class="highlight"><c- n>pred_</c-></code> with <code class="highlight"><c- n>pred</c-></code>.</p>
+     <p><i>Effects</i>: Initialises <code class="highlight"><c- n>base_</c-></code> with <code class="highlight"><c- n>base</c-></code> and initialises <code class="highlight"><c- n>pred_</c-></code> with <code class="highlight"><c- n>pred</c-></code>.</p>
    </ol>
 <pre class="language-cpp highlight"><c- k>template</c-><c- o>&lt;</c-><c- n>ViewableRange</c-> <c- n>O</c-><c- o>></c->
 <c- n>requires</c-> <c- n>constructible</c-><c- o>-</c-><c- n>from</c-><c- o>-</c-><c- n>range</c-><c- o>&lt;</c-><c- n>R</c-><c- p>,</c-> <c- n>O</c-><c- o>></c->
@@ -1935,27 +2030,27 @@ Unlike the others, there are two demonstrations of <code class="highlight"><c- n
 </pre>
    <ol start="2">
     <li data-md>
-     <p>_Effects_: Initialises <code class="highlight"><c- n>base_</c-></code> with <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>all</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>O</c-><c- o>></c-><c- p>(</c-><c- n>o</c-><c- p>))</c-></code>, and intialises <code class="highlight"><c- n>pred_</c-></code> with <code class="highlight"><c- n>pred</c-></code>.</p>
+     <p><i>Effects</i>: Initialises <code class="highlight"><c- n>base_</c-></code> with <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>all</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>O</c-><c- o>></c-><c- p>(</c-><c- n>o</c-><c- p>))</c-></code>, and intialises <code class="highlight"><c- n>pred_</c-></code> with <code class="highlight"><c- n>pred</c-></code>.</p>
    </ol>
    <h5 class="heading settled" data-level="3.5.2.2" id="drop_while_view-conversion"><span class="secno">3.5.2.2. </span><span class="content"><code class="highlight"><c- n>drop_while_view</c-></code> conversion</span><a class="self-link" href="#drop_while_view-conversion"></a></h5>
 <pre class="language-cpp highlight"><c- k>constexpr</c-> <c- n>R</c-> <c- nf>base</c-><c- p>()</c-> <c- k>const</c-><c- p>;</c->
 </pre>
    <ol start="3">
     <li data-md>
-     <p>_Returns_: <code class="highlight"><c- n>base_</c-></code>.</p>
+     <p><i>Returns</i>: <code class="highlight"><c- n>base_</c-></code>.</p>
    </ol>
 <pre class="language-cpp highlight"><c- k>constexpr</c-> <c- n>Pred</c-> <c- nf>pred</c-><c- p>()</c-> <c- k>const</c-><c- p>;</c->
 </pre>
    <ol start="4">
     <li data-md>
-     <p>_Returns_: <code class="highlight"><c- n>pred_</c-></code>.</p>
+     <p><i>Returns</i>: <code class="highlight"><c- n>pred_</c-></code>.</p>
    </ol>
    <h5 class="heading settled" data-level="3.5.2.3" id="drop_while_view-begin"><span class="secno">3.5.2.3. </span><span class="content"><code class="highlight"><c- n>drop_while_view</c-></code> begin</span><a class="self-link" href="#drop_while_view-begin"></a></h5>
 <pre class="language-cpp highlight"><c- k>constexpr</c-> <c- k>auto</c-> <c- nf>begin</c-><c- p>();</c->
 </pre>
    <ol start="5">
     <li data-md>
-     <p>_Effects_: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>ranges</c-><c- o>::</c-><c- n>find_if_not</c-><c- p>(</c-><c- n>base_</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>ref</c-><c- p>(</c-><c- n>pred_</c-><c- p>));</c-></code>.</p>
+     <p><i>Effects</i>: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>ranges</c-><c- o>::</c-><c- n>find_if_not</c-><c- p>(</c-><c- n>base_</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>ref</c-><c- p>(</c-><c- n>pred_</c-><c- p>));</c-></code>.</p>
     <li data-md>
      <p>_Remarks_: In order to provide the amortized constant time complexity required by the <code class="highlight"><c- n>Range</c-></code> concept, this function caches the result within the <code class="highlight"><c- n>drop_while_view</c-></code> for use on subsequent
 calls.</p>
@@ -1963,7 +2058,7 @@ calls.</p>
    <h5 class="heading settled" data-level="3.5.2.4" id="drop_while_view-end"><span class="secno">3.5.2.4. </span><span class="content"><code class="highlight"><c- n>drop_while_view</c-></code> end</span><a class="self-link" href="#drop_while_view-end"></a></h5>
    <ol start="7">
     <li data-md>
-     <p>_Effects_: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>ranges</c-><c- o>::</c-><c- n>end</c-><c- p>(</c-><c- n>base_</c-><c- p>);</c-></code>.</p>
+     <p><i>Effects</i>: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>ranges</c-><c- o>::</c-><c- n>end</c-><c- p>(</c-><c- n>base_</c-><c- p>);</c-></code>.</p>
    </ol>
    <h3 class="heading settled" data-level="3.6" id="viewdrop_while"><span class="secno">3.6. </span><span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>drop_while</c-></code></span><a class="self-link" href="#viewdrop_while"></a></h3>
    <p>The name <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>drop_while</c-></code> denotes a range adaptor object. Let <code class="highlight"><c- n>E</c-></code> and <code class="highlight"><c- n>F</c-></code> be expressions such that
@@ -1975,7 +2070,7 @@ to:</p>
     <li data-md>
      <p>Otherwise <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>drop</c-><c- p>(</c-><c- n>E</c-><c- p>,</c-> <c- n>F</c-><c- p>)</c-></code> is ill-formed.</p>
    </ol>
-   <h3 class="heading settled" data-level="3.7" id="istream_view"><span class="secno">3.7. </span><span class="content"><code class="highlight"><c- n>istream_view</c-></code></span><a class="self-link" href="#istream_view"></a></h3>
+   <h3 class="heading settled" data-level="3.7" id="basic_istream_view"><span class="secno">3.7. </span><span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code></span><a class="self-link" href="#basic_istream_view"></a></h3>
    <h4 class="heading settled" data-level="3.7.1" id="motivation④"><span class="secno">3.7.1. </span><span class="content">Motivation</span><a class="self-link" href="#motivation④"></a></h4>
    <p><code class="highlight"><c- n>istream_iterator</c-></code> is an abstraction over a <code class="highlight"><c- n>basic_istream</c-></code> object, so that it may be used as though
 it were an input iterator. It is a great way to populate a container from the get-go, or fill a
@@ -1983,17 +2078,32 @@ container later in its lifetime. This is great, as copy is a standard algorithm 
 communicates that we’re copying something from one range into another. There aren’t any Hidden
 Surprises<sup>TM</sup>. This is also good when writing generic code, because the generic library
 author does not need to care how things are inserted at the end of <code class="highlight"><c- n>v</c-></code>, only that they are.</p>
-   <p></p>
    <table>
     <tbody>
      <tr>
       <th>Without <code class="highlight"><c- n>istream_iterator</c-></code>
       <th>With <code class="highlight"><c- n>istream_iterator</c-></code>
      <tr>
-      <td><code class="highlight"> <c- k>auto</c-> <c- n>v</c-> <c- o>=</c-> <c- p>[]{</c-> <c- k>auto</c-> <c- n>result</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>vector</c-><c- p>r</c-><int><c- p>};</c-> <c- k>for</c-> <c- p>(</c-><c- k>auto</c-> <c- n>i</c-> <c- o>=</c-> <c- mi>0</c-><c- p>;</c-> <c- n>std</c-><c- o>::</c-><c- n>cin</c-> <c- o>>></c-> <c- n>i</c-><c- p>;)</c-> <c- p>{</c-> <c- n>result</c-><c- p>.</c-><c- n>push_back</c-><c- p>(</c-><c- n>i</c-><c- p>);</c-> <c- p>}</c-> <c- p>}();</c-> <c- c1>// ...</c-> <c- k>for</c-> <c- p>(</c-><c- k>auto</c-> <c- n>i</c-> <c- o>=</c-> <c- mi>0</c-><c- p>;</c-> <c- n>std</c-><c- o>::</c-><c- n>cin</c-> <c- o>>></c-> <c- n>i</c-><c- p>;)</c-> <c- p>{</c-> <c- n>result</c-><c- p>.</c-><c- n>push_back</c-><c- p>(</c-><c- n>i</c-><c- p>);</c-> <c- p>}</c-> </int></code>
       <td>
-       <code class="highlight"><c- k> </c-><p><c- k>to</c-> <c- n>v</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>vector</c-><c- p>(</c-><c- n>istream_iterator</c-><c- p>{</c-><c- n>r</c-><int><c- n>td</c-><c- o>::</c-><c- n>cin</c-><c- p>},</c-> <c- n>istream_iterator</c-><c- p>or</c-><int><c- p>);</c-> <c- c1>// ...</c-> <c- n>copy</c-><c- p>(</c-><c- n>istream_iterator</c-><c- p>{</c-><c- n>r</c-><int><c- n>td</c-><c- o>::</c-><c- n>cin</c-><c- p>},</c-> <c- n>istream_iterator</c-><c- p>or</c-><int><c- p>,</c-> <c- n>back_inserter</c-><c- p>(</c-><c- n>v</c-><c- p>));</c-> </int></int></int></int></p></code>
-       <p><code class="highlight"></code></p>
+<pre class="highlight">    <c- k>auto</c-> <c- n>v</c-> <c- o>=</c-> <c- p>[]{</c->
+       <c- k>auto</c-> <c- n>result</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>vector</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>{};</c->
+       <c- k>for</c-> <c- p>(</c-><c- k>auto</c-> <c- n>i</c-> <c- o>=</c-> <c- mi>0</c-><c- p>;</c-> <c- n>std</c-><c- o>::</c-><c- n>cin</c-> <c- o>>></c-> <c- n>i</c-><c- p>;)</c-> <c- p>{</c->
+          <c- n>result</c-><c- p>.</c-><c- n>push_back</c-><c- p>(</c-><c- n>i</c-><c- p>);</c->
+       <c- p>}</c->
+    <c- p>}();</c->
+    <c- c1>// ...</c->
+    <c- k>for</c-> <c- p>(</c-><c- k>auto</c-> <c- n>i</c-> <c- o>=</c-> <c- mi>0</c-><c- p>;</c-> <c- n>std</c-><c- o>::</c-><c- n>cin</c-> <c- o>>></c-> <c- n>i</c-><c- p>;)</c-> <c- p>{</c->
+       <c- n>result</c-><c- p>.</c-><c- n>push_back</c-><c- p>(</c-><c- n>i</c-><c- p>);</c->
+    <c- p>}</c->
+  
+</pre>
+      <td>
+<pre class="highlight"><c- o>&lt;</c-><c- n>p</c-> <c- n>line</c-><c- o>-</c-><c- n>number</c-><c- o>=</c-><c- mi>616</c-><c- o>></c-><c- k>auto</c-> <c- n>v</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>vector</c-><c- p>(</c-><c- n>istream_iterator</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>{</c-><c- n>std</c-><c- o>::</c-><c- n>cin</c-><c- p>},</c-> <c- n>istream_iterator</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>{});</c->
+    <c- c1>// ...</c->
+    <c- n>copy</c-><c- p>(</c-><c- n>istream_iterator</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>{</c-><c- n>std</c-><c- o>::</c-><c- n>cin</c-><c- p>},</c-> <c- n>istream_iterator</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>{},</c-> <c- n>back_inserter</c-><c- p>(</c-><c- n>v</c-><c- p>));</c-><c- o>&lt;/</c-><c- n>p</c-><c- o>></c->
+
+  
+</pre>
    </table>
    <p>The problem with <code class="highlight"><c- n>istream_iterator</c-></code> is that we need to provide a bogus <code class="highlight"><c- n>istream_iterator</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-><c- p>{}</c-></code> (or <code class="highlight"><c- n>default_sentinel</c-><c- p>{}</c-></code>) every time we want to use it; this acts as the sentinel for <code class="highlight"><c- n>istream_iterator</c-></code>. It is bogus, because the code is equivalent to saying "from the first element of
 the istream range until the last element of the istream range", but an <code class="highlight"><c- n>istream</c-></code> range does not have
@@ -2002,16 +2112,22 @@ set. This is otherwise known as the _end-of-stream_ iterator value, but it doesn
 'past-the-last element' in the same way that call to <code class="highlight"><c- n>vector</c-><c- o>&lt;</c-><c- n>T</c-><c- o>>::</c-><c- n>end</c-></code> does. Because it is the same
 for every range, the _end-of-stream_ object may as well be dropped, so that we can write code that
 resembles the code below.</p>
-<pre class="language-cpp highlight"><c- k>auto</c-> <c- n>v</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>vector</c-><c- p>(</c-><c- n>view</c-><c- o>::</c-><c- n>istream</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>{</c-><c- n>std</c-><c- o>::</c-><c- n>cin</c-><c- p>});</c->
+<pre class="language-cpp highlight"><c- k>auto</c-> <c- n>v</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>vector</c-><c- p>(</c-><c- n>ranges</c-><c- o>::</c-><c- n>istream_view</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>{</c-><c- n>std</c-><c- o>::</c-><c- n>cin</c-><c- p>});</c->
 <c- c1>// ...</c->
-<c- n>copy</c-><c- p>(</c-><c- n>view</c-><c- o>::</c-><c- n>istream</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>{</c-><c- n>std</c-><c- o>::</c-><c- n>cin</c-><c- p>},</c-> <c- n>back_inserter</c-><c- p>(</c-><c- n>v</c-><c- p>));</c->
+<c- n>copy</c-><c- p>(</c-><c- n>ranges</c-><c- o>::</c-><c- n>istream_view</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>{</c-><c- n>std</c-><c- o>::</c-><c- n>cin</c-><c- p>},</c-> <c- n>back_inserter</c-><c- p>(</c-><c- n>v</c-><c- p>));</c->
 </pre>
    <p>This code is cleaner: we are implicitly saying "until our <code class="highlight"><c- n>basic_istream</c-></code> object fails, insert our
 input into the back of <code class="highlight"><c- n>v</c-></code>". There is less to read (and type!), and the code is simpler for it.</p>
    <h4 class="heading settled" data-level="3.7.2" id="interface②"><span class="secno">3.7.2. </span><span class="content">Interface</span><a class="self-link" href="#interface②"></a></h4>
-<pre class="language-cpp highlight"><c- k>template</c-><c- o>&lt;</c-><c- n>Semiregular</c-> <c- n>Val</c-><c- p>,</c-> <c- k>class</c-> <c- nc>CharT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>Traits</c-> <c- o>=</c-> <c- n>char_traits</c-><c- o>&lt;</c-><c- n>CharT</c-><c- o>>></c->
-<c- n>requires</c-> <c- n>stream</c-><c- o>-</c-><c- n>extractable</c-><c- o>&lt;</c-><c- n>Val</c-><c- o>></c->
-<c- k>class</c-> <c- nc>basic_istream_view</c-> <c- o>:</c-> <c- k>public</c-> <c- n>view_interface</c-><c- o>&lt;</c-><c- n>istream_view</c-><c- o>&lt;</c-><c- n>Val</c-><c- p>,</c-> <c- n>CharT</c-><c- p>,</c-> <c- n>Traits</c-><c- o>>></c-> <c- p>{</c->
+<pre class="language-cpp highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- p>,</c-> <c- k>class</c-> <c- nc>CharT</c-> <c- o>=</c-> <c- b>char</c-><c- p>,</c-> <c- k>class</c-> <c- nc>Traits</c-> <c- o>=</c-> <c- n>char_traits</c-><c- o>&lt;</c-><c- n>CharT</c-><c- o>>></c->
+<c- n>concept</c-> <c- b>bool</c-> <c- n>StreamExtractable</c-> <c- o>=</c-> <c- n>see</c-><c- o>-</c-><c- n>below</c-><c- p>;</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- p>,</c-> <c- k>class</c-> <c- nc>charT</c-> <c- o>=</c-> <c- b>char</c-><c- p>,</c-> <c- k>class</c-> <c- nc>traits</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>char_traits</c-><c- o>&lt;</c-><c- n>charT</c-><c- o>>></c->
+<c- n>concept</c-> <c- b>bool</c-> <c- n>StreamInsertable</c-> <c- o>=</c-> <c- n>see</c-><c- o>-</c-><c- n>below</c-><c- p>;</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- n>Semiregular</c-> <c- n>Val</c-><c- p>,</c-> <c- k>class</c-> <c- nc>CharT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>Traits</c-> <c- o>=</c-> <c- n>char_traits</c-><c- o>&lt;</c-><c- n>CharT</c-><c- o>>></c->
+<c- n>requires</c-> <c- n>StreamExtractable</c-><c- o>&lt;</c-><c- n>Val</c-><c- p>,</c-> <c- n>CharT</c-><c- p>,</c-> <c- n>Traits</c-><c- o>></c->
+<c- k>class</c-> <c- nc>basic_istream_view</c-> <c- o>:</c-> <c- k>public</c-> <c- n>view_interface</c-><c- o>&lt;</c-><c- n>basic_istream_view</c-><c- o>&lt;</c-><c- n>Val</c-><c- p>,</c-> <c- n>CharT</c-><c- p>,</c-> <c- n>Traits</c-><c- o>>></c-> <c- p>{</c->
 <c- k>public</c-><c- o>:</c->
    <c- n>basic_istream_view</c-><c- p>()</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
 
@@ -2025,31 +2141,53 @@ input into the back of <code class="highlight"><c- n>v</c-></code>". There is le
    <c- n>Val</c-> <c- n>object_</c-><c- p>;</c-> <c- c1>// exposition-only</c->
 <c- p>};</c->
 </pre>
-   <h5 class="heading settled" data-level="3.7.2.1" id="basic_istream_view-constructor"><span class="secno">3.7.2.1. </span><span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code> constructor</span><a class="self-link" href="#basic_istream_view-constructor"></a></h5>
-<pre class="language-cpp highlight"><c- k>explicit</c-> <c- k>constexpr</c-> <c- nf>basic_istream_view</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>basic_istream</c-><c- o>&lt;</c-><c- n>CharT</c-><c- p>,</c-> <c- n>Traits</c-><c- o>>&amp;</c-> <c- n>stream</c-><c- p>);</c->
+   <h5 class="heading settled" data-level="3.7.2.1" id="concept-streamextractable"><span class="secno">3.7.2.1. </span><span class="content">Concept <code class="highlight"><c- n>StreamExtractable</c-></code></span><a class="self-link" href="#concept-streamextractable"></a></h5>
+<pre class="language-cpp highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- p>,</c-> <c- k>class</c-> <c- nc>CharT</c-> <c- o>=</c-> <c- b>char</c-><c- p>,</c-> <c- k>class</c-> <c- nc>Traits</c-> <c- o>=</c-> <c- n>char_traits</c-><c- o>&lt;</c-><c- n>CharT</c-><c- o>>></c->
+<c- n>concept</c-> <c- b>bool</c-> <c- n>StreamExtractable</c-> <c- o>=</c->
+   <c- n>requires</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>basic_istream</c-><c- o>&lt;</c-><c- n>charT</c-><c- p>,</c-> <c- n>traits</c-><c- o>>&amp;</c-> <c- n>is</c-><c- p>,</c-> <c- n>T</c-><c- o>&amp;</c-> <c- n>t</c-><c- p>)</c-> <c- p>{</c->
+      <c- p>{</c-> <c- n>is</c-> <c- o>>></c-> <c- n>t</c-> <c- p>}</c-> <c- o>-></c-> <c- n>Same</c-><c- o>&lt;</c-><c- n>std</c-><c- o>::</c-><c- n>basic_istream</c-><c- o>&lt;</c-><c- n>charT</c-><c- p>,</c-> <c- n>traits</c-><c- o>>>&amp;</c-><c- p>;</c->
+   <c- p>};</c->
 </pre>
    <ol>
     <li data-md>
-     <p>_Effects_: Initialises <code class="highlight"><c- n>stream_</c-></code> to <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>addressof</c-><c- p>(</c-><c- n>stream</c-><c- p>)</c-></code>.</p>
+     <p><i>Remarks</i>: <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>addressof</c-><c- p>(</c-><c- n>is</c-><c- p>)</c-> <c- o>==</c-> <c- n>std</c-><c- o>::</c-><c- n>addressof</c-><c- p>(</c-><c- n>is</c-> <c- o>&lt;&lt;</c-> <c- n>t</c-><c- p>)</c-></code>.</p>
    </ol>
-   <h5 class="heading settled" data-level="3.7.2.2" id="basic_istream_view-begin"><span class="secno">3.7.2.2. </span><span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code> begin</span><a class="self-link" href="#basic_istream_view-begin"></a></h5>
-<pre class="language-cpp highlight"><c- k>constexpr</c-> <c- k>auto</c-> <c- nf>begin</c-><c- p>();</c->
+   <h5 class="heading settled" data-level="3.7.2.2" id="concept-streaminsertable"><span class="secno">3.7.2.2. </span><span class="content">Concept <code class="highlight"><c- n>StreamInsertable</c-></code></span><a class="self-link" href="#concept-streaminsertable"></a></h5>
+<pre class="language-cpp highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- p>,</c-> <c- k>class</c-> <c- nc>charT</c-> <c- o>=</c-> <c- b>char</c-><c- p>,</c-> <c- k>class</c-> <c- nc>traits</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>char_traits</c-><c- o>&lt;</c-><c- n>charT</c-><c- o>>></c->
+<c- n>concept</c-> <c- b>bool</c-> <c- n>StreamInsertable</c-> <c- o>=</c->
+   <c- n>requires</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>basic_ostream</c-><c- o>&lt;</c-><c- n>charT</c-><c- p>,</c-> <c- n>traits</c-><c- o>>&amp;</c-> <c- n>os</c-><c- p>,</c-> <c- k>const</c-> <c- n>T</c-><c- o>&amp;</c-> <c- n>t</c-><c- p>)</c-> <c- p>{</c->
+      <c- p>{</c-> <c- n>os</c-> <c- o>&lt;&lt;</c-> <c- n>t</c-> <c- p>}</c-> <c- o>-></c-> <c- n>Same</c-><c- o>&lt;</c-><c- n>std</c-><c- o>::</c-><c- n>basic_ostream</c-><c- o>&lt;</c-><c- n>charT</c-><c- p>,</c-> <c- n>traits</c-><c- o>>>&amp;</c-><c- p>;</c->
+   <c- p>};</c->
 </pre>
    <ol start="2">
     <li data-md>
-     <p>_Effects_: Equivalent to</p>
+     <p><i>Remarks</i>: <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>addressof</c-><c- p>(</c-><c- n>os</c-><c- p>)</c-> <c- o>==</c-> <c- n>std</c-><c- o>::</c-><c- n>addressof</c-><c- p>(</c-><c- n>os</c-> <c- o>>></c-> <c- n>t</c-><c- p>)</c-></code>.</p>
+   </ol>
+   <h5 class="heading settled" data-level="3.7.2.3" id="basic_istream_view-constructor"><span class="secno">3.7.2.3. </span><span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code> constructor</span><a class="self-link" href="#basic_istream_view-constructor"></a></h5>
+<pre class="language-cpp highlight"><c- k>explicit</c-> <c- k>constexpr</c-> <c- nf>basic_istream_view</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>basic_istream</c-><c- o>&lt;</c-><c- n>CharT</c-><c- p>,</c-> <c- n>Traits</c-><c- o>>&amp;</c-> <c- n>stream</c-><c- p>);</c->
+</pre>
+   <ol start="3">
+    <li data-md>
+     <p><i>Effects</i>: Initialises <code class="highlight"><c- n>stream_</c-></code> to <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>addressof</c-><c- p>(</c-><c- n>stream</c-><c- p>)</c-></code>.</p>
+   </ol>
+   <h5 class="heading settled" data-level="3.7.2.4" id="basic_istream_view-begin"><span class="secno">3.7.2.4. </span><span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code> begin</span><a class="self-link" href="#basic_istream_view-begin"></a></h5>
+<pre class="language-cpp highlight"><c- k>constexpr</c-> <c- k>auto</c-> <c- nf>begin</c-><c- p>();</c->
+</pre>
+   <ol start="4">
+    <li data-md>
+     <p><i>Effects</i>: Equivalent to</p>
    </ol>
 <pre class="language-cpp highlight"><c- o>*</c-><c- n>stream_</c-> <c- o>>></c-> <c- n>object_</c-><c- p>;</c->
 <c- k>return</c-> <c- n>__iterator</c-><c- p>{</c-><c- o>*</c-><c- k>this</c-><c- p>};</c->
 </pre>
-   <h5 class="heading settled" data-level="3.7.2.3" id="basic_istream_view-end"><span class="secno">3.7.2.3. </span><span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code> end</span><a class="self-link" href="#basic_istream_view-end"></a></h5>
+   <h5 class="heading settled" data-level="3.7.2.5" id="basic_istream_view-end"><span class="secno">3.7.2.5. </span><span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code> end</span><a class="self-link" href="#basic_istream_view-end"></a></h5>
 <pre class="language-cpp highlight"><c- k>constexpr</c-> <c- n>default_sentinel</c-> <c- nf>end</c-><c- p>()</c-> <c- k>const</c-> <c- k>noexcept</c-><c- p>;</c->
 </pre>
-   <ol start="3">
+   <ol start="5">
     <li data-md>
-     <p>_Returns_: <code class="highlight"><c- n>default_sentinel</c-><c- p>{}</c-></code>.</p>
+     <p><i>Returns</i>: <code class="highlight"><c- n>default_sentinel</c-><c- p>{}</c-></code>.</p>
    </ol>
-   <h5 class="heading settled" data-level="3.7.2.4" id="basic_istream_view__iterator"><span class="secno">3.7.2.4. </span><span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code></span><a class="self-link" href="#basic_istream_view__iterator"></a></h5>
+   <h5 class="heading settled" data-level="3.7.2.6" id="basic_istream_view__iterator"><span class="secno">3.7.2.6. </span><span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code></span><a class="self-link" href="#basic_istream_view__iterator"></a></h5>
 <pre class="language-cpp highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>Val</c-><c- p>,</c-> <c- k>class</c-> <c- nc>CharT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>Traits</c-><c- o>></c->
 <c- k>class</c-> <c- nc>basic_istream_view</c-><c- o>&lt;</c-><c- n>Val</c-><c- p>,</c-> <c- n>CharT</c-><c- p>,</c-> <c- n>Traits</c-><c- o>>::</c-><c- n>__iterator</c-> <c- p>{</c->
 <c- k>public</c-><c- o>:</c->
@@ -2074,83 +2212,83 @@ input into the back of <code class="highlight"><c- n>v</c-></code>". There is le
    <c- n>basic_istream_view</c-><c- o>&lt;</c-><c- n>Val</c-><c- p>,</c-> <c- n>CharT</c-><c- p>,</c-> <c- n>Traits</c-><c- o>>*</c-> <c- n>parent_</c-> <c- o>=</c-> <c- k>nullptr</c-><c- p>;</c-> <c- c1>// exposition-only</c->
 <c- p>};</c->
 </pre>
-   <h5 class="heading settled" data-level="3.7.2.5" id="basic_istream_view__iterator-constructor"><span class="secno">3.7.2.5. </span><span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code> constructor</span><a class="self-link" href="#basic_istream_view__iterator-constructor"></a></h5>
+   <h5 class="heading settled" data-level="3.7.2.7" id="basic_istream_view__iterator-constructor"><span class="secno">3.7.2.7. </span><span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code> constructor</span><a class="self-link" href="#basic_istream_view__iterator-constructor"></a></h5>
 <pre class="language-cpp highlight"><c- k>explicit</c-> <c- k>constexpr</c-> <c- nf>__iterator</c-><c- p>(</c-><c- n>istream_view</c-><c- o>&lt;</c-><c- n>Val</c-><c- o>>&amp;</c-> <c- n>parent</c-><c- p>)</c-> <c- k>noexcept</c-><c- p>;</c->
-</pre>
-   <ol start="4">
-    <li data-md>
-     <p>_Effects_: Initialises <code class="highlight"><c- n>parent_</c-></code> with <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>addressof</c-><c- p>(</c-><c- n>parent_</c-><c- p>)</c-></code>.</p>
-   </ol>
-   <h5 class="heading settled" data-level="3.7.2.6" id="basic_istream_view__iterator-next"><span class="secno">3.7.2.6. </span><span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code> next</span><a class="self-link" href="#basic_istream_view__iterator-next"></a></h5>
-<pre class="language-cpp highlight"><c- n>__iterator</c-><c- o>&amp;</c-> <c- k>operator</c-><c- o>++</c-><c- p>();</c->
-<c- b>void</c-> <c- k>operator</c-><c- o>++</c-><c- p>(</c-><c- b>int</c-><c- p>);</c->
-</pre>
-   <ol start="5">
-    <li data-md>
-     <p>_Effects_: Equivalent to</p>
-   </ol>
-<pre class="language-cpp highlight"><c- o>*</c-><c- n>parent_</c-><c- o>-></c-><c- n>stream_</c-> <c- o>>></c-> <c- n>parent_</c-><c- o>-></c-><c- n>object_</c-><c- p>;</c->
-</pre>
-   <h5 class="heading settled" data-level="3.7.2.7" id="basic_istream_view__iterator-value"><span class="secno">3.7.2.7. </span><span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code> value</span><a class="self-link" href="#basic_istream_view__iterator-value"></a></h5>
-<pre class="language-cpp highlight"><c- n>Val</c-><c- o>&amp;</c-> <c- k>operator</c-><c- o>*</c-><c- p>()</c-> <c- k>const</c-><c- p>;</c->
 </pre>
    <ol start="6">
     <li data-md>
-     <p>_Effects_: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>parent_</c-><c- o>-></c-><c- n>value_</c-><c- p>;</c-></code></p>
+     <p><i>Effects</i>: Initialises <code class="highlight"><c- n>parent_</c-></code> with <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>addressof</c-><c- p>(</c-><c- n>parent_</c-><c- p>)</c-></code>.</p>
    </ol>
-   <h5 class="heading settled" data-level="3.7.2.8" id="basic_istream_view__iterator-comparison-functions"><span class="secno">3.7.2.8. </span><span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code> comparison functions</span><a class="self-link" href="#basic_istream_view__iterator-comparison-functions"></a></h5>
-<pre class="language-cpp highlight"><c- k>friend</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>==</c-><c- p>(</c-><c- n>__iterator</c-> <c- n>x</c-><c- p>,</c-> <c- n>default_sentinel</c-><c- p>);</c->
+   <h5 class="heading settled" data-level="3.7.2.8" id="basic_istream_view__iterator-next"><span class="secno">3.7.2.8. </span><span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code> next</span><a class="self-link" href="#basic_istream_view__iterator-next"></a></h5>
+<pre class="language-cpp highlight"><c- n>__iterator</c-><c- o>&amp;</c-> <c- k>operator</c-><c- o>++</c-><c- p>();</c->
+<c- b>void</c-> <c- k>operator</c-><c- o>++</c-><c- p>(</c-><c- b>int</c-><c- p>);</c->
 </pre>
    <ol start="7">
     <li data-md>
-     <p>_Effects_: Equivalent to <code class="highlight"><c- k>return</c-> <c- o>!*</c-><c- n>x</c-><c- p>.</c-><c- n>parent_</c-><c- o>-></c-><c- n>stream_</c-><c- p>;</c-></code>.</p>
+     <p><i>Effects</i>: Equivalent to</p>
    </ol>
-<pre class="language-cpp highlight"><c- k>friend</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>==</c-><c- p>(</c-><c- n>default_sentinel</c-> <c- n>y</c-><c- p>,</c-> <c- n>__iterator</c-> <c- n>x</c-><c- p>);</c->
+<pre class="language-cpp highlight"><c- o>*</c-><c- n>parent_</c-><c- o>-></c-><c- n>stream_</c-> <c- o>>></c-> <c- n>parent_</c-><c- o>-></c-><c- n>object_</c-><c- p>;</c->
+</pre>
+   <h5 class="heading settled" data-level="3.7.2.9" id="basic_istream_view__iterator-value"><span class="secno">3.7.2.9. </span><span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code> value</span><a class="self-link" href="#basic_istream_view__iterator-value"></a></h5>
+<pre class="language-cpp highlight"><c- n>Val</c-><c- o>&amp;</c-> <c- k>operator</c-><c- o>*</c-><c- p>()</c-> <c- k>const</c-><c- p>;</c->
 </pre>
    <ol start="8">
     <li data-md>
-     <p>_Returns_: <code class="highlight"><c- n>x</c-> <c- o>==</c-> <c- n>y</c-></code>.</p>
+     <p><i>Effects</i>: Equivalent to <code class="highlight"><c- k>return</c-> <c- n>parent_</c-><c- o>-></c-><c- n>value_</c-><c- p>;</c-></code></p>
    </ol>
-<pre class="language-cpp highlight"><c- k>friend</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>!=</c-><c- p>(</c-><c- n>__iterator</c-> <c- n>x</c-><c- p>,</c-> <c- n>default_sentinel</c-> <c- n>y</c-><c- p>);</c->
+   <h5 class="heading settled" data-level="3.7.2.10" id="basic_istream_view__iterator-comparison-functions"><span class="secno">3.7.2.10. </span><span class="content"><code class="highlight"><c- n>basic_istream_view</c-><c- o>::</c-><c- n>__iterator</c-></code> comparison functions</span><a class="self-link" href="#basic_istream_view__iterator-comparison-functions"></a></h5>
+<pre class="language-cpp highlight"><c- k>friend</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>==</c-><c- p>(</c-><c- n>__iterator</c-> <c- n>x</c-><c- p>,</c-> <c- n>default_sentinel</c-><c- p>);</c->
 </pre>
    <ol start="9">
     <li data-md>
-     <p>_Returns_: <code class="highlight"><c- o>!</c-><c- p>(</c-><c- n>x</c-> <c- o>==</c-> <c- n>y</c-><c- p>)</c-></code>.</p>
+     <p><i>Effects</i>: Equivalent to <code class="highlight"><c- k>return</c-> <c- o>!*</c-><c- n>x</c-><c- p>.</c-><c- n>parent_</c-><c- o>-></c-><c- n>stream_</c-><c- p>;</c-></code>.</p>
    </ol>
-<pre class="language-cpp highlight"><c- k>friend</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>!=</c-><c- p>(</c-><c- n>default_sentinel</c-> <c- n>y</c-><c- p>,</c-> <c- n>__iterator</c-> <c- n>x</c-><c- p>);</c->
+<pre class="language-cpp highlight"><c- k>friend</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>==</c-><c- p>(</c-><c- n>default_sentinel</c-> <c- n>y</c-><c- p>,</c-> <c- n>__iterator</c-> <c- n>x</c-><c- p>);</c->
 </pre>
    <ol start="10">
     <li data-md>
-     <p>_Returns_: <code class="highlight"><c- o>!</c-><c- p>(</c-><c- n>x</c-> <c- o>==</c-> <c- n>y</c-><c- p>)</c-></code>.</p>
+     <p><i>Returns</i>: <code class="highlight"><c- n>x</c-> <c- o>==</c-> <c- n>y</c-></code>.</p>
    </ol>
-   <h3 class="heading settled" data-level="3.8" id="basic_istream_view-range-adaptor-objects"><span class="secno">3.8. </span><span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code> range adaptor objects</span><a class="self-link" href="#basic_istream_view-range-adaptor-objects"></a></h3>
+<pre class="language-cpp highlight"><c- k>friend</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>!=</c-><c- p>(</c-><c- n>__iterator</c-> <c- n>x</c-><c- p>,</c-> <c- n>default_sentinel</c-> <c- n>y</c-><c- p>);</c->
+</pre>
+   <ol start="11">
+    <li data-md>
+     <p><i>Returns</i>: <code class="highlight"><c- o>!</c-><c- p>(</c-><c- n>x</c-> <c- o>==</c-> <c- n>y</c-><c- p>)</c-></code>.</p>
+   </ol>
+<pre class="language-cpp highlight"><c- k>friend</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>!=</c-><c- p>(</c-><c- n>default_sentinel</c-> <c- n>y</c-><c- p>,</c-> <c- n>__iterator</c-> <c- n>x</c-><c- p>);</c->
+</pre>
+   <ol start="12">
+    <li data-md>
+     <p><i>Returns</i>: <code class="highlight"><c- o>!</c-><c- p>(</c-><c- n>x</c-> <c- o>==</c-> <c- n>y</c-><c- p>)</c-></code>.</p>
+   </ol>
+   <h3 class="heading settled" data-level="3.8" id="basic_istream_view-range-adaptors"><span class="secno">3.8. </span><span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code> range adaptors</span><a class="self-link" href="#basic_istream_view-range-adaptors"></a></h3>
    <p>The names <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>istream</c-></code>, <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>wistream</c-></code>, <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>u16istream</c-></code>, and <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>u32istream</c-></code> denote range
-adaptor objects. Let <code class="highlight"><c- n>E</c-></code> be an expression and <code class="highlight"><c- n>T</c-></code> be a type distinct from <code class="highlight"><c- k>decltype</c-><c- p>((</c-><c- n>E</c-><c- p>))</c-></code>.</p>
+adaptors. Let <code class="highlight"><c- n>E</c-></code> be an expression and <code class="highlight"><c- n>T</c-></code> be a type distinct from <code class="highlight"><c- k>decltype</c-><c- p>((</c-><c- n>E</c-><c- p>))</c-></code>.</p>
    <ol>
     <li data-md>
-     <p>Then, the expression <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>istream</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-><c- p>(</c-><c- n>E</c-><c- p>)</c-></code> is expression-equivalent to:</p>
+     <p>Then, the expression <code class="highlight"><c- n>istream_view</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-><c- p>(</c-><c- n>E</c-><c- p>)</c-></code> is expression-equivalent to:</p>
     <li data-md>
      <p><code class="highlight"><c- n>basic_istream_view</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- b>char</c-><c- o>></c-><c- p>(</c-><c- n>E</c-><c- p>)</c-></code> if <code class="highlight"><c- k>decltype</c-><c- p>((</c-><c- n>E</c-><c- p>))</c-></code> models <code class="highlight"><c- n>DerivedFrom</c-><c- o>&lt;</c-><c- n>std</c-><c- o>::</c-><c- n>istream</c-><c- o>></c-></code> and <code class="highlight"><c- n>T</c-></code> models <code class="highlight"><c- n>StreamExtractable</c-></code>.</p>
     <li data-md>
-     <p>Otherwise <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>istream</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-><c- p>(</c-><c- n>E</c-><c- p>)</c-></code> is ill-formed.</p>
+     <p>Otherwise <code class="highlight"><c- n>istream_view</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-><c- p>(</c-><c- n>E</c-><c- p>)</c-></code> is ill-formed.</p>
     <li data-md>
-     <p>Then, the expression <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>wistream</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-><c- p>(</c-><c- n>E</c-><c- p>)</c-></code> is expression-equivalent to:</p>
+     <p>Then, the expression <code class="highlight"><c- n>wistream_view</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-><c- p>(</c-><c- n>E</c-><c- p>)</c-></code> is expression-equivalent to:</p>
     <li data-md>
      <p><code class="highlight"><c- n>basic_istream_view</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- b>wchar_t</c-><c- o>></c-><c- p>(</c-><c- n>E</c-><c- p>)</c-></code> if <code class="highlight"><c- k>decltype</c-><c- p>((</c-><c- n>E</c-><c- p>))</c-></code> models <code class="highlight"><c- n>DerivedFrom</c-><c- o>&lt;</c-><c- n>std</c-><c- o>::</c-><c- n>wistream</c-><c- o>></c-></code> and <code class="highlight"><c- n>T</c-></code> modes <code class="highlight"><c- n>StreamExtractable</c-></code>.</p>
     <li data-md>
-     <p>Otherwise <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>wistream</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-><c- p>(</c-><c- n>E</c-><c- p>)</c-></code> is ill-formed.</p>
+     <p>Otherwise <code class="highlight"><c- n>wistream_view</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-><c- p>(</c-><c- n>E</c-><c- p>)</c-></code> is ill-formed.</p>
     <li data-md>
-     <p>Then, the expression <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>u16istream</c-></code> is expression-equivalent to:</p>
+     <p>Then, the expression <code class="highlight"><c- n>u16istream_view</c-></code> is expression-equivalent to:</p>
     <li data-md>
      <p><code class="highlight"><c- n>basic_istream_view</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- b>char16_t</c-><c- o>></c-><c- p>(</c-><c- n>E</c-><c- p>)</c-></code> if <code class="highlight"><c- k>decltype</c-><c- p>((</c-><c- n>E</c-><c- p>))</c-></code> models <code class="highlight"><c- n>DerivedFrom</c-><c- o>&lt;</c-><c- n>basic_istream</c-><c- o>&lt;</c-><c- b>char16_t</c-><c- o>>></c-></code> and <code class="highlight"><c- n>T</c-></code> models <code class="highlight"><c- n>StreamExtractable</c-></code>.</p>
     <li data-md>
-     <p>Otherwise <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>u16istream</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-><c- p>(</c-><c- n>E</c-><c- p>)</c-></code> is ill-formed.</p>
+     <p>Otherwise <code class="highlight"><c- n>u16istream_view</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-><c- p>(</c-><c- n>E</c-><c- p>)</c-></code> is ill-formed.</p>
     <li data-md>
-     <p>Then, the expression <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>u32istream</c-></code> is expression-equivalent to:</p>
+     <p>Then, the expression <code class="highlight"><c- n>u32istream_view</c-></code> is expression-equivalent to:</p>
     <li data-md>
      <p><code class="highlight"><c- n>basic_istream_view</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- b>char32_t</c-><c- o>></c-><c- p>(</c-><c- n>E</c-><c- p>)</c-></code> if <code class="highlight"><c- k>decltype</c-><c- p>((</c-><c- n>E</c-><c- p>))</c-></code> models <code class="highlight"><c- n>DerivedFrom</c-><c- o>&lt;</c-><c- n>basic_istream</c-><c- o>&lt;</c-><c- b>char32_t</c-><c- o>>></c-></code> and <code class="highlight"><c- n>T</c-></code> models <code class="highlight"><c- n>StreamExtractable</c-></code>.</p>
     <li data-md>
-     <p>Otherwise <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>u32istream</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-><c- p>(</c-><c- n>E</c-><c- p>)</c-></code> is ill-formed.</p>
+     <p>Otherwise <code class="highlight"><c- n>u32istream_view</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-><c- p>(</c-><c- n>E</c-><c- p>)</c-></code> is ill-formed.</p>
    </ol>
    <h3 class="heading settled" data-level="3.9" id="zip_with_view"><span class="secno">3.9. </span><span class="content"><code class="highlight"><c- n>zip_with_view</c-></code></span><a class="self-link" href="#zip_with_view"></a></h3>
    <h3 class="heading settled" data-level="3.10" id="viewzip"><span class="secno">3.10. </span><span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip</c-></code></span><a class="self-link" href="#viewzip"></a></h3>
@@ -2159,9 +2297,6 @@ adaptor objects. Let <code class="highlight"><c- n>E</c-></code> be an expressio
    <h3 class="heading settled" data-level="3.13" id="viewkeys"><span class="secno">3.13. </span><span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>keys</c-></code></span><a class="self-link" href="#viewkeys"></a></h3>
    <h3 class="heading settled" data-level="3.14" id="value_view"><span class="secno">3.14. </span><span class="content"><code class="highlight"><c- n>value_view</c-></code></span><a class="self-link" href="#value_view"></a></h3>
    <h3 class="heading settled" data-level="3.15" id="viewvalues"><span class="secno">3.15. </span><span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>values</c-></code></span><a class="self-link" href="#viewvalues"></a></h3>
-   <p>[P0789]: https://wg21.link/p0789
-[cmcstl2]: https://github.com/CaseyCarter/cmcstl2
-[range-v3]: https://github.com/ericniebler/range-v3</p>
   </main>
 <script>
 (function() {
@@ -2292,3 +2427,13 @@ adaptor objects. Let <code class="highlight"><c- n>E</c-></code> be an expressio
 
 })();
 </script>
+  <h2 class="no-num no-ref heading settled" id="references"><span class="content">References</span><a class="self-link" href="#references"></a></h2>
+  <h3 class="no-num no-ref heading settled" id="informative"><span class="content">Informative References</span><a class="self-link" href="#informative"></a></h3>
+  <dl>
+   <dt id="biblio-cmcstl2">[CMCSTL2]
+   <dd>Casey Carter &amp; others. <a href=" https://github.com/CaseyCarter/cmcstl2">cmcstl2 C++ library</a>. URL: <a href=" https://github.com/CaseyCarter/cmcstl2"> https://github.com/CaseyCarter/cmcstl2</a>
+   <dt id="biblio-p0789">[P0789]
+   <dd>Eric Niebler. <a href="https://wg21.link/p0789">Range Adaptors and Utilities</a>. URL: <a href="https://wg21.link/p0789">https://wg21.link/p0789</a>
+   <dt id="biblio-range-v3">[RANGE-V3]
+   <dd>Eric Niebler &amp; others. <a href="https://github.com/ericniebler/range-v3">ranges-v3 C++ library</a>. URL: <a href="https://github.com/ericniebler/range-v3">https://github.com/ericniebler/range-v3</a>
+  </dl>
