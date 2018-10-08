@@ -184,7 +184,7 @@ requires
    std::is_object_v<Pred> &&
    IndirectUnaryPredicate<const Pred, iterator_t<R>
 class take_while_view : public view_interface<take_while_view<R, Pred>> {
-   template <bool> class __sentinel; // exposition-only
+   template<bool> class __sentinel; // exposition-only
 public:
    take_while_view() = default;
    constexpr take_while_view(R base, Pred pred);
@@ -826,19 +826,93 @@ adaptors. Let `E` be an expression and `T` be a type distinct from `decltype((E)
 
 ## `zip_with_view`
 
+### Motivation
+
+A zip, also known as a [[convolution operation]], performs a transformation on multiple input
+ranges. The typical zip operation transforms several input ranges into a single input range
+containing a tuple with the <i>i</i>th element from each range, and terminates when the smallest
+finite range is delimited. The following example has been adapted from [[P0836]] &sect;2.1.
+
+<table>
+  <tr><th>Current (C++17)</th><th>Proposed (C++20)</th></tr>
+  <tr>
+    <td>
+      <xmp>
+vector<float> const x = // ...
+vector<float> const y = // ...
+float a = // ...
+// ...
+auto result = vector<float>(size(x));
+transform(x, y, begin(result), [a](auto const x, auto const y) {
+   return a * x + y; });
+      </xmp>
+    </td>
+    <td>
+      <xmp>
+vector<float> const x = // ...
+vector<float> const y = // ...
+float const a = // ...
+// ...
+auto const pair_mult = [](auto const& ax){ auto [a, x] = ax; return a * x; };
+auto const pair_plus = [](auto const& axpy){ auto [ax, y] = axpy; return ax + y; };
+auto ax = view::zip(view::repeat(a), x) | view::transform(pair_mult);
+auto saxpy = view::zip(ax, y) | view::transform(pair_plus);
+auto const result = vector(begin(saxpy), end(saxpy));
+      </xmp>
+    </td>
+  </tr>
+</table>
+
+The benefits of this proposed approach include:
+
+* More <i>declared</i> operations, leading to more declarative -- rather than imperative -- style
+    programming.
+* Eliminates state.
+* `result` can be declared `const` without needing to rely on IILE. (Note the lack of IILE and the
+    non-`const`ness in the former).
+* Temporary storage is eliminated, which P0836 &sect;2.1 articulates as beneficial for heterogeneous
+    programming.
+
+`zip_with` is a generalisation of `zip`, such that we can apply an <i>n</i>-ary function in place of
+the `transform`s above. The following is an example of how `zip_with` can refine `zip` when tuples
+are not necessary.
+
+```cpp
+vector<float> const x = // ...
+vector<float> const y = // ...
+float const a = // ...
+// ...
+auto ax = x | view::transform([a](auto const x) noexcept { return a * x; });
+auto saxpy = view::zip_with(plus<>{}, ax, y);
+auto const result = vector(begin(saxpy), end(saxpy));
+```
+
+In the following text, `zip` is implemented in terms of `zip_with`.
+
+### `__common_tuple`
+
+#### Motivation
+
+`zip_with_view` requires a value type to store the iterators to the ranges it references, and a
+reference type that is used to access those iterators. `__common_tuple` is an exposition-only type
+that lets `tuple<Ts&...>` (the value type) and `tuple<Ts...>&` (the reference type) share a common
+reference a la `common_reference_t`.
+
+Without such a type, we would be required to expose a conversion operator that transforms
+`tuple<Ts&...>` to `tuple<Ts...>&`. Because this would then be exposed to Standard library users,
+and will lead to improper usage, this approach is not recommended.
+
+### `__iter_zip_with`
+
+TODO (released before San Diego).
+
 ## `view::zip`
 
-
+TODO (released before San Diego).
 
 ## `view::zip_with`
 
-## `key_view`
-
-## `view::keys`
-
-## `value_view`
-
-## `view::values`
+TODO (released before San Diego).
 
 <pre class=biblio>
 {
@@ -846,6 +920,11 @@ adaptors. Let `E` be an expression and `T` be a type distinct from `decltype((E)
     "title": "Range Adaptors and Utilities",
     "authors": ["Eric Niebler"],
     "href": "https://wg21.link/p0789"
+},
+"P0836": {
+    "title": "P0836 Introduce Parallelism to the Ranges TS",
+    "authors": ["Gordon Brown", "Christopher Di Bella", "Michael Haidl", "Toomas Remmelg", "Ruyman Reyes", "Michel Steuwer", "Michael Wong"],
+    "href": "https://wg21.link/p0836"
 },
 "range-v3": {
     "title": "ranges-v3 C++ library",
@@ -856,6 +935,11 @@ adaptors. Let `E` be an expression and `T` be a type distinct from `decltype((E)
     "title": "cmcstl2 C++ library",
     "authors": ["Casey Carter & others"],
     "href": " https://github.com/CaseyCarter/cmcstl2"
+},
+"convolution operation": {
+    "title": "Convolution",
+    "authors": ["Wikipedia-owned"],
+    "href": "https://en.wikipedia.org/wiki/Convolution_(computer_science)"
 }
 }
 </pre>

@@ -1230,7 +1230,7 @@ Possible extra rowspan handling
   <meta content="Bikeshed version e9290f0f6bc01459c8b7bdfa2bb91f6985fc5c67" name="generator">
   <link href="https://wg21.link/p1035" rel="canonical">
   <link href="https://isocpp.org/favicon.ico" rel="icon">
-  <meta content="0903a03e9b1535ff7fe1f45233ab11b0bd27a2fd" name="document-revision">
+  <meta content="0f58495c60c6bf5cc9566d1c6b62978486692445" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1537,13 +1537,19 @@ pre .property::before, pre .property::after {
          </ol>
        </ol>
       <li><a href="#basic_istream_view-range-adaptors"><span class="secno">3.8</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code> range adaptors</span></a>
-      <li><a href="#zip_with_view"><span class="secno">3.9</span> <span class="content"><code class="highlight"><c- n>zip_with_view</c-></code></span></a>
+      <li>
+       <a href="#zip_with_view"><span class="secno">3.9</span> <span class="content"><code class="highlight"><c- n>zip_with_view</c-></code></span></a>
+       <ol class="toc">
+        <li><a href="#motivation⑤"><span class="secno">3.9.1</span> <span class="content">Motivation</span></a>
+        <li>
+         <a href="#__common_tuple"><span class="secno">3.9.2</span> <span class="content"><code class="highlight"><c- n>__common_tuple</c-></code></span></a>
+         <ol class="toc">
+          <li><a href="#motivation⑥"><span class="secno">3.9.2.1</span> <span class="content">Motivation</span></a>
+         </ol>
+        <li><a href="#__iter_zip_with"><span class="secno">3.9.3</span> <span class="content"><code class="highlight"><c- n>__iter_zip_with</c-></code></span></a>
+       </ol>
       <li><a href="#viewzip"><span class="secno">3.10</span> <span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip</c-></code></span></a>
       <li><a href="#viewzip_with"><span class="secno">3.11</span> <span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip_with</c-></code></span></a>
-      <li><a href="#key_view"><span class="secno">3.12</span> <span class="content"><code class="highlight"><c- n>key_view</c-></code></span></a>
-      <li><a href="#viewkeys"><span class="secno">3.13</span> <span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>keys</c-></code></span></a>
-      <li><a href="#value_view"><span class="secno">3.14</span> <span class="content"><code class="highlight"><c- n>value_view</c-></code></span></a>
-      <li><a href="#viewvalues"><span class="secno">3.15</span> <span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>values</c-></code></span></a>
      </ol>
     <li>
      <a href="#references"><span class="secno"></span> <span class="content">References</span></a>
@@ -1707,7 +1713,7 @@ this, a proposal could be made in the C++23 timeframe.</p>
    <c- n>std</c-><c- o>::</c-><c- n>is_object_v</c-><c- o>&lt;</c-><c- n>Pred</c-><c- o>></c-> <c- o>&amp;&amp;</c->
    <c- n>IndirectUnaryPredicate</c-><c- o>&lt;</c-><c- k>const</c-> <c- n>Pred</c-><c- p>,</c-> <c- n>iterator_t</c-><c- o>&lt;</c-><c- n>R</c-><c- o>></c->
 <c- k>class</c-> <c- nc>take_while_view</c-> <c- o>:</c-> <c- k>public</c-> <c- n>view_interface</c-><c- o>&lt;</c-><c- n>take_while_view</c-><c- o>&lt;</c-><c- n>R</c-><c- p>,</c-> <c- n>Pred</c-><c- o>>></c-> <c- p>{</c->
-   <c- k>template</c-> <c- o>&lt;</c-><c- b>bool</c-><c- o>></c-> <c- k>class</c-> <c- nc>__sentinel</c-><c- p>;</c-> <c- c1>// exposition-only</c->
+   <c- k>template</c-><c- o>&lt;</c-><c- b>bool</c-><c- o>></c-> <c- k>class</c-> <c- nc>__sentinel</c-><c- p>;</c-> <c- c1>// exposition-only</c->
 <c- k>public</c-><c- o>:</c->
    <c- n>take_while_view</c-><c- p>()</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
    <c- k>constexpr</c-> <c- nf>take_while_view</c-><c- p>(</c-><c- n>R</c-> <c- n>base</c-><c- p>,</c-> <c- n>Pred</c-> <c- n>pred</c-><c- p>);</c->
@@ -2291,12 +2297,78 @@ adaptors. Let <code class="highlight"><c- n>E</c-></code> be an expression and <
      <p>Otherwise <code class="highlight"><c- n>u32istream_view</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-><c- p>(</c-><c- n>E</c-><c- p>)</c-></code> is ill-formed.</p>
    </ol>
    <h3 class="heading settled" data-level="3.9" id="zip_with_view"><span class="secno">3.9. </span><span class="content"><code class="highlight"><c- n>zip_with_view</c-></code></span><a class="self-link" href="#zip_with_view"></a></h3>
+   <h4 class="heading settled" data-level="3.9.1" id="motivation⑤"><span class="secno">3.9.1. </span><span class="content">Motivation</span><a class="self-link" href="#motivation⑤"></a></h4>
+   <p>A zip, also known as a [[convolution operation]], performs a transformation on multiple input
+ranges. The typical zip operation transforms several input ranges into a single input range
+containing a tuple with the <i>i</i>th element from each range, and terminates when the smallest
+finite range is delimited. The following example has been adapted from <a data-link-type="biblio" href="#biblio-p0836">[P0836]</a> §2.1.</p>
+   <table>
+    <tbody>
+     <tr>
+      <th>Current (C++17)
+      <th>Proposed (C++20)
+     <tr>
+      <td>
+<pre class="highlight"><c- n>vector</c-><c- o>&lt;</c-><c- b>float</c-><c- o>></c-> <c- k>const</c-> <c- n>x</c-> <c- o>=</c-> <c- c1>// ...</c->
+<c- n>vector</c-><c- o>&lt;</c-><c- b>float</c-><c- o>></c-> <c- k>const</c-> <c- n>y</c-> <c- o>=</c-> <c- c1>// ...</c->
+<c- b>float</c-> <c- n>a</c-> <c- o>=</c-> <c- c1>// ...</c->
+<c- c1>// ...</c->
+<c- k>auto</c-> <c- n>result</c-> <c- o>=</c-> <c- n>vector</c-><c- o>&lt;</c-><c- b>float</c-><c- o>></c-><c- p>(</c-><c- n>size</c-><c- p>(</c-><c- n>x</c-><c- p>));</c->
+<c- n>transform</c-><c- p>(</c-><c- n>x</c-><c- p>,</c-> <c- n>y</c-><c- p>,</c-> <c- n>begin</c-><c- p>(</c-><c- n>result</c-><c- p>),</c-> <c- p>[</c-><c- n>a</c-><c- p>](</c-><c- k>auto</c-> <c- k>const</c-> <c- n>x</c-><c- p>,</c-> <c- k>auto</c-> <c- k>const</c-> <c- n>y</c-><c- p>)</c-> <c- p>{</c->
+   <c- k>return</c-> <c- n>a</c-> <c- o>*</c-> <c- n>x</c-> <c- o>+</c-> <c- n>y</c-><c- p>;</c-> <c- p>});</c->
+</pre>
+      <td>
+<pre class="highlight"><c- n>vector</c-><c- o>&lt;</c-><c- b>float</c-><c- o>></c-> <c- k>const</c-> <c- n>x</c-> <c- o>=</c-> <c- c1>// ...</c->
+<c- n>vector</c-><c- o>&lt;</c-><c- b>float</c-><c- o>></c-> <c- k>const</c-> <c- n>y</c-> <c- o>=</c-> <c- c1>// ...</c->
+<c- b>float</c-> <c- k>const</c-> <c- n>a</c-> <c- o>=</c-> <c- c1>// ...</c->
+<c- c1>// ...</c->
+<c- k>auto</c-> <c- k>const</c-> <c- n>pair_mult</c-> <c- o>=</c-> <c- p>[](</c-><c- k>auto</c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>ax</c-><c- p>){</c-> <c- k>auto</c-> <c- p>[</c-><c- n>a</c-><c- p>,</c-> <c- n>x</c-><c- p>]</c-> <c- o>=</c-> <c- n>ax</c-><c- p>;</c-> <c- k>return</c-> <c- n>a</c-> <c- o>*</c-> <c- n>x</c-><c- p>;</c-> <c- p>};</c->
+<c- k>auto</c-> <c- k>const</c-> <c- n>pair_plus</c-> <c- o>=</c-> <c- p>[](</c-><c- k>auto</c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>axpy</c-><c- p>){</c-> <c- k>auto</c-> <c- p>[</c-><c- n>ax</c-><c- p>,</c-> <c- n>y</c-><c- p>]</c-> <c- o>=</c-> <c- n>axpy</c-><c- p>;</c-> <c- k>return</c-> <c- n>ax</c-> <c- o>+</c-> <c- n>y</c-><c- p>;</c-> <c- p>};</c->
+<c- k>auto</c-> <c- n>ax</c-> <c- o>=</c-> <c- n>view</c-><c- o>::</c-><c- n>zip</c-><c- p>(</c-><c- n>view</c-><c- o>::</c-><c- n>repeat</c-><c- p>(</c-><c- n>a</c-><c- p>),</c-> <c- n>x</c-><c- p>)</c-> <c- o>|</c-> <c- n>view</c-><c- o>::</c-><c- n>transform</c-><c- p>(</c-><c- n>pair_mult</c-><c- p>);</c->
+<c- k>auto</c-> <c- n>saxpy</c-> <c- o>=</c-> <c- n>view</c-><c- o>::</c-><c- n>zip</c-><c- p>(</c-><c- n>ax</c-><c- p>,</c-> <c- n>y</c-><c- p>)</c-> <c- o>|</c-> <c- n>view</c-><c- o>::</c-><c- n>transform</c-><c- p>(</c-><c- n>pair_plus</c-><c- p>);</c->
+<c- k>auto</c-> <c- k>const</c-> <c- n>result</c-> <c- o>=</c-> <c- n>vector</c-><c- p>(</c-><c- n>begin</c-><c- p>(</c-><c- n>saxpy</c-><c- p>),</c-> <c- n>end</c-><c- p>(</c-><c- n>saxpy</c-><c- p>));</c->
+</pre>
+   </table>
+   <p>The benefits of this proposed approach include:</p>
+   <ul>
+    <li data-md>
+     <p>More <i>declared</i> operations, leading to more declarative -- rather than imperative -- style
+programming.</p>
+    <li data-md>
+     <p>Eliminates state.</p>
+    <li data-md>
+     <p><code class="highlight"><c- n>result</c-></code> can be declared <code class="highlight"><c- k>const</c-></code> without needing to rely on IILE. (Note the lack of IILE and the
+non-<code class="highlight"><c- k>const</c-></code>ness in the former).</p>
+    <li data-md>
+     <p>Temporary storage is eliminated, which P0836 §2.1 articulates as beneficial for heterogeneous
+programming.</p>
+   </ul>
+   <p><code class="highlight"><c- n>zip_with</c-></code> is a generalisation of <code class="highlight"><c- n>zip</c-></code>, such that we can apply an <i>n</i>-ary function in place of
+the <code class="highlight"><c- n>transform</c-></code>s above. The following is an example of how <code class="highlight"><c- n>zip_with</c-></code> can refine <code class="highlight"><c- n>zip</c-></code> when tuples
+are not necessary.</p>
+<pre class="language-cpp highlight"><c- n>vector</c-><c- o>&lt;</c-><c- b>float</c-><c- o>></c-> <c- k>const</c-> <c- n>x</c-> <c- o>=</c-> <c- c1>// ...</c->
+<c- n>vector</c-><c- o>&lt;</c-><c- b>float</c-><c- o>></c-> <c- k>const</c-> <c- n>y</c-> <c- o>=</c-> <c- c1>// ...</c->
+<c- b>float</c-> <c- k>const</c-> <c- n>a</c-> <c- o>=</c-> <c- c1>// ...</c->
+<c- c1>// ...</c->
+<c- k>auto</c-> <c- n>ax</c-> <c- o>=</c-> <c- n>x</c-> <c- o>|</c-> <c- n>view</c-><c- o>::</c-><c- n>transform</c-><c- p>([</c-><c- n>a</c-><c- p>](</c-><c- k>auto</c-> <c- k>const</c-> <c- n>x</c-><c- p>)</c-> <c- k>noexcept</c-> <c- p>{</c-> <c- k>return</c-> <c- n>a</c-> <c- o>*</c-> <c- n>x</c-><c- p>;</c-> <c- p>});</c->
+<c- k>auto</c-> <c- n>saxpy</c-> <c- o>=</c-> <c- n>view</c-><c- o>::</c-><c- n>zip_with</c-><c- p>(</c-><c- n>plus</c-><c- o>&lt;></c-><c- p>{},</c-> <c- n>ax</c-><c- p>,</c-> <c- n>y</c-><c- p>);</c->
+<c- k>auto</c-> <c- k>const</c-> <c- n>result</c-> <c- o>=</c-> <c- n>vector</c-><c- p>(</c-><c- n>begin</c-><c- p>(</c-><c- n>saxpy</c-><c- p>),</c-> <c- n>end</c-><c- p>(</c-><c- n>saxpy</c-><c- p>));</c->
+</pre>
+   <p>In the following text, <code class="highlight"><c- n>zip</c-></code> is implemented in terms of <code class="highlight"><c- n>zip_with</c-></code>.</p>
+   <h4 class="heading settled" data-level="3.9.2" id="__common_tuple"><span class="secno">3.9.2. </span><span class="content"><code class="highlight"><c- n>__common_tuple</c-></code></span><a class="self-link" href="#__common_tuple"></a></h4>
+   <h5 class="heading settled" data-level="3.9.2.1" id="motivation⑥"><span class="secno">3.9.2.1. </span><span class="content">Motivation</span><a class="self-link" href="#motivation⑥"></a></h5>
+   <p><code class="highlight"><c- n>zip_with_view</c-></code> requires a value type to store the iterators to the ranges it references, and a
+reference type that is used to access those iterators. <code class="highlight"><c- n>__common_tuple</c-></code> is an exposition-only type
+that lets <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>...</c-><c- o>></c-></code> (the value type) and <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>...</c-><c- o>>&amp;</c-></code> (the reference type) share a common
+reference a la <code class="highlight"><c- n>common_reference_t</c-></code>.</p>
+   <p>Without such a type, we would be required to expose a conversion operator that transforms <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>...</c-><c- o>></c-></code> to <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>...</c-><c- o>>&amp;</c-></code>. Because this would then be exposed to Standard library users,
+and will lead to improper usage, this approach is not recommended.</p>
+   <h4 class="heading settled" data-level="3.9.3" id="__iter_zip_with"><span class="secno">3.9.3. </span><span class="content"><code class="highlight"><c- n>__iter_zip_with</c-></code></span><a class="self-link" href="#__iter_zip_with"></a></h4>
+   <p>TODO (released before San Diego).</p>
    <h3 class="heading settled" data-level="3.10" id="viewzip"><span class="secno">3.10. </span><span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip</c-></code></span><a class="self-link" href="#viewzip"></a></h3>
+   <p>TODO (released before San Diego).</p>
    <h3 class="heading settled" data-level="3.11" id="viewzip_with"><span class="secno">3.11. </span><span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip_with</c-></code></span><a class="self-link" href="#viewzip_with"></a></h3>
-   <h3 class="heading settled" data-level="3.12" id="key_view"><span class="secno">3.12. </span><span class="content"><code class="highlight"><c- n>key_view</c-></code></span><a class="self-link" href="#key_view"></a></h3>
-   <h3 class="heading settled" data-level="3.13" id="viewkeys"><span class="secno">3.13. </span><span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>keys</c-></code></span><a class="self-link" href="#viewkeys"></a></h3>
-   <h3 class="heading settled" data-level="3.14" id="value_view"><span class="secno">3.14. </span><span class="content"><code class="highlight"><c- n>value_view</c-></code></span><a class="self-link" href="#value_view"></a></h3>
-   <h3 class="heading settled" data-level="3.15" id="viewvalues"><span class="secno">3.15. </span><span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>values</c-></code></span><a class="self-link" href="#viewvalues"></a></h3>
+   <p>TODO (released before San Diego).</p>
   </main>
 <script>
 (function() {
@@ -2434,6 +2506,8 @@ adaptors. Let <code class="highlight"><c- n>E</c-></code> be an expression and <
    <dd>Casey Carter &amp; others. <a href=" https://github.com/CaseyCarter/cmcstl2">cmcstl2 C++ library</a>. URL: <a href=" https://github.com/CaseyCarter/cmcstl2"> https://github.com/CaseyCarter/cmcstl2</a>
    <dt id="biblio-p0789">[P0789]
    <dd>Eric Niebler. <a href="https://wg21.link/p0789">Range Adaptors and Utilities</a>. URL: <a href="https://wg21.link/p0789">https://wg21.link/p0789</a>
+   <dt id="biblio-p0836">[P0836]
+   <dd>Gordon Brown; et al. <a href="https://wg21.link/p0836">P0836 Introduce Parallelism to the Ranges TS</a>. URL: <a href="https://wg21.link/p0836">https://wg21.link/p0836</a>
    <dt id="biblio-range-v3">[RANGE-V3]
    <dd>Eric Niebler &amp; others. <a href="https://github.com/ericniebler/range-v3">ranges-v3 C++ library</a>. URL: <a href="https://github.com/ericniebler/range-v3">https://github.com/ericniebler/range-v3</a>
   </dl>
