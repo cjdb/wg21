@@ -579,7 +579,7 @@ constexpr auto begin();
 ## `view::drop_while`
 
 The name `view::drop_while` denotes a range adaptor object. Let `E` and `F` be expressions such that
-type `T` is `decltype((E))`. Then, the expression  `view::drop_while(E, F)`is expression-equivalent
+type `T` is `decltype((E))`. Then, the expression `view::drop_while(E, F)`is expression-equivalent
 to:
 
 1. `drop_while_view{E, F}` if `T` models `InputRange`, and `F` is both an object and models
@@ -893,24 +893,56 @@ In the following text, `zip` is implemented in terms of `zip_with`.
 
 #### Motivation
 
-`zip_with_view` requires a value type to store the iterators to the ranges it references, and a
-reference type that is used to access those iterators. `__common_tuple` is an exposition-only type
-that lets `tuple<Ts&...>` (the value type) and `tuple<Ts...>&` (the reference type) share a common
-reference a la `common_reference_t`.
+`zip_with_view` requires a value type to store the values of the iterators to the ranges that are
+iterated over, and a reference type to access those values via an iterator to the range.
+`__common_tuple` is an exposition-only type that lets `tuple<Ts...>` (the value type) and
+`tuple<Ts&...>` (the reference type) share a common reference a la `common_reference_t`.
 
-Without such a type, we would be required to expose a conversion operator that transforms
-`tuple<Ts&...>` to `tuple<Ts...>&`. Because this would then be exposed to Standard library users,
-and will lead to improper usage, this approach is not recommended.
+Without such a `__common_tuple` type, we would be required to expose a conversion operator that
+transforms `tuple<Ts...>&` to `tuple<Ts&...>`. This would then be exposed to Standard library users;
+it might not be obvious that this conversion is possible, and it is it not obvious that the
+conversion is undesirable: this is a dangerous situation to be in; and thus P1035 strongly opposes
+providing such conversion operators.
+
+##### Implementation
+
+TODO (released before San Diego).
 
 ### `__iter_zip_with`
 
 TODO (released before San Diego).
 
-## `view::zip`
+### `zip_with_view`
 
 TODO (released before San Diego).
 
 ## `view::zip_with`
+
+The name `view::zip_with` denotes a range adaptor object. Let `Args&&...` be a parameter pack, with
+`args...` as its pack expansion, and let `F` be an expression. Then, the expression
+`view::zip_with(F, std::forward<Args>(args)...)` is expression-equivalent to:
+
+1. `zip_with_view{F, std::forward<Args>(args)...}`, if all parameters in the parameter pack
+    `remove_cvref_t<Args>...` model `InputRange`, and if `F` models
+    `RegularInvocable<iter_reference_t<iterator_t<remove_cvref_t<Args>>>...>`.
+2. Otherwise, `view::zip_with(F, std::forward<Args>(args)...)` is ill-formed.
+
+## `view::zip`
+
+The name `view::zip` denotes a range adptor object. Let `Args&&...` be a parameter pack, with
+`args...` as its pack expansion. Then, the expression `view::zip(std::forward<Args>(args)...)` is
+expression-equivalent to:
+
+1. `view::zip_with{make_pair, std::forward<Args>(args)...}`, if `sizeof...(Args) == 2`, and both
+    parameters in the parameter pack `remove_cvref_t<Args>...` model `InputRange`.
+2. `view::zip_with{make_tuple, std::forward<Args>(args)...}`, if `sizeof...(Args) != 2`, and all
+    parameters in the parameter pack `remove_cvref_t<Args>...` model `InputRange`.
+3. Otherwise, `view::zip(std::forward<Args>(args)...)` is ill-formed.
+
+## Reviewing `iter_value_t`, etc., and introducing `range_value_t`, etc.
+
+P1035 also proposes to review `iter_value_t` on ranges, and to introduce a new `range_value_t`, if
+it is deemed appropriate.
 
 TODO (released before San Diego).
 

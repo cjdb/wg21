@@ -1230,7 +1230,7 @@ Possible extra rowspan handling
   <meta content="Bikeshed version e9290f0f6bc01459c8b7bdfa2bb91f6985fc5c67" name="generator">
   <link href="https://wg21.link/p1035" rel="canonical">
   <link href="https://isocpp.org/favicon.ico" rel="icon">
-  <meta content="1da620d74283a0df135a47bceb8cbf966ab89e36" name="document-revision">
+  <meta content="b956442b9614527f60f73fbdbf5f09becd75f1a2" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1544,12 +1544,18 @@ pre .property::before, pre .property::after {
         <li>
          <a href="#__common_tuple"><span class="secno">3.9.2</span> <span class="content"><code class="highlight"><c- n>__common_tuple</c-></code></span></a>
          <ol class="toc">
-          <li><a href="#motivation⑥"><span class="secno">3.9.2.1</span> <span class="content">Motivation</span></a>
+          <li>
+           <a href="#motivation⑥"><span class="secno">3.9.2.1</span> <span class="content">Motivation</span></a>
+           <ol class="toc">
+            <li><a href="#implementation"><span class="secno">3.9.2.1.1</span> <span class="content">Implementation</span></a>
+           </ol>
          </ol>
         <li><a href="#__iter_zip_with"><span class="secno">3.9.3</span> <span class="content"><code class="highlight"><c- n>__iter_zip_with</c-></code></span></a>
+        <li><a href="#zip_with_view①"><span class="secno">3.9.4</span> <span class="content"><code class="highlight"><c- n>zip_with_view</c-></code></span></a>
        </ol>
-      <li><a href="#viewzip"><span class="secno">3.10</span> <span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip</c-></code></span></a>
-      <li><a href="#viewzip_with"><span class="secno">3.11</span> <span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip_with</c-></code></span></a>
+      <li><a href="#viewzip_with"><span class="secno">3.10</span> <span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip_with</c-></code></span></a>
+      <li><a href="#viewzip"><span class="secno">3.11</span> <span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip</c-></code></span></a>
+      <li><a href="#reviewing-iter_value_t-etc-and-introducing-range_value_t-etc"><span class="secno">3.12</span> <span class="content">Reviewing <code class="highlight"><c- n>iter_value_t</c-></code>, etc., and introducing <code class="highlight"><c- n>range_value_t</c-></code>, etc.</span></a>
      </ol>
     <li>
      <a href="#references"><span class="secno"></span> <span class="content">References</span></a>
@@ -2357,17 +2363,43 @@ are not necessary.</p>
    <p>In the following text, <code class="highlight"><c- n>zip</c-></code> is implemented in terms of <code class="highlight"><c- n>zip_with</c-></code>.</p>
    <h4 class="heading settled" data-level="3.9.2" id="__common_tuple"><span class="secno">3.9.2. </span><span class="content"><code class="highlight"><c- n>__common_tuple</c-></code></span><a class="self-link" href="#__common_tuple"></a></h4>
    <h5 class="heading settled" data-level="3.9.2.1" id="motivation⑥"><span class="secno">3.9.2.1. </span><span class="content">Motivation</span><a class="self-link" href="#motivation⑥"></a></h5>
-   <p><code class="highlight"><c- n>zip_with_view</c-></code> requires a value type to store the iterators to the ranges it references, and a
-reference type that is used to access those iterators. <code class="highlight"><c- n>__common_tuple</c-></code> is an exposition-only type
-that lets <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>...</c-><c- o>></c-></code> (the value type) and <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>...</c-><c- o>>&amp;</c-></code> (the reference type) share a common
-reference a la <code class="highlight"><c- n>common_reference_t</c-></code>.</p>
-   <p>Without such a type, we would be required to expose a conversion operator that transforms <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>...</c-><c- o>></c-></code> to <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>...</c-><c- o>>&amp;</c-></code>. Because this would then be exposed to Standard library users,
-and will lead to improper usage, this approach is not recommended.</p>
+   <p><code class="highlight"><c- n>zip_with_view</c-></code> requires a value type to store the values of the iterators to the ranges that are
+iterated over, and a reference type to access those values via an iterator to the range. <code class="highlight"><c- n>__common_tuple</c-></code> is an exposition-only type that lets <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>...</c-><c- o>></c-></code> (the value type) and <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>...</c-><c- o>></c-></code> (the reference type) share a common reference a la <code class="highlight"><c- n>common_reference_t</c-></code>.</p>
+   <p>Without such a <code class="highlight"><c- n>__common_tuple</c-></code> type, we would be required to expose a conversion operator that
+transforms <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>...</c-><c- o>>&amp;</c-></code> to <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>...</c-><c- o>></c-></code>. This would then be exposed to Standard library users;
+it might not be obvious that this conversion is possible, and it is it not obvious that the
+conversion is undesirable: this is a dangerous situation to be in; and thus P1035 strongly opposes
+providing such conversion operators.</p>
+   <h6 class="heading settled" data-level="3.9.2.1.1" id="implementation"><span class="secno">3.9.2.1.1. </span><span class="content">Implementation</span><a class="self-link" href="#implementation"></a></h6>
+   <p>TODO (released before San Diego).</p>
    <h4 class="heading settled" data-level="3.9.3" id="__iter_zip_with"><span class="secno">3.9.3. </span><span class="content"><code class="highlight"><c- n>__iter_zip_with</c-></code></span><a class="self-link" href="#__iter_zip_with"></a></h4>
    <p>TODO (released before San Diego).</p>
-   <h3 class="heading settled" data-level="3.10" id="viewzip"><span class="secno">3.10. </span><span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip</c-></code></span><a class="self-link" href="#viewzip"></a></h3>
+   <h4 class="heading settled" data-level="3.9.4" id="zip_with_view①"><span class="secno">3.9.4. </span><span class="content"><code class="highlight"><c- n>zip_with_view</c-></code></span><a class="self-link" href="#zip_with_view①"></a></h4>
    <p>TODO (released before San Diego).</p>
-   <h3 class="heading settled" data-level="3.11" id="viewzip_with"><span class="secno">3.11. </span><span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip_with</c-></code></span><a class="self-link" href="#viewzip_with"></a></h3>
+   <h3 class="heading settled" data-level="3.10" id="viewzip_with"><span class="secno">3.10. </span><span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip_with</c-></code></span><a class="self-link" href="#viewzip_with"></a></h3>
+   <p>The name <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip_with</c-></code> denotes a range adaptor object. Let <code class="highlight"><c- n>Args</c-><c- o>&amp;&amp;</c-><c- p>...</c-></code> be a parameter pack, with <code class="highlight"><c- n>args</c-><c- p>...</c-></code> as its pack expansion, and let <code class="highlight"><c- n>F</c-></code> be an expression. Then, the expression <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip_with</c-><c- p>(</c-><c- n>F</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>(</c-><c- n>args</c-><c- p>)...)</c-></code> is expression-equivalent to:</p>
+   <ol>
+    <li data-md>
+     <p><code class="highlight"><c- n>zip_with_view</c-><c- p>{</c-><c- n>F</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>(</c-><c- n>args</c-><c- p>)...}</c-></code>, if all parameters in the parameter pack <code class="highlight"><c- n>remove_cvref_t</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>...</c-></code> model <code class="highlight"><c- n>InputRange</c-></code>, and if <code class="highlight"><c- n>F</c-></code> models <code class="highlight"><c- n>RegularInvocable</c-><c- o>&lt;</c-><c- n>iter_reference_t</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>remove_cvref_t</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>>>></c-><c- p>...</c-><c- o>></c-></code>.</p>
+    <li data-md>
+     <p>Otherwise, <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip_with</c-><c- p>(</c-><c- n>F</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>(</c-><c- n>args</c-><c- p>)...)</c-></code> is ill-formed.</p>
+   </ol>
+   <h3 class="heading settled" data-level="3.11" id="viewzip"><span class="secno">3.11. </span><span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip</c-></code></span><a class="self-link" href="#viewzip"></a></h3>
+   <p>The name <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip</c-></code> denotes a range adptor object. Let <code class="highlight"><c- n>Args</c-><c- o>&amp;&amp;</c-><c- p>...</c-></code> be a parameter pack, with <code class="highlight"><c- n>args</c-><c- p>...</c-></code> as its pack expansion. Then, the expression <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>(</c-><c- n>args</c-><c- p>)...)</c-></code> is
+expression-equivalent to:</p>
+   <ol>
+    <li data-md>
+     <p><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip_with</c-><c- p>{</c-><c- n>make_pair</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>(</c-><c- n>args</c-><c- p>)...}</c-></code>, if <code class="highlight"><c- k>sizeof</c-><c- p>...(</c-><c- n>Args</c-><c- p>)</c-> <c- o>==</c-> <c- mi>2</c-></code>, and both
+parameters in the parameter pack <code class="highlight"><c- n>remove_cvref_t</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>...</c-></code> model <code class="highlight"><c- n>InputRange</c-></code>.</p>
+    <li data-md>
+     <p><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip_with</c-><c- p>{</c-><c- n>make_tuple</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>(</c-><c- n>args</c-><c- p>)...}</c-></code>, if <code class="highlight"><c- k>sizeof</c-><c- p>...(</c-><c- n>Args</c-><c- p>)</c-> <c- o>!=</c-> <c- mi>2</c-></code>, and all
+parameters in the parameter pack <code class="highlight"><c- n>remove_cvref_t</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>...</c-></code> model <code class="highlight"><c- n>InputRange</c-></code>.</p>
+    <li data-md>
+     <p>Otherwise, <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>(</c-><c- n>args</c-><c- p>)...)</c-></code> is ill-formed.</p>
+   </ol>
+   <h3 class="heading settled" data-level="3.12" id="reviewing-iter_value_t-etc-and-introducing-range_value_t-etc"><span class="secno">3.12. </span><span class="content">Reviewing <code class="highlight"><c- n>iter_value_t</c-></code>, etc., and introducing <code class="highlight"><c- n>range_value_t</c-></code>, etc.</span><a class="self-link" href="#reviewing-iter_value_t-etc-and-introducing-range_value_t-etc"></a></h3>
+   <p>P1035 also proposes to review <code class="highlight"><c- n>iter_value_t</c-></code> on ranges, and to introduce a new <code class="highlight"><c- n>range_value_t</c-></code>, if
+it is deemed appropriate.</p>
    <p>TODO (released before San Diego).</p>
   </main>
 <script>
