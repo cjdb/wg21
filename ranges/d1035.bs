@@ -828,7 +828,7 @@ adaptors. Let `E` be an expression and `T` be a type distinct from `decltype((E)
 
 ### Motivation
 
-A zip, also known as a [[convolution operation]], performs a transformation on multiple input
+A zip, also known as a [[convolution]] operation, performs a transformation on multiple input
 ranges. The typical zip operation transforms several input ranges into a single input range
 containing a tuple with the <i>i</i>th element from each range, and terminates when the smallest
 finite range is delimited. The following example has been adapted from [[P0836]] &sect;2.1.
@@ -936,10 +936,10 @@ TODO (released before San Diego).
     "authors": ["Casey Carter & others"],
     "href": " https://github.com/CaseyCarter/cmcstl2"
 },
-"convolution operation": {
+"convolution": {
     "title": "Convolution",
-    "authors": ["Wikipedia-owned"],
+    "authors": ["Wikipedia"],
     "href": "https://en.wikipedia.org/wiki/Convolution_(computer_science)"
 }
 }
-</pre>
+</pre>   
