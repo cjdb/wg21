@@ -1,10 +1,12 @@
 <pre class='metadata'>
 Title: Input range adaptors
 Shortname: D1035
-Level: 0
+Level: 2
 Status: D
 Group: wg21
 Editor: Christopher Di Bella, cjdb.ns@gmail.com
+Editor: Casey Carter, casey@carter.com
+Editor: Corentin Jabot, corentin.jabot@gmail.com
 URL: https://wg21.link/p1035
 Abstract: P1035 proposes to introduce seven additional range adaptors in the C++20 timeframe.
 Audience: LEWG
@@ -824,7 +826,11 @@ adaptors. Let `E` be an expression and `T` be a type distinct from `decltype((E)
       `DerivedFrom<basic_istream<char32_t>>` and `T` models `StreamExtractable`.
    2. Otherwise `u32istream_view<T>(E)` is ill-formed.
 
-## `zip_with_view`
+## `zip_view`
+
+<b>Note: This section was formerly titled <i><code>zip_with_view</code></i> in P1035R1. Due to
+complications in the design process, `zip_with_view` will not be proposed, but `zip_view` shall be.
+A subsubsection below articulates how to emulate `zip_with_view` below.</b>
 
 ### Motivation
 
@@ -873,6 +879,35 @@ The benefits of this proposed approach include:
 * Temporary storage is eliminated, which P0836 &sect;2.1 articulates as beneficial for heterogeneous
     programming.
 
+Another motivating example for using `zip` involves replacing raw loops with algorithms and range
+adaptors, but still being able to index the operation in question.
+
+<table>
+  <tr><th>Current (C++17)</th><th>Proposed (C++20)</th></tr>
+  <tr>
+    <td>
+      <xmp>
+auto v = vector(istream_iterator<int>(std::cin), istream_iterator<int>());
+auto weighted_sum = 0;
+for (auto i = 0; i < ranges::distance(v); ++i) {
+   weighted_sum += i * v[i];
+}
+      </xmp>
+    </td>
+    <td>
+      <xmp>
+auto in = view::zip(view::iota(0), istream_range<int>{std::cin});
+auto weighted_sum = accumulate(begin(in), end(in), [](auto const a, auto const b){
+   auto const [index, in] = b;
+   return a + (index * in);
+});
+      </xmp>
+    </td>
+  </tr>
+</table>
+
+#### `zip_with` in C++20
+
 `zip_with` is a generalisation of `zip`, such that we can apply an <i>n</i>-ary function in place of
 the `transform`s above. The following is an example of how `zip_with` can refine `zip` when tuples
 are not necessary.
@@ -887,64 +922,608 @@ auto saxpy = view::zip_with(plus<>{}, ax, y);
 auto const result = vector(begin(saxpy), end(saxpy));
 ```
 
-In the following text, `zip` is implemented in terms of `zip_with`.
+As `zip_with_view` is no longer proposed in C++20, users wanting `zip_with` functionality will be
+required to use:
 
-### `__common_tuple`
+<xmp>
+template<class F>
+constexpr auto compose_apply(F&& f) {
+   return [f = std::forward<F>(f)](auto&& t) {
+      return std::apply(std::forward<F>(f), std::forward<decltype(t)>(t));
+   };
+};
 
-#### Motivation
+// ...
+auto saxpy = zip(ax, y) | transform(compose_apply(std::plus<>{}));
+</xmp>
 
-`zip_with_view` requires a value type to store the values of the iterators to the ranges that are
+This isn't an ideal approach, but some of the finer details of `zip_with_view` that are independent
+of `zip_view` are still being worked out, and this should not preclude the usage of zipping ranges
+for maximum composability.
+
+### Example implementation
+
+The following implementation has been taken from cmcstl2:
+
+<xmp>
+template<WeaklyIncrementable... Ts>
+using __common_difference_type_t =
+	meta::_t<meta::if_c<sizeof...(Ts) != 0,
+		common_type<iter_difference_t<Ts>...>,
+		meta::id<int>>>;
+
+template<View... Rs>
+struct __zip_view_base {
+	std::tuple<iterator_t<Rs>...> current_ {};
+};
+template<View... Rs>
+requires (ForwardRange<Rs> && ...)
+struct __zip_view_base<Rs...> {};
+
+template<View... Rs>
+struct zip_view
+: view_interface<zip_view<Rs...>>
+, private __zip_view_base<Rs...>
+{
+private:
+	template <bool Const, class Indices> struct __zipperator;
+	template <bool Const, class Indices> struct __sentinel;
+	using Indices = std::index_sequence_for<Rs...>;
+	static constexpr bool all_simple = (ext::SimpleView<Rs> && ...);
+	static constexpr bool all_forward = (ForwardRange<Rs> && ...);
+	static constexpr bool all_forward_const = (ForwardRange<const Rs> && ...);
+	static constexpr bool all_sized = (SizedRange<Rs> && ...);
+	static constexpr bool all_sized_const = (SizedRange<const Rs> && ...);
+
+	std::tuple<Rs...> ranges_ {};
+
+	template<std::size_t... Is, class Self>
+	static constexpr auto size_(std::index_sequence<Is...>, Self& self)
+	{
+		if constexpr (sizeof...(Rs) != 0) {
+			static_assert(Same<std::index_sequence<Is...>, Indices>);
+			using D = __common_difference_type_t<iterator_t<Rs>...>;
+			return ranges::min({static_cast<D>(
+				ranges::size(std::get<Is>(self.ranges_)))...});
+		} else {
+			return 0;
+		}
+	}
+	template<std::size_t... Is>
+	constexpr void begin_(std::index_sequence<Is...>)
+	{ (((void)(std::get<Is>(this->current_) = ranges::begin(std::get<Is>(ranges_)))), ...); }
+public:
+	zip_view() = default;
+	constexpr zip_view(Rs... rs)
+	noexcept((std::is_nothrow_move_constructible_v<Rs> && ...))
+	requires sizeof...(Rs) != 0
+	: ranges_(std::move(rs)...) {}
+
+	constexpr auto begin() {
+		if constexpr (!all_forward) begin_(Indices{});
+		return __zipperator<all_simple && all_forward, Indices>{*this};
+	}
+	constexpr auto begin() const requires all_forward_const
+	{ return __zipperator<true, Indices>{*this}; }
+
+	constexpr auto end() requires all_forward
+	{
+		if constexpr ((RandomAccessRange<Rs> && ...) && all_sized)
+			return __zipperator<all_simple, Indices>{*this, size_(Indices{}, *this)};
+		else
+			return __sentinel<all_simple, Indices>{*this};
+	}
+	constexpr auto end() const
+	{
+		if constexpr ((RandomAccessRange<const Rs> && ...) && all_sized_const)
+			return __zipperator<true, Indices>{*this, size_(Indices{}, *this)};
+		else if constexpr (all_forward && all_forward_const)
+			return __sentinel<true, Indices>{*this};
+		else
+			return default_sentinel{};
+	}
+
+	constexpr auto size() requires all_sized
+	{ return size_(Indices{}, *this); }
+	constexpr auto size() const requires all_sized_const
+	{ return size_(Indices{}, *this); }
+};
+
+template <class... Rs>
+zip_view(Rs&&...) -> zip_view<all_view<Rs>...>;
+
+template<bool, View... Rs>
+struct __zipperator_base {
+	zip_view<Rs...>* parent_ = nullptr;
+};
+template<bool Const, View... Rs>
+requires (ForwardRange<__maybe_const<Const, Rs>> && ...)
+struct __zipperator_base<Const, Rs...> {
+	std::tuple<iterator_t<__maybe_const<Const, Rs>>...> current_ {};
+};
+
+template<bool, View... Rs>
+struct __zipperator_vt_base {};
+template<bool Const, View... Rs>
+requires (InputRange<__maybe_const<Const, Rs>> && ...)
+struct __zipperator_vt_base<Const, Rs...> {
+	using value_type = std::tuple<
+		iter_value_t<iterator_t<__maybe_const<Const, Rs>>>...>;
+};
+
+template<View... Rs>
+template<bool Const, std::size_t... Is>
+struct zip_view<Rs...>::__zipperator<Const, std::index_sequence<Is...>>
+: private __zipperator_base<Const, Rs...>
+, __zipperator_vt_base<Const, Rs...>
+{
+private:
+	using Parent = __maybe_const<Const, zip_view<Rs...>>;
+	using Sent = typename zip_view<Rs...>::template
+		__sentinel<Const, std::index_sequence<Is...>>;
+
+	static constexpr bool all_random_access =
+		(RandomAccessRange<__maybe_const<Const, Rs>> && ...);
+	static constexpr bool all_bidi =
+		(BidirectionalRange<__maybe_const<Const, Rs>> && ...);
+	static constexpr bool all_forward =
+		(ForwardRange<__maybe_const<Const, Rs>> && ...);
+	static constexpr bool all_input =
+		(InputRange<__maybe_const<Const, Rs>> && ...);
+
+	static_assert(!Const || all_forward);
+	static_assert(Same<std::index_sequence_for<Rs...>,
+		std::index_sequence<Is...>>);
+
+	auto& current() noexcept requires all_forward
+	{ return this->current_; }
+	auto& current() const noexcept {
+		if constexpr (all_forward)
+			return this->current_;
+		else
+			return this->parent_->current_;
+	}
+
+public:
+	using iterator_category =
+		meta::if_c<all_random_access, random_access_iterator_tag,
+		meta::if_c<all_bidi, bidirectional_iterator_tag,
+		meta::if_c<all_forward, forward_iterator_tag,
+		meta::if_c<all_input, input_iterator_tag,
+		output_iterator_tag>>>>;
+	using difference_type = __common_difference_type_t<
+		iterator_t<__maybe_const<Const, Rs>>...>;
+
+	__zipperator() = default;
+	explicit constexpr __zipperator(Parent& parent)
+	: __zipperator_base<Const, Rs...>{detail::addressof(parent)}
+	{}
+	constexpr __zipperator(Parent& parent)
+	requires all_forward
+	: __zipperator_base<Const, Rs...>{{
+		(ranges::begin(std::get<Is>(parent.ranges_)))...
+	}} {}
+	constexpr __zipperator(Parent& parent, [[maybe_unused]] difference_type n)
+	requires all_random_access
+	: __zipperator_base<Const, Rs...>{{
+		(ranges::begin(std::get<Is>(parent.ranges_)) +
+			static_cast<iter_difference_t<iterator_t<__maybe_const<Const, Rs>>>>(n))...
+	}} {}
+
+	constexpr auto operator*()
+	{ return __tuple_hack{*std::get<Is>(current())...}; }
+	constexpr auto operator*() const
+	requires (detail::Dereferenceable<const iterator_t<__maybe_const<Const, Rs>>> && ...)
+	{ return __tuple_hack{*std::get<Is>(current())...}; }
+
+	constexpr __zipperator& operator++() {
+		((void)++std::get<Is>(current()), ...);
+		return *this;
+	}
+	constexpr auto operator++(int) {
+		if constexpr (all_forward) {
+			auto tmp = *this;
+			++*this;
+			return tmp;
+		} else
+			++*this;
+	}
+
+	constexpr __zipperator& operator--()
+	requires all_bidi
+	{
+		((void)--std::get<Is>(current()), ...);
+		return *this;
+	}
+	constexpr __zipperator operator--(int)
+	requires all_bidi
+	{
+		auto tmp = *this;
+		--*this;
+		return tmp;
+	}
+
+	friend constexpr bool operator==(const __zipperator& x, const __zipperator& y)
+	requires all_forward
+	{ return x.current_ == y.current_; }
+	friend constexpr bool operator!=(const __zipperator& x, const __zipperator& y)
+	requires all_forward
+	{ return !(x == y); }
+
+	friend constexpr bool operator==(const __zipperator& x, default_sentinel)
+	requires !all_forward
+	{ return ((std::get<Is>(x.current()) == ranges::end(std::get<Is>(x.parent_->ranges_))) || ...); }
+	friend constexpr bool operator==(default_sentinel y, const __zipperator& x)
+	requires !all_forward
+	{ return (x == y); }
+	friend constexpr bool operator!=(const __zipperator& x, default_sentinel y)
+	requires !all_forward
+	{ return !(x == y); }
+	friend constexpr bool operator!=(default_sentinel y, const __zipperator& x)
+	requires !all_forward
+	{ return !(y == x); }
+
+	friend constexpr bool operator==(const __zipperator& x, const Sent& y)
+	requires all_forward
+	{ return ((std::get<Is>(current()) == std::get<Is>(y.last_)) || ...); }
+	friend constexpr bool operator==(const Sent& y, const __zipperator& x)
+	requires all_forward
+	{ return (x == y); }
+	friend constexpr bool operator!=(const __zipperator& x, const Sent& y)
+	requires all_forward
+	{ return !(x == y); }
+	friend constexpr bool operator!=(const Sent& y, const __zipperator& x)
+	requires all_forward
+	{ return !(y == x); }
+
+	friend constexpr bool operator<(const __zipperator& x, const __zipperator& y)
+	requires all_random_access
+	{ return x.current_ < y.current_; }
+	friend constexpr bool operator>(const __zipperator& x, const __zipperator& y)
+	requires all_random_access
+	{ return y < x; }
+	friend constexpr bool operator<=(const __zipperator& x, const __zipperator& y)
+	requires all_random_access
+	{ return !(y < x); }
+	friend constexpr bool operator>=(const __zipperator& x, const __zipperator& y)
+	requires all_random_access
+	{ return !(x < y); }
+
+	constexpr __zipperator& operator+=([[maybe_unused]] difference_type n)
+	requires all_random_access
+	{
+		((void)(std::get<Is>(current()) += n), ...);
+		return *this;
+	}
+	friend constexpr __zipperator operator+(const __zipperator& x, difference_type n)
+	requires all_random_access
+	{
+		auto tmp = x;
+		tmp += n;
+		return tmp;
+	}
+	friend constexpr __zipperator operator+(difference_type n, const __zipperator& x)
+	requires all_random_access
+	{ return x + n; }
+
+	constexpr __zipperator& operator-=([[maybe_unused]] difference_type n)
+	requires all_random_access
+	{
+		((void)(std::get<Is>(current()) -= n), ...);
+		return *this;
+	}
+	friend constexpr __zipperator operator-(const __zipperator& x, difference_type n)
+	requires all_random_access
+	{
+		auto tmp = x;
+		tmp -= n;
+		return tmp;
+	}
+	friend constexpr difference_type operator-(const __zipperator& x, const __zipperator& y)
+	requires (SizedSentinel<iterator_t<__maybe_const<Const, Rs>>,
+		iterator_t<__maybe_const<Const, Rs>>> && ...)
+	{
+		if constexpr (sizeof...(Rs) != 0) {
+			return ranges::max({static_cast<difference_type>(
+				std::get<Is>(x.current()) - std::get<Is>(y.current()))...});
+		} else {
+			return 0;
+		}
+	}
+
+	constexpr auto operator[](difference_type n) const
+	requires all_random_access
+	{ return *(*this + n); }
+
+	friend constexpr auto iter_move(const __zipperator& x)
+	noexcept(noexcept(((void)ranges::iter_move(
+		std::declval<const iterator_t<__maybe_const<Const, Rs>>&>()), ...)))
+	requires ((Readable<iterator_t<__maybe_const<Const, Rs>>> && ...))
+	{ return __tuple_hack{ranges::iter_move(std::get<Is>(x.current()))...}; }
+
+	friend constexpr void iter_swap(const __zipperator& x, const __zipperator& y)
+	noexcept(noexcept((ranges::iter_swap(
+		std::declval<const iterator_t<__maybe_const<Const, Rs>>&>(),
+		std::declval<const iterator_t<__maybe_const<Const, Rs>>&>()), ...)))
+	requires (IndirectlySwappable<iterator_t<__maybe_const<Const, Rs>>> && ...)
+	{ (ranges::iter_swap(std::get<Is>(x.current()), std::get<Is>(y.current())), ...); }
+};
+
+template<View... Rs>
+template<bool Const, std::size_t... Is>
+struct zip_view<Rs...>::__sentinel<Const, std::index_sequence<Is...>> {
+private:
+	using Iter = typename zip_view<Rs...>::template
+		__zipperator<Const, std::index_sequence<Is...>>;
+	friend Iter;
+	using Parent = __maybe_const<Const, zip_view<Rs...>>;
+	static constexpr bool all_forward =
+		(ForwardRange<__maybe_const<Const, Rs>> && ...);
+	static_assert(all_forward);
+	static_assert(Same<std::index_sequence_for<Rs...>,
+		std::index_sequence<Is...>>);
+
+	std::tuple<sentinel_t<__maybe_const<Const, Rs>>...> last_;
+
+public:
+	__sentinel() = default;
+	explicit constexpr __sentinel(Parent& parent)
+	: last_{ranges::end(std::get<Is>(parent.ranges_))...}
+	{}
+};
+} // namespace ext
+
+namespace view {
+struct __zip_fn {
+	template<class... Rs>
+	requires requires(Rs&&... rs) {
+		ranges::ext::zip_view{view::all(static_cast<Rs>(rs))...};
+	}
+	constexpr auto operator()(Rs&&... rs) const
+	STL2_NOEXCEPT_RETURN(
+		ranges::ext::zip_view{view::all(static_cast<Rs>(rs))...}
+	)
+};
+
+inline constexpr __zip_fn zip{};
+</xmp>
+
+### Problems with `std::pair` and `std::tuple`
+
+`zip_view` requires a value type to store the values of the iterators to the ranges that are
 iterated over, and a reference type to access those values via an iterator to the range.
-`__common_tuple` is an exposition-only type that lets `tuple<Ts...>` (the value type) and
-`tuple<Ts&...>` (the reference type) share a common reference a la `common_reference_t`.
+Additionally, the concept "`Writable` wants `const` proxy references to be assignable, so we need a
+tuple-like type with `const`-qualified assignment operators"[[cmcstl2/zip_view]].
 
-Without such a `__common_tuple` type, we would be required to expose a conversion operator that
-transforms `tuple<Ts...>&` to `tuple<Ts&...>`. This would then be exposed to Standard library users;
-it might not be obvious that this conversion is possible, and it is it not obvious that the
-conversion is undesirable: this is a dangerous situation to be in; and thus P1035 strongly opposes
-providing such conversion operators.
+Both range-v3 and the cmcstl2 implementation above use an exposition-only type derived from
+`std::tuple` (both) or `std::pair` (range-v3 only) that permits a `CommonReference` between
+`tuple<Ts...>&` (an lvalue reference to the value type) and `tuple<Ts&...>` (the perceived reference
+type). This is deemed to be a hack by both Eric Niebler and Casey Carter; a careful reader might
+notice that the above implementation specifies this as `__tuple_hack` (which has conveniently been
+left out of P1035).
 
-##### Implementation
+Adding a third (and possibly fourth) tuple type that is exposition-only is <i>not</i> ideal: this
+requires extensions to both `pair` and `tuple` so that they are compatible with `__tuple_hack` and
+`__pair_hack`, specialisations for all tuple utilities will be required, and overloads to `get`,
+`apply`, etc. are also necessary.
 
-TODO (released before San Diego).
+Alternatively, we can provide an implicit conversion from `tuple<Ts...>&` to `tuple<Ts&...>`, and
+ensure that a `common_reference` exists (à la `basic_common_reference`), and similarly for the other
+reference types.
 
-### `__iter_zip_with`
+<xmp>
+template<class... Ts>
+struct tuple {
+	// ...
 
-TODO (released before San Diego).
+	constexpr tuple const& operator=(tuple<_Elements...> const&)
+	requires (__stl2::Assignable<_Elements const&, _Elements const&> and ...);
 
-### `zip_with_view`
+	constexpr tuple const& operator=(tuple<_Elements...>&&)
+	requires (__stl2::Assignable<_Elements const&, _Elements> and ...);
 
-TODO (released before San Diego).
+	template<class... Us>
+	requires sizeof...(Ts) == sizeof...(Us) and (Assignable<Ts const&, Us const&> and ...)
+	constexpr tuple const& operator=(tuple<Us...> const& other) const;
 
-## `view::zip_with`
+	template<class... Us>
+	requires sizeof...(Ts) == sizeof...(Us) and (Assignable<Ts const&, Us const&> and ...)
+	constexpr tuple const& operator=(tuple<Us...>&& other) const;
 
-The name `view::zip_with` denotes a range adaptor object. Let `Args&&...` be a parameter pack, with
-`args...` as its pack expansion, and let `F` be an expression. Then, the expression
-`view::zip_with(F, std::forward<Args>(args)...)` is expression-equivalent to:
+	constexpr operator tuple<remove_reference_t<_Elements>&...>() noexcept;
+	constexpr operator tuple<remove_reference_t<_Elements> const&...>() const noexcept;
+	constexpr operator tuple<remove_reference_t<_Elements>&&...>() noexcept;
+	constexpr operator tuple<remove_reference_t<_Elements> const&&...>() const noexcept;
+};
 
-1. `zip_with_view{F, std::forward<Args>(args)...}`, if all parameters in the parameter pack
-    `remove_cvref_t<Args>...` model `InputRange`, and if `F` models
-    `RegularInvocable<iter_reference_t<iterator_t<remove_cvref_t<Args>>>...>`.
-2. Otherwise, `view::zip_with(F, std::forward<Args>(args)...)` is ill-formed.
+template<class... Ts>
+requires (requires { typename common_type_t<Ts, Ts&>; } && ...)
+struct common_type<tuple<Ts&...>, std::tuple<Ts...>> {
+	using type = tuple<common_type_t<Ts&, Ts>...>;
+};
+template<class... Ts>
+requires (requires { typename common_type_t<Ts, Ts&>; } && ...)
+struct common_type<std::tuple<Ts...>, tuple<Ts&...>>	{
+	using type = tuple<common_type_t<Ts&, Ts>...>;
+};
 
-## `view::zip`
+template<class... Ts,
+	template <class> class TQual, template <class> class UQual>
+requires (requires { typename common_reference_t<TQual<Ts>, UQual<Ts&>>; } && ...)
+struct basic_common_reference<tuple<Ts&...>, std::tuple<Ts...>, TQual, UQual> {
+	using type = tuple<common_reference_t<TQual<Ts&>, UQual<Ts>>...>;
+};
+template<class... Ts,
+	template <class> class TQual, template <class> class UQual>
+requires (requires { typename common_reference_t<TQual<Ts>, UQual<Ts&>>; } && ...)
+struct basic_common_reference<std::tuple<Ts...>, tuple<Ts&...>, TQual, UQual> {
+	using type = tuple<common_reference_t<TQual<Ts>, UQual<Ts&>>...>;
+};
 
-The name `view::zip` denotes a range adptor object. Let `Args&&...` be a parameter pack, with
-`args...` as its pack expansion. Then, the expression `view::zip(std::forward<Args>(args)...)` is
-expression-equivalent to:
+// lvalue to rvalue reference
+template<class... Ts>
+requires (requires { typename common_type_t<Ts, Ts&&>; } && ...)
+struct common_type<tuple<Ts&&...>, std::tuple<Ts...>> {
+	using type = tuple<common_type_t<Ts&&, Ts>...>;
+};
+template<class... Ts>
+requires (requires { typename common_type_t<Ts, Ts&&>; } && ...)
+struct common_type<std::tuple<Ts...>, tuple<Ts&&...>>	{
+	using type = tuple<common_type_t<Ts&&, Ts>...>;
+};
 
-1. `view::zip_with{make_pair, std::forward<Args>(args)...}`, if `sizeof...(Args) == 2`, and both
-    parameters in the parameter pack `remove_cvref_t<Args>...` model `InputRange`.
-2. `view::zip_with{make_tuple, std::forward<Args>(args)...}`, if `sizeof...(Args) != 2`, and all
-    parameters in the parameter pack `remove_cvref_t<Args>...` model `InputRange`.
-3. Otherwise, `view::zip(std::forward<Args>(args)...)` is ill-formed.
+template<class... Ts,
+	template <class> class TQual, template <class> class UQual>
+requires (requires { typename common_reference_t<TQual<Ts>, UQual<Ts&&>>; } && ...)
+struct basic_common_reference<tuple<Ts&&...>, std::tuple<Ts...>, TQual, UQual> {
+	using type = tuple<common_reference_t<TQual<Ts&&>, UQual<Ts>>...>;
+};
+template<class... Ts,
+	template <class> class TQual, template <class> class UQual>
+requires (requires { typename common_reference_t<TQual<Ts>, UQual<Ts&&>>; } && ...)
+struct basic_common_reference<std::tuple<Ts...>, tuple<Ts&&...>, TQual, UQual> {
+	using type = tuple<common_reference_t<TQual<Ts>, UQual<Ts&&>>...>;
+};
 
-## Reviewing `iter_value_t`, etc., and introducing `range_value_t`, etc.
+// lvalue reference to rvalue reference
+template<class... Ts>
+requires (requires { typename common_type_t<Ts&, remove_reference_t<Ts>&&>; } && ...)
+struct common_type<tuple<remove_reference_t<Ts>&&...>, std::tuple<Ts&...>> {
+	using type = tuple<common_type_t<remove_reference_t<Ts>&&, Ts&>...>;
+};
+template<class... Ts>
+requires (requires { typename common_type_t<Ts&, remove_reference_t<Ts>&&>; } && ...)
+struct common_type<std::tuple<Ts&...>, tuple<remove_reference_t<Ts>&&...>>	{
+	using type = tuple<common_type_t<remove_reference_t<Ts>&&, Ts&>...>;
+};
 
-P1035 also proposes to review `iter_value_t` on ranges, and to introduce a new `range_value_t`, if
-it is deemed appropriate.
+template<class... Ts,
+	template <class> class TQual, template <class> class UQual>
+requires (requires { typename common_reference_t<TQual<Ts&>, UQual<remove_reference_t<Ts>&&>>; } && ...)
+struct basic_common_reference<tuple<remove_reference_t<Ts>&&...>, std::tuple<Ts&...>, TQual, UQual> {
+	using type = tuple<common_reference_t<TQual<remove_reference_t<Ts>&&>, UQual<Ts&>>...>;
+};
+template<class... Ts,
+	template <class> class TQual, template <class> class UQual>
+requires (requires { typename common_reference_t<TQual<Ts&>, UQual<remove_reference_t<Ts>&&>>; } && ...)
+struct basic_common_reference<std::tuple<Ts&...>, tuple<remove_reference_t<Ts>&&...>, TQual, UQual> {
+	using type = tuple<common_reference_t<TQual<Ts&>, UQual<remove_reference_t<Ts>&&>>...>;
+};
+</xmp>
 
-TODO (released before San Diego).
+
+
+## `keys` and `values`
+
+### Motivation
+
+TODO: Add me.
+
+### Implementation
+
+Given an exposition-only tuple extractor (`__get_fn`), `keys` and `values` need only be range
+adaptor objects implemented in terms of `view::transform`, rather than range adaptors.
+
+<xmp>
+namespace view {
+	template<int X>
+	requires (X == 0) || (X == 1)
+	struct __get_fn {
+		template<class P>
+		requires pair-like<P>
+		constexpr decltype(auto) operator()(P&& p) const
+		{
+			using T = decltype(std::get<X>(std::forward<P>(p)));
+			return std::forward<T>(std::get<X>(std::forward<P>(p)));
+		}
+	};
+
+	inline constexpr auto keys = view::transform(__get_fn<0>{});
+	inline constexpr auto values = view::transform(__get_fn<1>{});
+} // namespace view
+</xmp>
+
+## Introducing associated types for ranges
+
+<b>Note: This section was formerly titled <i>Reviewing `iter_value_t`, etc., and introducing
+`range_value_t`, etc.</i> in P1035R1, but the current title is more accurate.</b>
+
+[[P1037]] introduced `iter_difference_t`, `iter_value_t`, `iter_reference_t`, and
+`iter_rvalue_reference_t`, which dispatch to templates that correclty identify the associated
+types for iterators (formerly known as iterator traits). The current mechanism supports iterators,
+but not ranges. For example, in order to extract an range's value type, we are required to do one of
+three things:
+
+<ol>
+   <li>
+      Use the traditional `typename T::value_type`. As we have had template aliases since C++11,
+      this has probably been abandoned in many projects (not cited).
+   </li>
+   <li>
+      Define our own associated type à la
+
+<xmp>
+template<class T>
+requires requires { typename T::value_type; }
+using value_type = typename T::value_type;
+</xmp>
+
+This was apparently possible in the Ranges TS (albeit in much more detail) 
+[[iter.assoc.types.value_type]], but P1037 has redefined `value_type_t` as `iter_value_t`, which
+focuses on iterators, rather than anything defining `value_type` alias. We <i>could</i> do this in
+C++20, but we then risk `R::value_type` being different to `R::iterator::value_type` (consider
+`vector<int const>::value_type` and `vector<int const>::iterator::value_type`, which are `int const`
+and `int`, respectively)[[value_type]].
+   </li>
+
+   <li>
+      Use `iter_value_t<iterator_t<R>>`, which what we probably want, and is also a mouthful.
+   </li>
+</ol>
+
+When discussing extending `iter_value_t` so that it can also operate on ranges, Casey Carter had
+this to say:
+
+<blockquote>
+   What should `iter_value_t<T>` be when `T` is an iterator with value type `U` and a range with
+   value type `V`?
+
+   Alternately: What is `iter_value_t<array<const int>>`? `array<const int>::value_type` is
+   `const int`, but `iter_value_t<iterator_t<array<const int>>` is `int`.
+
+   Specific examples aside, early attempts to make the associated type aliases "polymorphic" kept
+   running into ambiguities that we had to disambiguate or simply declare broken.
+
+   I'd rather see `range_value_t` et al proposed.
+</blockquote>
+
+P1035 introduces shorthands for `iter_foo_t<iterator_t<R>>` as `range_foo_t<R>`, which in turn have
+been taken from range-v3.
+
+```cpp
+template<Range R>
+using range_difference_t = iter_difference_t<iterator_t<R>>;
+
+template<Range R>
+using range_size_t = make_unsigned_t<range_difference_t<R>>;
+
+template<InputRange R>
+using range_value_t = iter_value_t<iterator_t<R>>;
+
+template<InputRange R>
+using range_reference_t = iter_reference_t<iterator_t<R>>;
+
+template<InputRange R>
+using range_rvalue_reference_t = iter_rvalue_reference_t<iterator_t<R>>;
+
+template<Range R>
+requires Same<iterator_t<R>, sentinel_t<R>>
+using range_common_iterator_t = common_iterator<iterator_t<R>, sentinel_t<R>>;
+```
+
+These have an enormous amount of usage in range-v3, and will ensure consistency between generic code
+that uses ranges and generic code that uses iterators (which are essential for underpinning all
+range abstractions in C++).
 
 <pre class=biblio>
 {
@@ -957,6 +1536,11 @@ TODO (released before San Diego).
     "title": "P0836 Introduce Parallelism to the Ranges TS",
     "authors": ["Gordon Brown", "Christopher Di Bella", "Michael Haidl", "Toomas Remmelg", "Ruyman Reyes", "Michel Steuwer", "Michael Wong"],
     "href": "https://wg21.link/p0836"
+},
+"P1037": {
+    "title": "Deep Integration of the Ranges TS",
+    "authors": ["Eric Niebler", "Casey Carter"],
+    "href": "https://wg21.link/p1037"
 },
 "range-v3": {
     "title": "ranges-v3 C++ library",
@@ -972,6 +1556,15 @@ TODO (released before San Diego).
     "title": "Convolution",
     "authors": ["Wikipedia"],
     "href": "https://en.wikipedia.org/wiki/Convolution_(computer_science)"
+},
+"iter.assoc.types.value_type": {
+   "title": "ISO/IEC TS 21425:2017 C++ Extensions for Ranges",
+   "authors": ["Eric Niebler", "Casey Carter"],
+   "href": "https://timsong-cpp.github.io/cppwp/ranges-ts/iterator.assoc.types.value_type"
+},
+"value_type": {
+    "title": "static_assert(not is_same_v<vector<int const>::value_type, vector<int const>::iterator::value_type>)",
+    "href": "https://godbolt.org/z/xkcREX"
 }
 }
 </pre>   

@@ -2,7 +2,7 @@
  <head>
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
   <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
-  <title>D1035R0: Input range adaptors</title>
+  <title>D1035R2: Input range adaptors</title>
 <style data-fill-with="stylesheet">/******************************************************************************
  *                   Style sheet for the W3C specifications                   *
  *
@@ -1230,7 +1230,7 @@ Possible extra rowspan handling
   <meta content="Bikeshed version e9290f0f6bc01459c8b7bdfa2bb91f6985fc5c67" name="generator">
   <link href="https://wg21.link/p1035" rel="canonical">
   <link href="https://isocpp.org/favicon.ico" rel="icon">
-  <meta content="b956442b9614527f60f73fbdbf5f09becd75f1a2" name="document-revision">
+  <meta content="4d135cb07a7a844ed847d37948d9dc50e206f2b0" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1439,15 +1439,19 @@ pre .property::before, pre .property::after {
  <body class="h-entry">
   <div class="head">
    <p data-fill-with="logo"></p>
-   <h1 class="p-name no-ref" id="title">D1035R0<br>Input range adaptors</h1>
+   <h1 class="p-name no-ref" id="title">D1035R2<br>Input range adaptors</h1>
    <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Proposal, <time class="dt-updated" datetime="2018-10-08">2018-10-08</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
      <dd><a class="u-url" href="https://wg21.link/p1035">https://wg21.link/p1035</a>
-     <dt>Author:
+     <dt>Authors:
      <dd>
       <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:cjdb.ns@gmail.com">Christopher Di Bella</a>
+     <dd>
+      <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:casey@carter.com">Casey Carter</a>
+     <dd>
+      <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:corentin.jabot@gmail.com">Corentin Jabot</a>
      <dt>Audience:
      <dd>LEWG
      <dt>Project:
@@ -1538,24 +1542,23 @@ pre .property::before, pre .property::after {
        </ol>
       <li><a href="#basic_istream_view-range-adaptors"><span class="secno">3.8</span> <span class="content"><code class="highlight"><c- n>basic_istream_view</c-></code> range adaptors</span></a>
       <li>
-       <a href="#zip_with_view"><span class="secno">3.9</span> <span class="content"><code class="highlight"><c- n>zip_with_view</c-></code></span></a>
+       <a href="#zip_view"><span class="secno">3.9</span> <span class="content"><code class="highlight"><c- n>zip_view</c-></code></span></a>
        <ol class="toc">
-        <li><a href="#motivation⑤"><span class="secno">3.9.1</span> <span class="content">Motivation</span></a>
         <li>
-         <a href="#__common_tuple"><span class="secno">3.9.2</span> <span class="content"><code class="highlight"><c- n>__common_tuple</c-></code></span></a>
+         <a href="#motivation⑤"><span class="secno">3.9.1</span> <span class="content">Motivation</span></a>
          <ol class="toc">
-          <li>
-           <a href="#motivation⑥"><span class="secno">3.9.2.1</span> <span class="content">Motivation</span></a>
-           <ol class="toc">
-            <li><a href="#implementation"><span class="secno">3.9.2.1.1</span> <span class="content">Implementation</span></a>
-           </ol>
+          <li><a href="#zip_with-in-c20"><span class="secno">3.9.1.1</span> <span class="content"><code class="highlight"><c- n>zip_with</c-></code> in C++20</span></a>
          </ol>
-        <li><a href="#__iter_zip_with"><span class="secno">3.9.3</span> <span class="content"><code class="highlight"><c- n>__iter_zip_with</c-></code></span></a>
-        <li><a href="#zip_with_view①"><span class="secno">3.9.4</span> <span class="content"><code class="highlight"><c- n>zip_with_view</c-></code></span></a>
+        <li><a href="#example-implementation"><span class="secno">3.9.2</span> <span class="content">Example implementation</span></a>
+        <li><a href="#problems-with-stdpair-and-stdtuple"><span class="secno">3.9.3</span> <span class="content">Problems with <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>pair</c-></code> and <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>tuple</c-></code></span></a>
        </ol>
-      <li><a href="#viewzip_with"><span class="secno">3.10</span> <span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip_with</c-></code></span></a>
-      <li><a href="#viewzip"><span class="secno">3.11</span> <span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip</c-></code></span></a>
-      <li><a href="#reviewing-iter_value_t-etc-and-introducing-range_value_t-etc"><span class="secno">3.12</span> <span class="content">Reviewing <code class="highlight"><c- n>iter_value_t</c-></code>, etc., and introducing <code class="highlight"><c- n>range_value_t</c-></code>, etc.</span></a>
+      <li>
+       <a href="#keys-and-values"><span class="secno">3.10</span> <span class="content"><code class="highlight"><c- n>keys</c-></code> and <code class="highlight"><c- n>values</c-></code></span></a>
+       <ol class="toc">
+        <li><a href="#motivation⑥"><span class="secno">3.10.1</span> <span class="content">Motivation</span></a>
+        <li><a href="#implementation"><span class="secno">3.10.2</span> <span class="content">Implementation</span></a>
+       </ol>
+      <li><a href="#introducing-associated-types-for-ranges"><span class="secno">3.11</span> <span class="content">Introducing associated types for ranges</span></a>
      </ol>
     <li>
      <a href="#references"><span class="secno"></span> <span class="content">References</span></a>
@@ -2110,7 +2113,7 @@ author does not need to care how things are inserted at the end of <code class="
   
 </pre>
       <td>
-<pre class="highlight"><c- o>&lt;</c-><c- n>p</c-> <c- n>line</c-><c- o>-</c-><c- n>number</c-><c- o>=</c-><c- mi>616</c-><c- o>></c-><c- k>auto</c-> <c- n>v</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>vector</c-><c- p>(</c-><c- n>istream_iterator</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>{</c-><c- n>std</c-><c- o>::</c-><c- n>cin</c-><c- p>},</c-> <c- n>istream_iterator</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>{});</c->
+<pre class="highlight"><c- o>&lt;</c-><c- n>p</c-> <c- n>line</c-><c- o>-</c-><c- n>number</c-><c- o>=</c-><c- mi>618</c-><c- o>></c-><c- k>auto</c-> <c- n>v</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>vector</c-><c- p>(</c-><c- n>istream_iterator</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>{</c-><c- n>std</c-><c- o>::</c-><c- n>cin</c-><c- p>},</c-> <c- n>istream_iterator</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>{});</c->
     <c- c1>// ...</c->
     <c- n>copy</c-><c- p>(</c-><c- n>istream_iterator</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>{</c-><c- n>std</c-><c- o>::</c-><c- n>cin</c-><c- p>},</c-> <c- n>istream_iterator</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>{},</c-> <c- n>back_inserter</c-><c- p>(</c-><c- n>v</c-><c- p>));</c-><c- o>&lt;/</c-><c- n>p</c-><c- o>></c->
 
@@ -2302,7 +2305,10 @@ adaptors. Let <code class="highlight"><c- n>E</c-></code> be an expression and <
     <li data-md>
      <p>Otherwise <code class="highlight"><c- n>u32istream_view</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-><c- p>(</c-><c- n>E</c-><c- p>)</c-></code> is ill-formed.</p>
    </ol>
-   <h3 class="heading settled" data-level="3.9" id="zip_with_view"><span class="secno">3.9. </span><span class="content"><code class="highlight"><c- n>zip_with_view</c-></code></span><a class="self-link" href="#zip_with_view"></a></h3>
+   <h3 class="heading settled" data-level="3.9" id="zip_view"><span class="secno">3.9. </span><span class="content"><code class="highlight"><c- n>zip_view</c-></code></span><a class="self-link" href="#zip_view"></a></h3>
+   <p><b>Note: This section was formerly titled <i><code class="highlight"><c- n>zip_with_view</c-></code></i> in P1035R1. Due to
+complications in the design process, <code class="highlight"><c- n>zip_with_view</c-></code> will not be proposed, but <code class="highlight"><c- n>zip_view</c-></code> shall be.
+A subsubsection below articulates how to emulate <code class="highlight"><c- n>zip_with_view</c-></code> below.</b></p>
    <h4 class="heading settled" data-level="3.9.1" id="motivation⑤"><span class="secno">3.9.1. </span><span class="content">Motivation</span><a class="self-link" href="#motivation⑤"></a></h4>
    <p>A zip, also known as a <a data-link-type="biblio" href="#biblio-convolution">[convolution]</a> operation, performs a transformation on multiple input
 ranges. The typical zip operation transforms several input ranges into a single input range
@@ -2349,6 +2355,30 @@ non-<code class="highlight"><c- k>const</c-></code>ness in the former).</p>
      <p>Temporary storage is eliminated, which P0836 §2.1 articulates as beneficial for heterogeneous
 programming.</p>
    </ul>
+   <p>Another motivating example for using <code class="highlight"><c- n>zip</c-></code> involves replacing raw loops with algorithms and range
+adaptors, but still being able to index the operation in question.</p>
+   <table>
+    <tbody>
+     <tr>
+      <th>Current (C++17)
+      <th>Proposed (C++20)
+     <tr>
+      <td>
+<pre class="highlight"><c- k>auto</c-> <c- n>v</c-> <c- o>=</c-> <c- n>vector</c-><c- p>(</c-><c- n>istream_iterator</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>cin</c-><c- p>),</c-> <c- n>istream_iterator</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>());</c->
+<c- k>auto</c-> <c- n>weighted_sum</c-> <c- o>=</c-> <c- mi>0</c-><c- p>;</c->
+<c- k>for</c-> <c- p>(</c-><c- k>auto</c-> <c- n>i</c-> <c- o>=</c-> <c- mi>0</c-><c- p>;</c-> <c- n>i</c-> <c- o>&lt;</c-> <c- n>ranges</c-><c- o>::</c-><c- n>distance</c-><c- p>(</c-><c- n>v</c-><c- p>);</c-> <c- o>++</c-><c- n>i</c-><c- p>)</c-> <c- p>{</c->
+   <c- n>weighted_sum</c-> <c- o>+=</c-> <c- n>i</c-> <c- o>*</c-> <c- n>v</c-><c- p>[</c-><c- n>i</c-><c- p>];</c->
+<c- p>}</c->
+</pre>
+      <td>
+<pre class="highlight"><c- k>auto</c-> <c- n>in</c-> <c- o>=</c-> <c- n>view</c-><c- o>::</c-><c- n>zip</c-><c- p>(</c-><c- n>view</c-><c- o>::</c-><c- n>iota</c-><c- p>(</c-><c- mi>0</c-><c- p>),</c-> <c- n>istream_range</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>{</c-><c- n>std</c-><c- o>::</c-><c- n>cin</c-><c- p>});</c->
+<c- k>auto</c-> <c- n>weighted_sum</c-> <c- o>=</c-> <c- n>accumulate</c-><c- p>(</c-><c- n>begin</c-><c- p>(</c-><c- n>in</c-><c- p>),</c-> <c- n>end</c-><c- p>(</c-><c- n>in</c-><c- p>),</c-> <c- p>[](</c-><c- k>auto</c-> <c- k>const</c-> <c- n>a</c-><c- p>,</c-> <c- k>auto</c-> <c- k>const</c-> <c- n>b</c-><c- p>){</c->
+   <c- k>auto</c-> <c- k>const</c-> <c- p>[</c-><c- n>index</c-><c- p>,</c-> <c- n>in</c-><c- p>]</c-> <c- o>=</c-> <c- n>b</c-><c- p>;</c->
+   <c- k>return</c-> <c- n>a</c-> <c- o>+</c-> <c- p>(</c-><c- n>index</c-> <c- o>*</c-> <c- n>in</c-><c- p>);</c->
+<c- p>});</c->
+</pre>
+   </table>
+   <h5 class="heading settled" data-level="3.9.1.1" id="zip_with-in-c20"><span class="secno">3.9.1.1. </span><span class="content"><code class="highlight"><c- n>zip_with</c-></code> in C++20</span><a class="self-link" href="#zip_with-in-c20"></a></h5>
    <p><code class="highlight"><c- n>zip_with</c-></code> is a generalisation of <code class="highlight"><c- n>zip</c-></code>, such that we can apply an <i>n</i>-ary function in place of
 the <code class="highlight"><c- n>transform</c-></code>s above. The following is an example of how <code class="highlight"><c- n>zip_with</c-></code> can refine <code class="highlight"><c- n>zip</c-></code> when tuples
 are not necessary.</p>
@@ -2360,47 +2390,553 @@ are not necessary.</p>
 <c- k>auto</c-> <c- n>saxpy</c-> <c- o>=</c-> <c- n>view</c-><c- o>::</c-><c- n>zip_with</c-><c- p>(</c-><c- n>plus</c-><c- o>&lt;></c-><c- p>{},</c-> <c- n>ax</c-><c- p>,</c-> <c- n>y</c-><c- p>);</c->
 <c- k>auto</c-> <c- k>const</c-> <c- n>result</c-> <c- o>=</c-> <c- n>vector</c-><c- p>(</c-><c- n>begin</c-><c- p>(</c-><c- n>saxpy</c-><c- p>),</c-> <c- n>end</c-><c- p>(</c-><c- n>saxpy</c-><c- p>));</c->
 </pre>
-   <p>In the following text, <code class="highlight"><c- n>zip</c-></code> is implemented in terms of <code class="highlight"><c- n>zip_with</c-></code>.</p>
-   <h4 class="heading settled" data-level="3.9.2" id="__common_tuple"><span class="secno">3.9.2. </span><span class="content"><code class="highlight"><c- n>__common_tuple</c-></code></span><a class="self-link" href="#__common_tuple"></a></h4>
-   <h5 class="heading settled" data-level="3.9.2.1" id="motivation⑥"><span class="secno">3.9.2.1. </span><span class="content">Motivation</span><a class="self-link" href="#motivation⑥"></a></h5>
-   <p><code class="highlight"><c- n>zip_with_view</c-></code> requires a value type to store the values of the iterators to the ranges that are
-iterated over, and a reference type to access those values via an iterator to the range. <code class="highlight"><c- n>__common_tuple</c-></code> is an exposition-only type that lets <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>...</c-><c- o>></c-></code> (the value type) and <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>...</c-><c- o>></c-></code> (the reference type) share a common reference a la <code class="highlight"><c- n>common_reference_t</c-></code>.</p>
-   <p>Without such a <code class="highlight"><c- n>__common_tuple</c-></code> type, we would be required to expose a conversion operator that
-transforms <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>...</c-><c- o>>&amp;</c-></code> to <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>...</c-><c- o>></c-></code>. This would then be exposed to Standard library users;
-it might not be obvious that this conversion is possible, and it is it not obvious that the
-conversion is undesirable: this is a dangerous situation to be in; and thus P1035 strongly opposes
-providing such conversion operators.</p>
-   <h6 class="heading settled" data-level="3.9.2.1.1" id="implementation"><span class="secno">3.9.2.1.1. </span><span class="content">Implementation</span><a class="self-link" href="#implementation"></a></h6>
-   <p>TODO (released before San Diego).</p>
-   <h4 class="heading settled" data-level="3.9.3" id="__iter_zip_with"><span class="secno">3.9.3. </span><span class="content"><code class="highlight"><c- n>__iter_zip_with</c-></code></span><a class="self-link" href="#__iter_zip_with"></a></h4>
-   <p>TODO (released before San Diego).</p>
-   <h4 class="heading settled" data-level="3.9.4" id="zip_with_view①"><span class="secno">3.9.4. </span><span class="content"><code class="highlight"><c- n>zip_with_view</c-></code></span><a class="self-link" href="#zip_with_view①"></a></h4>
-   <p>TODO (released before San Diego).</p>
-   <h3 class="heading settled" data-level="3.10" id="viewzip_with"><span class="secno">3.10. </span><span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip_with</c-></code></span><a class="self-link" href="#viewzip_with"></a></h3>
-   <p>The name <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip_with</c-></code> denotes a range adaptor object. Let <code class="highlight"><c- n>Args</c-><c- o>&amp;&amp;</c-><c- p>...</c-></code> be a parameter pack, with <code class="highlight"><c- n>args</c-><c- p>...</c-></code> as its pack expansion, and let <code class="highlight"><c- n>F</c-></code> be an expression. Then, the expression <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip_with</c-><c- p>(</c-><c- n>F</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>(</c-><c- n>args</c-><c- p>)...)</c-></code> is expression-equivalent to:</p>
+   <p>As <code class="highlight"><c- n>zip_with_view</c-></code> is no longer proposed in C++20, users wanting <code class="highlight"><c- n>zip_with</c-></code> functionality will be
+required to use:</p>
+<pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>F</c-><c- o>></c->
+<c- k>constexpr</c-> <c- k>auto</c-> <c- n>compose_apply</c-><c- p>(</c-><c- n>F</c-><c- o>&amp;&amp;</c-> <c- n>f</c-><c- p>)</c-> <c- p>{</c->
+   <c- k>return</c-> <c- p>[</c-><c- n>f</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>F</c-><c- o>></c-><c- p>(</c-><c- n>f</c-><c- p>)](</c-><c- k>auto</c-><c- o>&amp;&amp;</c-> <c- n>t</c-><c- p>)</c-> <c- p>{</c->
+      <c- k>return</c-> <c- n>std</c-><c- o>::</c-><c- n>apply</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>F</c-><c- o>></c-><c- p>(</c-><c- n>f</c-><c- p>),</c-> <c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- k>decltype</c-><c- p>(</c-><c- n>t</c-><c- p>)</c-><c- o>></c-><c- p>(</c-><c- n>t</c-><c- p>));</c->
+   <c- p>};</c->
+<c- p>};</c->
+
+<c- c1>// ...</c->
+<c- k>auto</c-> <c- n>saxpy</c-> <c- o>=</c-> <c- n>zip</c-><c- p>(</c-><c- n>ax</c-><c- p>,</c-> <c- n>y</c-><c- p>)</c-> <c- o>|</c-> <c- n>transform</c-><c- p>(</c-><c- n>compose_apply</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>plus</c-><c- o>&lt;></c-><c- p>{}));</c->
+</pre>
+   <p>This isn’t an ideal approach, but some of the finer details of <code class="highlight"><c- n>zip_with_view</c-></code> that are independent
+of <code class="highlight"><c- n>zip_view</c-></code> are still being worked out, and this should not preclude the usage of zipping ranges
+for maximum composability.</p>
+   <h4 class="heading settled" data-level="3.9.2" id="example-implementation"><span class="secno">3.9.2. </span><span class="content">Example implementation</span><a class="self-link" href="#example-implementation"></a></h4>
+   <p>The following implementation has been taken from cmcstl2:</p>
+<pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- n>WeaklyIncrementable</c-><c- p>...</c-> <c- n>Ts</c-><c- o>></c->
+<c- k>using</c-> <c- n>__common_difference_type_t</c-> <c- o>=</c->
+  <c- n>meta</c-><c- o>::</c-><c- n>_t</c-><c- o>&lt;</c-><c- n>meta</c-><c- o>::</c-><c- n>if_c</c-><c- o>&lt;</c-><c- k>sizeof</c-><c- p>...(</c-><c- n>Ts</c-><c- p>)</c-> <c- o>!=</c-> <c- mi>0</c-><c- p>,</c->
+    <c- n>common_type</c-><c- o>&lt;</c-><c- n>iter_difference_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>></c-><c- p>...</c-><c- o>></c-><c- p>,</c->
+    <c- n>meta</c-><c- o>::</c-><c- n>id</c-><c- o>&lt;</c-><c- b>int</c-><c- o>>>></c-><c- p>;</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- n>View</c-><c- p>...</c-> <c- n>Rs</c-><c- o>></c->
+<c- k>struct</c-> <c- n>__zip_view_base</c-> <c- p>{</c->
+  <c- n>std</c-><c- o>::</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>Rs</c-><c- o>></c-><c- p>...</c-><c- o>></c-> <c- n>current_</c-> <c- p>{};</c->
+<c- p>};</c->
+<c- k>template</c-><c- o>&lt;</c-><c- n>View</c-><c- p>...</c-> <c- n>Rs</c-><c- o>></c->
+<c- n>requires</c-> <c- p>(</c-><c- n>ForwardRange</c-><c- o>&lt;</c-><c- n>Rs</c-><c- o>></c-> <c- o>&amp;&amp;</c-> <c- p>...)</c->
+<c- k>struct</c-> <c- n>__zip_view_base</c-><c- o>&lt;</c-><c- n>Rs</c-><c- p>...</c-><c- o>></c-> <c- p>{};</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- n>View</c-><c- p>...</c-> <c- n>Rs</c-><c- o>></c->
+<c- k>struct</c-> <c- nl>zip_view</c->
+<c- p>:</c-> <c- n>view_interface</c-><c- o>&lt;</c-><c- n>zip_view</c-><c- o>&lt;</c-><c- n>Rs</c-><c- p>...</c-><c- o>>></c->
+<c- p>,</c-> <c- k>private</c-> <c- n>__zip_view_base</c-><c- o>&lt;</c-><c- n>Rs</c-><c- p>...</c-><c- o>></c->
+<c- p>{</c->
+<c- k>private</c-><c- o>:</c->
+  <c- k>template</c-> <c- o>&lt;</c-><c- b>bool</c-> <c- n>Const</c-><c- p>,</c-> <c- k>class</c-> <c- nc>Indices</c-><c- o>></c-> <c- k>struct</c-> <c- n>__zipperator</c-><c- p>;</c->
+  <c- k>template</c-> <c- o>&lt;</c-><c- b>bool</c-> <c- n>Const</c-><c- p>,</c-> <c- k>class</c-> <c- nc>Indices</c-><c- o>></c-> <c- k>struct</c-> <c- n>__sentinel</c-><c- p>;</c->
+  <c- k>using</c-> <c- n>Indices</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>index_sequence_for</c-><c- o>&lt;</c-><c- n>Rs</c-><c- p>...</c-><c- o>></c-><c- p>;</c->
+  <c- k>static</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- n>all_simple</c-> <c- o>=</c-> <c- p>(</c-><c- n>ext</c-><c- o>::</c-><c- n>SimpleView</c-><c- o>&lt;</c-><c- n>Rs</c-><c- o>></c-> <c- o>&amp;&amp;</c-> <c- p>...);</c->
+  <c- k>static</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- n>all_forward</c-> <c- o>=</c-> <c- p>(</c-><c- n>ForwardRange</c-><c- o>&lt;</c-><c- n>Rs</c-><c- o>></c-> <c- o>&amp;&amp;</c-> <c- p>...);</c->
+  <c- k>static</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- n>all_forward_const</c-> <c- o>=</c-> <c- p>(</c-><c- n>ForwardRange</c-><c- o>&lt;</c-><c- k>const</c-> <c- n>Rs</c-><c- o>></c-> <c- o>&amp;&amp;</c-> <c- p>...);</c->
+  <c- k>static</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- n>all_sized</c-> <c- o>=</c-> <c- p>(</c-><c- n>SizedRange</c-><c- o>&lt;</c-><c- n>Rs</c-><c- o>></c-> <c- o>&amp;&amp;</c-> <c- p>...);</c->
+  <c- k>static</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- n>all_sized_const</c-> <c- o>=</c-> <c- p>(</c-><c- n>SizedRange</c-><c- o>&lt;</c-><c- k>const</c-> <c- n>Rs</c-><c- o>></c-> <c- o>&amp;&amp;</c-> <c- p>...);</c->
+
+  <c- n>std</c-><c- o>::</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>Rs</c-><c- p>...</c-><c- o>></c-> <c- n>ranges_</c-> <c- p>{};</c->
+
+  <c- k>template</c-><c- o>&lt;</c-><c- n>std</c-><c- o>::</c-><c- b>size_t</c-><c- p>...</c-> <c- n>Is</c-><c- p>,</c-> <c- k>class</c-> <c- nc>Self</c-><c- o>></c->
+  <c- k>static</c-> <c- k>constexpr</c-> <c- k>auto</c-> <c- n>size_</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>index_sequence</c-><c- o>&lt;</c-><c- n>Is</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>Self</c-><c- o>&amp;</c-> <c- n>self</c-><c- p>)</c->
+  <c- p>{</c->
+    <c- k>if</c-> <c- k>constexpr</c-> <c- p>(</c-><c- k>sizeof</c-><c- p>...(</c-><c- n>Rs</c-><c- p>)</c-> <c- o>!=</c-> <c- mi>0</c-><c- p>)</c-> <c- p>{</c->
+      <c- k>static_assert</c-><c- p>(</c-><c- n>Same</c-><c- o>&lt;</c-><c- n>std</c-><c- o>::</c-><c- n>index_sequence</c-><c- o>&lt;</c-><c- n>Is</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>Indices</c-><c- o>></c-><c- p>);</c->
+      <c- k>using</c-> <c- n>D</c-> <c- o>=</c-> <c- n>__common_difference_type_t</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>Rs</c-><c- o>></c-><c- p>...</c-><c- o>></c-><c- p>;</c->
+      <c- k>return</c-> <c- n>ranges</c-><c- o>::</c-><c- n>min</c-><c- p>({</c-><c- k>static_cast</c-><c- o>&lt;</c-><c- n>D</c-><c- o>></c-><c- p>(</c->
+        <c- n>ranges</c-><c- o>::</c-><c- n>size</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>self</c-><c- p>.</c-><c- n>ranges_</c-><c- p>)))...});</c->
+    <c- p>}</c-> <c- k>else</c-> <c- p>{</c->
+      <c- k>return</c-> <c- mi>0</c-><c- p>;</c->
+    <c- p>}</c->
+  <c- p>}</c->
+  <c- k>template</c-><c- o>&lt;</c-><c- n>std</c-><c- o>::</c-><c- b>size_t</c-><c- p>...</c-> <c- n>Is</c-><c- o>></c->
+  <c- k>constexpr</c-> <c- b>void</c-> <c- n>begin_</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>index_sequence</c-><c- o>&lt;</c-><c- n>Is</c-><c- p>...</c-><c- o>></c-><c- p>)</c->
+  <c- p>{</c-> <c- p>(((</c-><c- b>void</c-><c- p>)(</c-><c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- k>this</c-><c- o>-></c-><c- n>current_</c-><c- p>)</c-> <c- o>=</c-> <c- n>ranges</c-><c- o>::</c-><c- n>begin</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>ranges_</c-><c- p>)))),</c-> <c- p>...);</c-> <c- p>}</c->
+<c- k>public</c-><c- o>:</c->
+  <c- n>zip_view</c-><c- p>()</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
+  <c- k>constexpr</c-> <c- nf>zip_view</c-><c- p>(</c-><c- n>Rs</c-><c- p>...</c-> <c- n>rs</c-><c- p>)</c->
+  <c- k>noexcept</c-><c- p>((</c-><c- n>std</c-><c- o>::</c-><c- n>is_nothrow_move_constructible_v</c-><c- o>&lt;</c-><c- n>Rs</c-><c- o>></c-> <c- o>&amp;&amp;</c-> <c- p>...))</c->
+  <c- n>requires</c-> <c- k>sizeof</c-><c- p>...(</c-><c- n>Rs</c-><c- p>)</c-> <c- o>!=</c-> <c- mi>0</c->
+  <c- o>:</c-> <c- n>ranges_</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>move</c-><c- p>(</c-><c- n>rs</c-><c- p>)...)</c-> <c- p>{}</c->
+
+  <c- k>constexpr</c-> <c- k>auto</c-> <c- nf>begin</c-><c- p>()</c-> <c- p>{</c->
+    <c- k>if</c-> <c- k>constexpr</c-> <c- p>(</c-><c- o>!</c-><c- n>all_forward</c-><c- p>)</c-> <c- n>begin_</c-><c- p>(</c-><c- n>Indices</c-><c- p>{});</c->
+    <c- k>return</c-> <c- n>__zipperator</c-><c- o>&lt;</c-><c- n>all_simple</c-> <c- o>&amp;&amp;</c-> <c- n>all_forward</c-><c- p>,</c-> <c- n>Indices</c-><c- o>></c-><c- p>{</c-><c- o>*</c-><c- k>this</c-><c- p>};</c->
+  <c- p>}</c->
+  <c- k>constexpr</c-> <c- k>auto</c-> <c- nf>begin</c-><c- p>()</c-> <c- k>const</c-> <c- n>requires</c-> <c- n>all_forward_const</c->
+  <c- p>{</c-> <c- k>return</c-> <c- n>__zipperator</c-><c- o>&lt;</c->true<c- p>,</c-> <c- n>Indices</c-><c- o>></c-><c- p>{</c-><c- o>*</c-><c- k>this</c-><c- p>};</c-> <c- p>}</c->
+
+  <c- k>constexpr</c-> <c- k>auto</c-> <c- nf>end</c-><c- p>()</c-> <c- n>requires</c-> <c- n>all_forward</c->
+  <c- p>{</c->
+    <c- k>if</c-> <c- k>constexpr</c-> <c- p>((</c-><c- n>RandomAccessRange</c-><c- o>&lt;</c-><c- n>Rs</c-><c- o>></c-> <c- o>&amp;&amp;</c-> <c- p>...)</c-> <c- o>&amp;&amp;</c-> <c- n>all_sized</c-><c- p>)</c->
+      <c- k>return</c-> <c- n>__zipperator</c-><c- o>&lt;</c-><c- n>all_simple</c-><c- p>,</c-> <c- n>Indices</c-><c- o>></c-><c- p>{</c-><c- o>*</c-><c- k>this</c-><c- p>,</c-> <c- n>size_</c-><c- p>(</c-><c- n>Indices</c-><c- p>{},</c-> <c- o>*</c-><c- k>this</c-><c- p>)};</c->
+    <c- k>else</c->
+      <c- k>return</c-> <c- n>__sentinel</c-><c- o>&lt;</c-><c- n>all_simple</c-><c- p>,</c-> <c- n>Indices</c-><c- o>></c-><c- p>{</c-><c- o>*</c-><c- k>this</c-><c- p>};</c->
+  <c- p>}</c->
+  <c- k>constexpr</c-> <c- k>auto</c-> <c- nf>end</c-><c- p>()</c-> <c- k>const</c->
+  <c- p>{</c->
+    <c- k>if</c-> <c- k>constexpr</c-> <c- p>((</c-><c- n>RandomAccessRange</c-><c- o>&lt;</c-><c- k>const</c-> <c- n>Rs</c-><c- o>></c-> <c- o>&amp;&amp;</c-> <c- p>...)</c-> <c- o>&amp;&amp;</c-> <c- n>all_sized_const</c-><c- p>)</c->
+      <c- k>return</c-> <c- n>__zipperator</c-><c- o>&lt;</c->true<c- p>,</c-> <c- n>Indices</c-><c- o>></c-><c- p>{</c-><c- o>*</c-><c- k>this</c-><c- p>,</c-> <c- n>size_</c-><c- p>(</c-><c- n>Indices</c-><c- p>{},</c-> <c- o>*</c-><c- k>this</c-><c- p>)};</c->
+    <c- k>else</c-> <c- k>if</c-> <c- k>constexpr</c-> <c- p>(</c-><c- n>all_forward</c-> <c- o>&amp;&amp;</c-> <c- n>all_forward_const</c-><c- p>)</c->
+      <c- k>return</c-> <c- n>__sentinel</c-><c- o>&lt;</c->true<c- p>,</c-> <c- n>Indices</c-><c- o>></c-><c- p>{</c-><c- o>*</c-><c- k>this</c-><c- p>};</c->
+    <c- k>else</c->
+      <c- k>return</c-> <c- n>default_sentinel</c-><c- p>{};</c->
+  <c- p>}</c->
+
+  <c- k>constexpr</c-> <c- k>auto</c-> <c- nf>size</c-><c- p>()</c-> <c- n>requires</c-> <c- n>all_sized</c->
+  <c- p>{</c-> <c- k>return</c-> <c- n>size_</c-><c- p>(</c-><c- n>Indices</c-><c- p>{},</c-> <c- o>*</c-><c- k>this</c-><c- p>);</c-> <c- p>}</c->
+  <c- k>constexpr</c-> <c- k>auto</c-> <c- nf>size</c-><c- p>()</c-> <c- k>const</c-> <c- n>requires</c-> <c- n>all_sized_const</c->
+  <c- p>{</c-> <c- k>return</c-> <c- n>size_</c-><c- p>(</c-><c- n>Indices</c-><c- p>{},</c-> <c- o>*</c-><c- k>this</c-><c- p>);</c-> <c- p>}</c->
+<c- p>};</c->
+
+<c- k>template</c-> <c- o>&lt;</c-><c- n>class</c-><c- p>...</c-> <c- n>Rs</c-><c- o>></c->
+<c- n>zip_view</c-><c- p>(</c-><c- n>Rs</c-><c- o>&amp;&amp;</c-><c- p>...)</c-> <c- o>-></c-> <c- n>zip_view</c-><c- o>&lt;</c-><c- n>all_view</c-><c- o>&lt;</c-><c- n>Rs</c-><c- o>></c-><c- p>...</c-><c- o>></c-><c- p>;</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- b>bool</c-><c- p>,</c-> <c- n>View</c-><c- p>...</c-> <c- n>Rs</c-><c- o>></c->
+<c- k>struct</c-> <c- n>__zipperator_base</c-> <c- p>{</c->
+  <c- n>zip_view</c-><c- o>&lt;</c-><c- n>Rs</c-><c- p>...</c-><c- o>>*</c-> <c- n>parent_</c-> <c- o>=</c-> <c- k>nullptr</c-><c- p>;</c->
+<c- p>};</c->
+<c- k>template</c-><c- o>&lt;</c-><c- b>bool</c-> <c- n>Const</c-><c- p>,</c-> <c- n>View</c-><c- p>...</c-> <c- n>Rs</c-><c- o>></c->
+<c- n>requires</c-> <c- p>(</c-><c- n>ForwardRange</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>></c-> <c- o>&amp;&amp;</c-> <c- p>...)</c->
+<c- k>struct</c-> <c- n>__zipperator_base</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- p>...</c-><c- o>></c-> <c- p>{</c->
+  <c- n>std</c-><c- o>::</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>></c-><c- p>...</c-><c- o>></c-> <c- n>current_</c-> <c- p>{};</c->
+<c- p>};</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- b>bool</c-><c- p>,</c-> <c- n>View</c-><c- p>...</c-> <c- n>Rs</c-><c- o>></c->
+<c- k>struct</c-> <c- n>__zipperator_vt_base</c-> <c- p>{};</c->
+<c- k>template</c-><c- o>&lt;</c-><c- b>bool</c-> <c- n>Const</c-><c- p>,</c-> <c- n>View</c-><c- p>...</c-> <c- n>Rs</c-><c- o>></c->
+<c- n>requires</c-> <c- p>(</c-><c- n>InputRange</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>></c-> <c- o>&amp;&amp;</c-> <c- p>...)</c->
+<c- k>struct</c-> <c- n>__zipperator_vt_base</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- p>...</c-><c- o>></c-> <c- p>{</c->
+  <c- k>using</c-> <c- n>value_type</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>tuple</c-><c- o>&lt;</c->
+    <c- n>iter_value_t</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>>></c-><c- p>...</c-><c- o>></c-><c- p>;</c->
+<c- p>};</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- n>View</c-><c- p>...</c-> <c- n>Rs</c-><c- o>></c->
+<c- k>template</c-><c- o>&lt;</c-><c- b>bool</c-> <c- n>Const</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- b>size_t</c-><c- p>...</c-> <c- n>Is</c-><c- o>></c->
+<c- k>struct</c-> <c- n>zip_view</c-><c- o>&lt;</c-><c- n>Rs</c-><c- p>...</c-><c- o>>::</c-><c- n>__zipperator</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>index_sequence</c-><c- o>&lt;</c-><c- n>Is</c-><c- p>...</c-><c- o>>></c->
+<c- o>:</c-> <c- k>private</c-> <c- n>__zipperator_base</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- p>...</c-><c- o>></c->
+<c- p>,</c-> <c- n>__zipperator_vt_base</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- p>...</c-><c- o>></c->
+<c- p>{</c->
+<c- k>private</c-><c- o>:</c->
+  <c- k>using</c-> <c- n>Parent</c-> <c- o>=</c-> <c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>zip_view</c-><c- o>&lt;</c-><c- n>Rs</c-><c- p>...</c-><c- o>>></c-><c- p>;</c->
+  <c- k>using</c-> <c- n>Sent</c-> <c- o>=</c-> <c- k>typename</c-> <c- n>zip_view</c-><c- o>&lt;</c-><c- n>Rs</c-><c- p>...</c-><c- o>>::</c-><c- k>template</c->
+    <c- n>__sentinel</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>index_sequence</c-><c- o>&lt;</c-><c- n>Is</c-><c- p>...</c-><c- o>>></c-><c- p>;</c->
+
+  <c- k>static</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- n>all_random_access</c-> <c- o>=</c->
+    <c- p>(</c-><c- n>RandomAccessRange</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>></c-> <c- o>&amp;&amp;</c-> <c- p>...);</c->
+  <c- k>static</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- n>all_bidi</c-> <c- o>=</c->
+    <c- p>(</c-><c- n>BidirectionalRange</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>></c-> <c- o>&amp;&amp;</c-> <c- p>...);</c->
+  <c- k>static</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- n>all_forward</c-> <c- o>=</c->
+    <c- p>(</c-><c- n>ForwardRange</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>></c-> <c- o>&amp;&amp;</c-> <c- p>...);</c->
+  <c- k>static</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- n>all_input</c-> <c- o>=</c->
+    <c- p>(</c-><c- n>InputRange</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>></c-> <c- o>&amp;&amp;</c-> <c- p>...);</c->
+
+  <c- k>static_assert</c-><c- p>(</c-><c- o>!</c-><c- n>Const</c-> <c- o>||</c-> <c- n>all_forward</c-><c- p>);</c->
+  <c- k>static_assert</c-><c- p>(</c-><c- n>Same</c-><c- o>&lt;</c-><c- n>std</c-><c- o>::</c-><c- n>index_sequence_for</c-><c- o>&lt;</c-><c- n>Rs</c-><c- p>...</c-><c- o>></c-><c- p>,</c->
+    <c- n>std</c-><c- o>::</c-><c- n>index_sequence</c-><c- o>&lt;</c-><c- n>Is</c-><c- p>...</c-><c- o>>></c-><c- p>);</c->
+
+  <c- k>auto</c-><c- o>&amp;</c-> <c- n>current</c-><c- p>()</c-> <c- k>noexcept</c-> <c- n>requires</c-> <c- n>all_forward</c->
+  <c- p>{</c-> <c- k>return</c-> <c- k>this</c-><c- o>-></c-><c- n>current_</c-><c- p>;</c-> <c- p>}</c->
+  <c- k>auto</c-><c- o>&amp;</c-> <c- n>current</c-><c- p>()</c-> <c- k>const</c-> <c- k>noexcept</c-> <c- p>{</c->
+    <c- k>if</c-> <c- k>constexpr</c-> <c- p>(</c-><c- n>all_forward</c-><c- p>)</c->
+      <c- k>return</c-> <c- k>this</c-><c- o>-></c-><c- n>current_</c-><c- p>;</c->
+    <c- k>else</c->
+      <c- k>return</c-> <c- k>this</c-><c- o>-></c-><c- n>parent_</c-><c- o>-></c-><c- n>current_</c-><c- p>;</c->
+  <c- p>}</c->
+
+<c- k>public</c-><c- o>:</c->
+  <c- k>using</c-> <c- n>iterator_category</c-> <c- o>=</c->
+    <c- n>meta</c-><c- o>::</c-><c- n>if_c</c-><c- o>&lt;</c-><c- n>all_random_access</c-><c- p>,</c-> <c- n>random_access_iterator_tag</c-><c- p>,</c->
+    <c- n>meta</c-><c- o>::</c-><c- n>if_c</c-><c- o>&lt;</c-><c- n>all_bidi</c-><c- p>,</c-> <c- n>bidirectional_iterator_tag</c-><c- p>,</c->
+    <c- n>meta</c-><c- o>::</c-><c- n>if_c</c-><c- o>&lt;</c-><c- n>all_forward</c-><c- p>,</c-> <c- n>forward_iterator_tag</c-><c- p>,</c->
+    <c- n>meta</c-><c- o>::</c-><c- n>if_c</c-><c- o>&lt;</c-><c- n>all_input</c-><c- p>,</c-> <c- n>input_iterator_tag</c-><c- p>,</c->
+    <c- n>output_iterator_tag</c-><c- o>>>>></c-><c- p>;</c->
+  <c- k>using</c-> <c- n>difference_type</c-> <c- o>=</c-> <c- n>__common_difference_type_t</c-><c- o>&lt;</c->
+    <c- n>iterator_t</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>></c-><c- p>...</c-><c- o>></c-><c- p>;</c->
+
+  <c- n>__zipperator</c-><c- p>()</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
+  <c- k>explicit</c-> <c- k>constexpr</c-> <c- nf>__zipperator</c-><c- p>(</c-><c- n>Parent</c-><c- o>&amp;</c-> <c- n>parent</c-><c- p>)</c->
+  <c- o>:</c-> <c- n>__zipperator_base</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- p>...</c-><c- o>></c-><c- p>{</c-><c- n>detail</c-><c- o>::</c-><c- n>addressof</c-><c- p>(</c-><c- n>parent</c-><c- p>)}</c->
+  <c- p>{}</c->
+  <c- k>constexpr</c-> <c- n>__zipperator</c-><c- p>(</c-><c- n>Parent</c-><c- o>&amp;</c-> <c- n>parent</c-><c- p>)</c->
+  <c- n>requires</c-> <c- nl>all_forward</c->
+  <c- p>:</c-> <c- n>__zipperator_base</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- p>...</c-><c- o>></c-><c- p>{{</c->
+    <c- p>(</c-><c- n>ranges</c-><c- o>::</c-><c- n>begin</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>parent</c-><c- p>.</c-><c- n>ranges_</c-><c- p>)))...</c->
+  <c- p>}}</c-> <c- p>{}</c->
+  <c- k>constexpr</c-> <c- n>__zipperator</c-><c- p>(</c-><c- n>Parent</c-><c- o>&amp;</c-> <c- n>parent</c-><c- p>,</c-> <c- p>[[</c-><c- n>maybe_unused</c-><c- p>]]</c-> <c- n>difference_type</c-> <c- n>n</c-><c- p>)</c->
+  <c- n>requires</c-> <c- nl>all_random_access</c->
+  <c- p>:</c-> <c- n>__zipperator_base</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- p>...</c-><c- o>></c-><c- p>{{</c->
+    <c- p>(</c-><c- n>ranges</c-><c- o>::</c-><c- n>begin</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>parent</c-><c- p>.</c-><c- n>ranges_</c-><c- p>))</c-> <c- o>+</c->
+      <c- k>static_cast</c-><c- o>&lt;</c-><c- n>iter_difference_t</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>>>></c-><c- p>(</c-><c- n>n</c-><c- p>))...</c->
+  <c- p>}}</c-> <c- p>{}</c->
+
+  <c- k>constexpr</c-> <c- k>auto</c-> <c- k>operator</c-><c- o>*</c-><c- p>()</c->
+  <c- p>{</c-> <c- k>return</c-> <c- n>__tuple_hack</c-><c- p>{</c-><c- o>*</c-><c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>current</c-><c- p>())...};</c-> <c- p>}</c->
+  <c- k>constexpr</c-> <c- k>auto</c-> <c- k>operator</c-><c- o>*</c-><c- p>()</c-> <c- k>const</c->
+  <c- n>requires</c-> <c- p>(</c-><c- n>detail</c-><c- o>::</c-><c- n>Dereferenceable</c-><c- o>&lt;</c-><c- k>const</c-> <c- n>iterator_t</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>>></c-> <c- o>&amp;&amp;</c-> <c- p>...)</c->
+  <c- p>{</c-> <c- k>return</c-> <c- n>__tuple_hack</c-><c- p>{</c-><c- o>*</c-><c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>current</c-><c- p>())...};</c-> <c- p>}</c->
+
+  <c- k>constexpr</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- k>operator</c-><c- o>++</c-><c- p>()</c-> <c- p>{</c->
+    <c- p>((</c-><c- b>void</c-><c- p>)</c-><c- o>++</c-><c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>current</c-><c- p>()),</c-> <c- p>...);</c->
+    <c- k>return</c-> <c- o>*</c-><c- k>this</c-><c- p>;</c->
+  <c- p>}</c->
+  <c- k>constexpr</c-> <c- k>auto</c-> <c- k>operator</c-><c- o>++</c-><c- p>(</c-><c- b>int</c-><c- p>)</c-> <c- p>{</c->
+    <c- k>if</c-> <c- k>constexpr</c-> <c- p>(</c-><c- n>all_forward</c-><c- p>)</c-> <c- p>{</c->
+      <c- k>auto</c-> <c- n>tmp</c-> <c- o>=</c-> <c- o>*</c-><c- k>this</c-><c- p>;</c->
+      <c- o>++*</c-><c- k>this</c-><c- p>;</c->
+      <c- k>return</c-> <c- n>tmp</c-><c- p>;</c->
+    <c- p>}</c-> <c- k>else</c->
+      <c- o>++*</c-><c- k>this</c-><c- p>;</c->
+  <c- p>}</c->
+
+  <c- k>constexpr</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- k>operator</c-><c- o>--</c-><c- p>()</c->
+  <c- n>requires</c-> <c- n>all_bidi</c->
+  <c- p>{</c->
+    <c- p>((</c-><c- b>void</c-><c- p>)</c-><c- o>--</c-><c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>current</c-><c- p>()),</c-> <c- p>...);</c->
+    <c- k>return</c-> <c- o>*</c-><c- k>this</c-><c- p>;</c->
+  <c- p>}</c->
+  <c- k>constexpr</c-> <c- n>__zipperator</c-> <c- k>operator</c-><c- o>--</c-><c- p>(</c-><c- b>int</c-><c- p>)</c->
+  <c- n>requires</c-> <c- n>all_bidi</c->
+  <c- p>{</c->
+    <c- k>auto</c-> <c- n>tmp</c-> <c- o>=</c-> <c- o>*</c-><c- k>this</c-><c- p>;</c->
+    <c- o>--*</c-><c- k>this</c-><c- p>;</c->
+    <c- k>return</c-> <c- n>tmp</c-><c- p>;</c->
+  <c- p>}</c->
+
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>==</c-><c- p>(</c-><c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>,</c-> <c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>y</c-><c- p>)</c->
+  <c- n>requires</c-> <c- n>all_forward</c->
+  <c- p>{</c-> <c- k>return</c-> <c- n>x</c-><c- p>.</c-><c- n>current_</c-> <c- o>==</c-> <c- n>y</c-><c- p>.</c-><c- n>current_</c-><c- p>;</c-> <c- p>}</c->
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>!=</c-><c- p>(</c-><c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>,</c-> <c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>y</c-><c- p>)</c->
+  <c- n>requires</c-> <c- n>all_forward</c->
+  <c- p>{</c-> <c- k>return</c-> <c- o>!</c-><c- p>(</c-><c- n>x</c-> <c- o>==</c-> <c- n>y</c-><c- p>);</c-> <c- p>}</c->
+
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>==</c-><c- p>(</c-><c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>,</c-> <c- n>default_sentinel</c-><c- p>)</c->
+  <c- n>requires</c-> <c- o>!</c-><c- n>all_forward</c->
+  <c- p>{</c-> <c- k>return</c-> <c- p>((</c-><c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>x</c-><c- p>.</c-><c- n>current</c-><c- p>())</c-> <c- o>==</c-> <c- n>ranges</c-><c- o>::</c-><c- n>end</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>x</c-><c- p>.</c-><c- n>parent_</c-><c- o>-></c-><c- n>ranges_</c-><c- p>)))</c-> <c- o>||</c-> <c- p>...);</c-> <c- p>}</c->
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>==</c-><c- p>(</c-><c- n>default_sentinel</c-> <c- n>y</c-><c- p>,</c-> <c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>)</c->
+  <c- n>requires</c-> <c- o>!</c-><c- n>all_forward</c->
+  <c- p>{</c-> <c- k>return</c-> <c- p>(</c-><c- n>x</c-> <c- o>==</c-> <c- n>y</c-><c- p>);</c-> <c- p>}</c->
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>!=</c-><c- p>(</c-><c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>,</c-> <c- n>default_sentinel</c-> <c- n>y</c-><c- p>)</c->
+  <c- n>requires</c-> <c- o>!</c-><c- n>all_forward</c->
+  <c- p>{</c-> <c- k>return</c-> <c- o>!</c-><c- p>(</c-><c- n>x</c-> <c- o>==</c-> <c- n>y</c-><c- p>);</c-> <c- p>}</c->
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>!=</c-><c- p>(</c-><c- n>default_sentinel</c-> <c- n>y</c-><c- p>,</c-> <c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>)</c->
+  <c- n>requires</c-> <c- o>!</c-><c- n>all_forward</c->
+  <c- p>{</c-> <c- k>return</c-> <c- o>!</c-><c- p>(</c-><c- n>y</c-> <c- o>==</c-> <c- n>x</c-><c- p>);</c-> <c- p>}</c->
+
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>==</c-><c- p>(</c-><c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>,</c-> <c- k>const</c-> <c- n>Sent</c-><c- o>&amp;</c-> <c- n>y</c-><c- p>)</c->
+  <c- n>requires</c-> <c- n>all_forward</c->
+  <c- p>{</c-> <c- k>return</c-> <c- p>((</c-><c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>current</c-><c- p>())</c-> <c- o>==</c-> <c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>y</c-><c- p>.</c-><c- n>last_</c-><c- p>))</c-> <c- o>||</c-> <c- p>...);</c-> <c- p>}</c->
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>==</c-><c- p>(</c-><c- k>const</c-> <c- n>Sent</c-><c- o>&amp;</c-> <c- n>y</c-><c- p>,</c-> <c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>)</c->
+  <c- n>requires</c-> <c- n>all_forward</c->
+  <c- p>{</c-> <c- k>return</c-> <c- p>(</c-><c- n>x</c-> <c- o>==</c-> <c- n>y</c-><c- p>);</c-> <c- p>}</c->
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>!=</c-><c- p>(</c-><c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>,</c-> <c- k>const</c-> <c- n>Sent</c-><c- o>&amp;</c-> <c- n>y</c-><c- p>)</c->
+  <c- n>requires</c-> <c- n>all_forward</c->
+  <c- p>{</c-> <c- k>return</c-> <c- o>!</c-><c- p>(</c-><c- n>x</c-> <c- o>==</c-> <c- n>y</c-><c- p>);</c-> <c- p>}</c->
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>!=</c-><c- p>(</c-><c- k>const</c-> <c- n>Sent</c-><c- o>&amp;</c-> <c- n>y</c-><c- p>,</c-> <c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>)</c->
+  <c- n>requires</c-> <c- n>all_forward</c->
+  <c- p>{</c-> <c- k>return</c-> <c- o>!</c-><c- p>(</c-><c- n>y</c-> <c- o>==</c-> <c- n>x</c-><c- p>);</c-> <c- p>}</c->
+
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>&lt;</c-><c- p>(</c-><c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>,</c-> <c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>y</c-><c- p>)</c->
+  <c- n>requires</c-> <c- n>all_random_access</c->
+  <c- p>{</c-> <c- k>return</c-> <c- n>x</c-><c- p>.</c-><c- n>current_</c-> <c- o>&lt;</c-> <c- n>y</c-><c- p>.</c-><c- n>current_</c-><c- p>;</c-> <c- p>}</c->
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>></c-><c- p>(</c-><c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>,</c-> <c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>y</c-><c- p>)</c->
+  <c- n>requires</c-> <c- n>all_random_access</c->
+  <c- p>{</c-> <c- k>return</c-> <c- n>y</c-> <c- o>&lt;</c-> <c- n>x</c-><c- p>;</c-> <c- p>}</c->
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>&lt;=</c-><c- p>(</c-><c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>,</c-> <c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>y</c-><c- p>)</c->
+  <c- n>requires</c-> <c- n>all_random_access</c->
+  <c- p>{</c-> <c- k>return</c-> <c- o>!</c-><c- p>(</c-><c- n>y</c-> <c- o>&lt;</c-> <c- n>x</c-><c- p>);</c-> <c- p>}</c->
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- k>operator</c-><c- o>>=</c-><c- p>(</c-><c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>,</c-> <c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>y</c-><c- p>)</c->
+  <c- n>requires</c-> <c- n>all_random_access</c->
+  <c- p>{</c-> <c- k>return</c-> <c- o>!</c-><c- p>(</c-><c- n>x</c-> <c- o>&lt;</c-> <c- n>y</c-><c- p>);</c-> <c- p>}</c->
+
+  <c- k>constexpr</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- k>operator</c-><c- o>+=</c-><c- p>([[</c-><c- n>maybe_unused</c-><c- p>]]</c-> <c- n>difference_type</c-> <c- n>n</c-><c- p>)</c->
+  <c- n>requires</c-> <c- n>all_random_access</c->
+  <c- p>{</c->
+    <c- p>((</c-><c- b>void</c-><c- p>)(</c-><c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>current</c-><c- p>())</c-> <c- o>+=</c-> <c- n>n</c-><c- p>),</c-> <c- p>...);</c->
+    <c- k>return</c-> <c- o>*</c-><c- k>this</c-><c- p>;</c->
+  <c- p>}</c->
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- n>__zipperator</c-> <c- k>operator</c-><c- o>+</c-><c- p>(</c-><c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>,</c-> <c- n>difference_type</c-> <c- n>n</c-><c- p>)</c->
+  <c- n>requires</c-> <c- n>all_random_access</c->
+  <c- p>{</c->
+    <c- k>auto</c-> <c- n>tmp</c-> <c- o>=</c-> <c- n>x</c-><c- p>;</c->
+    <c- n>tmp</c-> <c- o>+=</c-> <c- n>n</c-><c- p>;</c->
+    <c- k>return</c-> <c- n>tmp</c-><c- p>;</c->
+  <c- p>}</c->
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- n>__zipperator</c-> <c- k>operator</c-><c- o>+</c-><c- p>(</c-><c- n>difference_type</c-> <c- n>n</c-><c- p>,</c-> <c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>)</c->
+  <c- n>requires</c-> <c- n>all_random_access</c->
+  <c- p>{</c-> <c- k>return</c-> <c- n>x</c-> <c- o>+</c-> <c- n>n</c-><c- p>;</c-> <c- p>}</c->
+
+  <c- k>constexpr</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- k>operator</c-><c- o>-=</c-><c- p>([[</c-><c- n>maybe_unused</c-><c- p>]]</c-> <c- n>difference_type</c-> <c- n>n</c-><c- p>)</c->
+  <c- n>requires</c-> <c- n>all_random_access</c->
+  <c- p>{</c->
+    <c- p>((</c-><c- b>void</c-><c- p>)(</c-><c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>current</c-><c- p>())</c-> <c- o>-=</c-> <c- n>n</c-><c- p>),</c-> <c- p>...);</c->
+    <c- k>return</c-> <c- o>*</c-><c- k>this</c-><c- p>;</c->
+  <c- p>}</c->
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- n>__zipperator</c-> <c- k>operator</c-><c- o>-</c-><c- p>(</c-><c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>,</c-> <c- n>difference_type</c-> <c- n>n</c-><c- p>)</c->
+  <c- n>requires</c-> <c- n>all_random_access</c->
+  <c- p>{</c->
+    <c- k>auto</c-> <c- n>tmp</c-> <c- o>=</c-> <c- n>x</c-><c- p>;</c->
+    <c- n>tmp</c-> <c- o>-=</c-> <c- n>n</c-><c- p>;</c->
+    <c- k>return</c-> <c- n>tmp</c-><c- p>;</c->
+  <c- p>}</c->
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- n>difference_type</c-> <c- k>operator</c-><c- o>-</c-><c- p>(</c-><c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>,</c-> <c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>y</c-><c- p>)</c->
+  <c- n>requires</c-> <c- p>(</c-><c- n>SizedSentinel</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>></c-><c- p>,</c->
+    <c- n>iterator_t</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>>></c-> <c- o>&amp;&amp;</c-> <c- p>...)</c->
+  <c- p>{</c->
+    <c- k>if</c-> <c- k>constexpr</c-> <c- p>(</c-><c- k>sizeof</c-><c- p>...(</c-><c- n>Rs</c-><c- p>)</c-> <c- o>!=</c-> <c- mi>0</c-><c- p>)</c-> <c- p>{</c->
+      <c- k>return</c-> <c- n>ranges</c-><c- o>::</c-><c- n>max</c-><c- p>({</c-><c- k>static_cast</c-><c- o>&lt;</c-><c- n>difference_type</c-><c- o>></c-><c- p>(</c->
+        <c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>x</c-><c- p>.</c-><c- n>current</c-><c- p>())</c-> <c- o>-</c-> <c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>y</c-><c- p>.</c-><c- n>current</c-><c- p>()))...});</c->
+    <c- p>}</c-> <c- k>else</c-> <c- p>{</c->
+      <c- k>return</c-> <c- mi>0</c-><c- p>;</c->
+    <c- p>}</c->
+  <c- p>}</c->
+
+  <c- k>constexpr</c-> <c- k>auto</c-> <c- k>operator</c-><c- p>[](</c-><c- n>difference_type</c-> <c- n>n</c-><c- p>)</c-> <c- k>const</c->
+  <c- n>requires</c-> <c- n>all_random_access</c->
+  <c- p>{</c-> <c- k>return</c-> <c- o>*</c-><c- p>(</c-><c- o>*</c-><c- k>this</c-> <c- o>+</c-> <c- n>n</c-><c- p>);</c-> <c- p>}</c->
+
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- k>auto</c-> <c- n>iter_move</c-><c- p>(</c-><c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>)</c->
+  <c- k>noexcept</c-><c- p>(</c-><c- k>noexcept</c-><c- p>(((</c-><c- b>void</c-><c- p>)</c-><c- n>ranges</c-><c- o>::</c-><c- n>iter_move</c-><c- p>(</c->
+    <c- n>std</c-><c- o>::</c-><c- n>declval</c-><c- o>&lt;</c-><c- k>const</c-> <c- n>iterator_t</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>>&amp;></c-><c- p>()),</c-> <c- p>...)))</c->
+  <c- n>requires</c-> <c- p>((</c-><c- n>Readable</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>>></c-> <c- o>&amp;&amp;</c-> <c- p>...))</c->
+  <c- p>{</c-> <c- k>return</c-> <c- n>__tuple_hack</c-><c- p>{</c-><c- n>ranges</c-><c- o>::</c-><c- n>iter_move</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>x</c-><c- p>.</c-><c- n>current</c-><c- p>()))...};</c-> <c- p>}</c->
+
+  <c- k>friend</c-> <c- k>constexpr</c-> <c- b>void</c-> <c- n>iter_swap</c-><c- p>(</c-><c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>x</c-><c- p>,</c-> <c- k>const</c-> <c- n>__zipperator</c-><c- o>&amp;</c-> <c- n>y</c-><c- p>)</c->
+  <c- k>noexcept</c-><c- p>(</c-><c- k>noexcept</c-><c- p>((</c-><c- n>ranges</c-><c- o>::</c-><c- n>iter_swap</c-><c- p>(</c->
+    <c- n>std</c-><c- o>::</c-><c- n>declval</c-><c- o>&lt;</c-><c- k>const</c-> <c- n>iterator_t</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>>&amp;></c-><c- p>(),</c->
+    <c- n>std</c-><c- o>::</c-><c- n>declval</c-><c- o>&lt;</c-><c- k>const</c-> <c- n>iterator_t</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>>&amp;></c-><c- p>()),</c-> <c- p>...)))</c->
+  <c- n>requires</c-> <c- p>(</c-><c- n>IndirectlySwappable</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>>></c-> <c- o>&amp;&amp;</c-> <c- p>...)</c->
+  <c- p>{</c-> <c- p>(</c-><c- n>ranges</c-><c- o>::</c-><c- n>iter_swap</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>x</c-><c- p>.</c-><c- n>current</c-><c- p>()),</c-> <c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>y</c-><c- p>.</c-><c- n>current</c-><c- p>())),</c-> <c- p>...);</c-> <c- p>}</c->
+<c- p>};</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- n>View</c-><c- p>...</c-> <c- n>Rs</c-><c- o>></c->
+<c- k>template</c-><c- o>&lt;</c-><c- b>bool</c-> <c- n>Const</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- b>size_t</c-><c- p>...</c-> <c- n>Is</c-><c- o>></c->
+<c- k>struct</c-> <c- n>zip_view</c-><c- o>&lt;</c-><c- n>Rs</c-><c- p>...</c-><c- o>>::</c-><c- n>__sentinel</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>index_sequence</c-><c- o>&lt;</c-><c- n>Is</c-><c- p>...</c-><c- o>>></c-> <c- p>{</c->
+<c- k>private</c-><c- o>:</c->
+  <c- k>using</c-> <c- n>Iter</c-> <c- o>=</c-> <c- k>typename</c-> <c- n>zip_view</c-><c- o>&lt;</c-><c- n>Rs</c-><c- p>...</c-><c- o>>::</c-><c- k>template</c->
+    <c- n>__zipperator</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>index_sequence</c-><c- o>&lt;</c-><c- n>Is</c-><c- p>...</c-><c- o>>></c-><c- p>;</c->
+  <c- k>friend</c-> <c- n>Iter</c-><c- p>;</c->
+  <c- k>using</c-> <c- n>Parent</c-> <c- o>=</c-> <c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>zip_view</c-><c- o>&lt;</c-><c- n>Rs</c-><c- p>...</c-><c- o>>></c-><c- p>;</c->
+  <c- k>static</c-> <c- k>constexpr</c-> <c- b>bool</c-> <c- n>all_forward</c-> <c- o>=</c->
+    <c- p>(</c-><c- n>ForwardRange</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>></c-> <c- o>&amp;&amp;</c-> <c- p>...);</c->
+  <c- k>static_assert</c-><c- p>(</c-><c- n>all_forward</c-><c- p>);</c->
+  <c- k>static_assert</c-><c- p>(</c-><c- n>Same</c-><c- o>&lt;</c-><c- n>std</c-><c- o>::</c-><c- n>index_sequence_for</c-><c- o>&lt;</c-><c- n>Rs</c-><c- p>...</c-><c- o>></c-><c- p>,</c->
+    <c- n>std</c-><c- o>::</c-><c- n>index_sequence</c-><c- o>&lt;</c-><c- n>Is</c-><c- p>...</c-><c- o>>></c-><c- p>);</c->
+
+  <c- n>std</c-><c- o>::</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>sentinel_t</c-><c- o>&lt;</c-><c- n>__maybe_const</c-><c- o>&lt;</c-><c- n>Const</c-><c- p>,</c-> <c- n>Rs</c-><c- o>>></c-><c- p>...</c-><c- o>></c-> <c- n>last_</c-><c- p>;</c->
+
+<c- k>public</c-><c- o>:</c->
+  <c- n>__sentinel</c-><c- p>()</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
+  <c- k>explicit</c-> <c- k>constexpr</c-> <c- nf>__sentinel</c-><c- p>(</c-><c- n>Parent</c-><c- o>&amp;</c-> <c- n>parent</c-><c- p>)</c->
+  <c- o>:</c-> <c- n>last_</c-><c- p>{</c-><c- n>ranges</c-><c- o>::</c-><c- n>end</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>Is</c-><c- o>></c-><c- p>(</c-><c- n>parent</c-><c- p>.</c-><c- n>ranges_</c-><c- p>))...}</c->
+  <c- p>{}</c->
+<c- p>};</c->
+<c- p>}</c-> <c- c1>// namespace ext</c->
+
+<c- k>namespace</c-> <c- n>view</c-> <c- p>{</c->
+<c- k>struct</c-> <c- n>__zip_fn</c-> <c- p>{</c->
+  <c- k>template</c-><c- o>&lt;</c-><c- n>class</c-><c- p>...</c-> <c- n>Rs</c-><c- o>></c->
+  <c- n>requires</c-> <c- n>requires</c-><c- p>(</c-><c- n>Rs</c-><c- o>&amp;&amp;</c-><c- p>...</c-> <c- n>rs</c-><c- p>)</c-> <c- p>{</c->
+    <c- n>ranges</c-><c- o>::</c-><c- n>ext</c-><c- o>::</c-><c- n>zip_view</c-><c- p>{</c-><c- n>view</c-><c- o>::</c-><c- n>all</c-><c- p>(</c-><c- k>static_cast</c-><c- o>&lt;</c-><c- n>Rs</c-><c- o>></c-><c- p>(</c-><c- n>rs</c-><c- p>))...};</c->
+  <c- p>}</c->
+  <c- k>constexpr</c-> <c- k>auto</c-> <c- k>operator</c-><c- p>()(</c-><c- n>Rs</c-><c- o>&amp;&amp;</c-><c- p>...</c-> <c- n>rs</c-><c- p>)</c-> <c- k>const</c->
+  <c- n>STL2_NOEXCEPT_RETURN</c-><c- p>(</c->
+    <c- n>ranges</c-><c- o>::</c-><c- n>ext</c-><c- o>::</c-><c- n>zip_view</c-><c- p>{</c-><c- n>view</c-><c- o>::</c-><c- n>all</c-><c- p>(</c-><c- k>static_cast</c-><c- o>&lt;</c-><c- n>Rs</c-><c- o>></c-><c- p>(</c-><c- n>rs</c-><c- p>))...}</c->
+  <c- p>)</c->
+<c- p>};</c->
+
+<c- kr>inline</c-> <c- k>constexpr</c-> <c- n>__zip_fn</c-> <c- n>zip</c-><c- p>{};</c->
+</pre>
+   <h4 class="heading settled" data-level="3.9.3" id="problems-with-stdpair-and-stdtuple"><span class="secno">3.9.3. </span><span class="content">Problems with <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>pair</c-></code> and <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>tuple</c-></code></span><a class="self-link" href="#problems-with-stdpair-and-stdtuple"></a></h4>
+   <p><code class="highlight"><c- n>zip_view</c-></code> requires a value type to store the values of the iterators to the ranges that are
+iterated over, and a reference type to access those values via an iterator to the range.
+Additionally, the concept "<code class="highlight"><c- n>Writable</c-></code> wants <code class="highlight"><c- k>const</c-></code> proxy references to be assignable, so we need a
+tuple-like type with <code class="highlight"><c- k>const</c-></code>-qualified assignment operators"<a href=" https://github.com/CaseyCarter/cmcstl2/zip_view#">cmcstl2 C++ library §zip_view#</a>.</p>
+   <p>Both range-v3 and the cmcstl2 implementation above use an exposition-only type derived from <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>tuple</c-></code> (both) or <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>pair</c-></code> (range-v3 only) that permits a <code class="highlight"><c- n>CommonReference</c-></code> between <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>...</c-><c- o>>&amp;</c-></code> (an lvalue reference to the value type) and <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>...</c-><c- o>></c-></code> (the perceived reference
+type). This is deemed to be a hack by both Eric Niebler and Casey Carter; a careful reader might
+notice that the above implementation specifies this as <code class="highlight"><c- n>__tuple_hack</c-></code> (which has conveniently been
+left out of P1035).</p>
+   <p>Adding a third (and possibly fourth) tuple type that is exposition-only is <i>not</i> ideal: this
+requires extensions to both <code class="highlight"><c- n>pair</c-></code> and <code class="highlight"><c- n>tuple</c-></code> so that they are compatible with <code class="highlight"><c- n>__tuple_hack</c-></code> and <code class="highlight"><c- n>__pair_hack</c-></code>, specialisations for all tuple utilities will be required, and overloads to <code class="highlight"><c- n>get</c-></code>, <code class="highlight"><c- n>apply</c-></code>, etc. are also necessary.</p>
+   <p>Alternatively, we can provide an implicit conversion from <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>...</c-><c- o>>&amp;</c-></code> to <code class="highlight"><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>...</c-><c- o>></c-></code>, and
+ensure that a <code class="highlight"><c- n>common_reference</c-></code> exists (à la <code class="highlight"><c- n>basic_common_reference</c-></code>), and similarly for the other
+reference types.</p>
+<pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- n>class</c-><c- p>...</c-> <c- n>Ts</c-><c- o>></c->
+<c- k>struct</c-> <c- n>tuple</c-> <c- p>{</c->
+  <c- c1>// ...</c->
+
+  <c- k>constexpr</c-> <c- n>tuple</c-> <c- k>const</c-><c- o>&amp;</c-> <c- k>operator</c-><c- o>=</c-><c- p>(</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>_Elements</c-><c- p>...</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-><c- p>)</c->
+  <c- n>requires</c-> <c- p>(</c-><c- n>__stl2</c-><c- o>::</c-><c- n>Assignable</c-><c- o>&lt;</c-><c- n>_Elements</c-> <c- k>const</c-><c- o>&amp;</c-><c- p>,</c-> <c- n>_Elements</c-> <c- k>const</c-><c- o>&amp;></c-> <c- n>and</c-> <c- p>...);</c->
+
+  <c- k>constexpr</c-> <c- n>tuple</c-> <c- k>const</c-><c- o>&amp;</c-> <c- k>operator</c-><c- o>=</c-><c- p>(</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>_Elements</c-><c- p>...</c-><c- o>>&amp;&amp;</c-><c- p>)</c->
+  <c- n>requires</c-> <c- p>(</c-><c- n>__stl2</c-><c- o>::</c-><c- n>Assignable</c-><c- o>&lt;</c-><c- n>_Elements</c-> <c- k>const</c-><c- o>&amp;</c-><c- p>,</c-> <c- n>_Elements</c-><c- o>></c-> <c- n>and</c-> <c- p>...);</c->
+
+  <c- k>template</c-><c- o>&lt;</c-><c- n>class</c-><c- p>...</c-> <c- n>Us</c-><c- o>></c->
+  <c- n>requires</c-> <c- k>sizeof</c-><c- p>...(</c-><c- n>Ts</c-><c- p>)</c-> <c- o>==</c-> <c- k>sizeof</c-><c- p>...(</c-><c- n>Us</c-><c- p>)</c-> <c- n>and</c-> <c- p>(</c-><c- n>Assignable</c-><c- o>&lt;</c-><c- n>Ts</c-> <c- k>const</c-><c- o>&amp;</c-><c- p>,</c-> <c- n>Us</c-> <c- k>const</c-><c- o>&amp;></c-> <c- n>and</c-> <c- p>...)</c->
+  <c- k>constexpr</c-> <c- n>tuple</c-> <c- k>const</c-><c- o>&amp;</c-> <c- k>operator</c-><c- o>=</c-><c- p>(</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>Us</c-><c- p>...</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>other</c-><c- p>)</c-> <c- k>const</c-><c- p>;</c->
+
+  <c- k>template</c-><c- o>&lt;</c-><c- n>class</c-><c- p>...</c-> <c- n>Us</c-><c- o>></c->
+  <c- n>requires</c-> <c- k>sizeof</c-><c- p>...(</c-><c- n>Ts</c-><c- p>)</c-> <c- o>==</c-> <c- k>sizeof</c-><c- p>...(</c-><c- n>Us</c-><c- p>)</c-> <c- n>and</c-> <c- p>(</c-><c- n>Assignable</c-><c- o>&lt;</c-><c- n>Ts</c-> <c- k>const</c-><c- o>&amp;</c-><c- p>,</c-> <c- n>Us</c-> <c- k>const</c-><c- o>&amp;></c-> <c- n>and</c-> <c- p>...)</c->
+  <c- k>constexpr</c-> <c- n>tuple</c-> <c- k>const</c-><c- o>&amp;</c-> <c- k>operator</c-><c- o>=</c-><c- p>(</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>Us</c-><c- p>...</c-><c- o>>&amp;&amp;</c-> <c- n>other</c-><c- p>)</c-> <c- k>const</c-><c- p>;</c->
+
+  <c- k>constexpr</c-> <c- k>operator</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>remove_reference_t</c-><c- o>&lt;</c-><c- n>_Elements</c-><c- o>>&amp;</c-><c- p>...</c-><c- o>></c-><c- p>()</c-> <c- k>noexcept</c-><c- p>;</c->
+  <c- k>constexpr</c-> <c- k>operator</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>remove_reference_t</c-><c- o>&lt;</c-><c- n>_Elements</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-><c- p>...</c-><c- o>></c-><c- p>()</c-> <c- k>const</c-> <c- k>noexcept</c-><c- p>;</c->
+  <c- k>constexpr</c-> <c- k>operator</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>remove_reference_t</c-><c- o>&lt;</c-><c- n>_Elements</c-><c- o>>&amp;&amp;</c-><c- p>...</c-><c- o>></c-><c- p>()</c-> <c- k>noexcept</c-><c- p>;</c->
+  <c- k>constexpr</c-> <c- k>operator</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>remove_reference_t</c-><c- o>&lt;</c-><c- n>_Elements</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;&amp;</c-><c- p>...</c-><c- o>></c-><c- p>()</c-> <c- k>const</c-> <c- k>noexcept</c-><c- p>;</c->
+<c- p>};</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- n>class</c-><c- p>...</c-> <c- n>Ts</c-><c- o>></c->
+<c- n>requires</c-> <c- p>(</c-><c- n>requires</c-> <c- p>{</c-> <c- k>typename</c-> <c- n>common_type_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>,</c-> <c- n>Ts</c-><c- o>&amp;></c-><c- p>;</c-> <c- p>}</c-> <c- o>&amp;&amp;</c-> <c- p>...)</c->
+<c- k>struct</c-> <c- n>common_type</c-><c- o>&lt;</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>...</c-><c- o>>></c-> <c- p>{</c->
+  <c- k>using</c-> <c- n>type</c-> <c- o>=</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>common_type_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>,</c-> <c- n>Ts</c-><c- o>></c-><c- p>...</c-><c- o>></c-><c- p>;</c->
+<c- p>};</c->
+<c- k>template</c-><c- o>&lt;</c-><c- n>class</c-><c- p>...</c-> <c- n>Ts</c-><c- o>></c->
+<c- n>requires</c-> <c- p>(</c-><c- n>requires</c-> <c- p>{</c-> <c- k>typename</c-> <c- n>common_type_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>,</c-> <c- n>Ts</c-><c- o>&amp;></c-><c- p>;</c-> <c- p>}</c-> <c- o>&amp;&amp;</c-> <c- p>...)</c->
+<c- k>struct</c-> <c- n>common_type</c-><c- o>&lt;</c-><c- n>std</c-><c- o>::</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>...</c-><c- o>>></c->  <c- p>{</c->
+  <c- k>using</c-> <c- n>type</c-> <c- o>=</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>common_type_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>,</c-> <c- n>Ts</c-><c- o>></c-><c- p>...</c-><c- o>></c-><c- p>;</c->
+<c- p>};</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- n>class</c-><c- p>...</c-> <c- n>Ts</c-><c- p>,</c->
+  <c- k>template</c-> <c- o>&lt;</c-><c- n>class</c-><c- o>></c-> <c- k>class</c-> <c- nc>TQual</c-><c- p>,</c-> <c- k>template</c-> <c- o>&lt;</c-><c- n>class</c-><c- o>></c-> <c- k>class</c-> <c- nc>UQual</c-><c- o>></c->
+<c- n>requires</c-> <c- p>(</c-><c- n>requires</c-> <c- p>{</c-> <c- k>typename</c-> <c- n>common_reference_t</c-><c- o>&lt;</c-><c- n>TQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>></c-><c- p>,</c-> <c- n>UQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;>></c-><c- p>;</c-> <c- p>}</c-> <c- o>&amp;&amp;</c-> <c- p>...)</c->
+<c- k>struct</c-> <c- n>basic_common_reference</c-><c- o>&lt;</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>TQual</c-><c- p>,</c-> <c- n>UQual</c-><c- o>></c-> <c- p>{</c->
+  <c- k>using</c-> <c- n>type</c-> <c- o>=</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>common_reference_t</c-><c- o>&lt;</c-><c- n>TQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;></c-><c- p>,</c-> <c- n>UQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>>></c-><c- p>...</c-><c- o>></c-><c- p>;</c->
+<c- p>};</c->
+<c- k>template</c-><c- o>&lt;</c-><c- n>class</c-><c- p>...</c-> <c- n>Ts</c-><c- p>,</c->
+  <c- k>template</c-> <c- o>&lt;</c-><c- n>class</c-><c- o>></c-> <c- k>class</c-> <c- nc>TQual</c-><c- p>,</c-> <c- k>template</c-> <c- o>&lt;</c-><c- n>class</c-><c- o>></c-> <c- k>class</c-> <c- nc>UQual</c-><c- o>></c->
+<c- n>requires</c-> <c- p>(</c-><c- n>requires</c-> <c- p>{</c-> <c- k>typename</c-> <c- n>common_reference_t</c-><c- o>&lt;</c-><c- n>TQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>></c-><c- p>,</c-> <c- n>UQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;>></c-><c- p>;</c-> <c- p>}</c-> <c- o>&amp;&amp;</c-> <c- p>...)</c->
+<c- k>struct</c-> <c- n>basic_common_reference</c-><c- o>&lt;</c-><c- n>std</c-><c- o>::</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>TQual</c-><c- p>,</c-> <c- n>UQual</c-><c- o>></c-> <c- p>{</c->
+  <c- k>using</c-> <c- n>type</c-> <c- o>=</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>common_reference_t</c-><c- o>&lt;</c-><c- n>TQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>></c-><c- p>,</c-> <c- n>UQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;>></c-><c- p>...</c-><c- o>></c-><c- p>;</c->
+<c- p>};</c->
+
+<c- c1>// lvalue to rvalue reference</c->
+<c- k>template</c-><c- o>&lt;</c-><c- n>class</c-><c- p>...</c-> <c- n>Ts</c-><c- o>></c->
+<c- n>requires</c-> <c- p>(</c-><c- n>requires</c-> <c- p>{</c-> <c- k>typename</c-> <c- n>common_type_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>,</c-> <c- n>Ts</c-><c- o>&amp;&amp;></c-><c- p>;</c-> <c- p>}</c-> <c- o>&amp;&amp;</c-> <c- p>...)</c->
+<c- k>struct</c-> <c- n>common_type</c-><c- o>&lt;</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;&amp;</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>...</c-><c- o>>></c-> <c- p>{</c->
+  <c- k>using</c-> <c- n>type</c-> <c- o>=</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>common_type_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;&amp;</c-><c- p>,</c-> <c- n>Ts</c-><c- o>></c-><c- p>...</c-><c- o>></c-><c- p>;</c->
+<c- p>};</c->
+<c- k>template</c-><c- o>&lt;</c-><c- n>class</c-><c- p>...</c-> <c- n>Ts</c-><c- o>></c->
+<c- n>requires</c-> <c- p>(</c-><c- n>requires</c-> <c- p>{</c-> <c- k>typename</c-> <c- n>common_type_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>,</c-> <c- n>Ts</c-><c- o>&amp;&amp;></c-><c- p>;</c-> <c- p>}</c-> <c- o>&amp;&amp;</c-> <c- p>...)</c->
+<c- k>struct</c-> <c- n>common_type</c-><c- o>&lt;</c-><c- n>std</c-><c- o>::</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;&amp;</c-><c- p>...</c-><c- o>>></c->  <c- p>{</c->
+  <c- k>using</c-> <c- n>type</c-> <c- o>=</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>common_type_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;&amp;</c-><c- p>,</c-> <c- n>Ts</c-><c- o>></c-><c- p>...</c-><c- o>></c-><c- p>;</c->
+<c- p>};</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- n>class</c-><c- p>...</c-> <c- n>Ts</c-><c- p>,</c->
+  <c- k>template</c-> <c- o>&lt;</c-><c- n>class</c-><c- o>></c-> <c- k>class</c-> <c- nc>TQual</c-><c- p>,</c-> <c- k>template</c-> <c- o>&lt;</c-><c- n>class</c-><c- o>></c-> <c- k>class</c-> <c- nc>UQual</c-><c- o>></c->
+<c- n>requires</c-> <c- p>(</c-><c- n>requires</c-> <c- p>{</c-> <c- k>typename</c-> <c- n>common_reference_t</c-><c- o>&lt;</c-><c- n>TQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>></c-><c- p>,</c-> <c- n>UQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;&amp;>></c-><c- p>;</c-> <c- p>}</c-> <c- o>&amp;&amp;</c-> <c- p>...)</c->
+<c- k>struct</c-> <c- n>basic_common_reference</c-><c- o>&lt;</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;&amp;</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>TQual</c-><c- p>,</c-> <c- n>UQual</c-><c- o>></c-> <c- p>{</c->
+  <c- k>using</c-> <c- n>type</c-> <c- o>=</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>common_reference_t</c-><c- o>&lt;</c-><c- n>TQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;&amp;></c-><c- p>,</c-> <c- n>UQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>>></c-><c- p>...</c-><c- o>></c-><c- p>;</c->
+<c- p>};</c->
+<c- k>template</c-><c- o>&lt;</c-><c- n>class</c-><c- p>...</c-> <c- n>Ts</c-><c- p>,</c->
+  <c- k>template</c-> <c- o>&lt;</c-><c- n>class</c-><c- o>></c-> <c- k>class</c-> <c- nc>TQual</c-><c- p>,</c-> <c- k>template</c-> <c- o>&lt;</c-><c- n>class</c-><c- o>></c-> <c- k>class</c-> <c- nc>UQual</c-><c- o>></c->
+<c- n>requires</c-> <c- p>(</c-><c- n>requires</c-> <c- p>{</c-> <c- k>typename</c-> <c- n>common_reference_t</c-><c- o>&lt;</c-><c- n>TQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>></c-><c- p>,</c-> <c- n>UQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;&amp;>></c-><c- p>;</c-> <c- p>}</c-> <c- o>&amp;&amp;</c-> <c- p>...)</c->
+<c- k>struct</c-> <c- n>basic_common_reference</c-><c- o>&lt;</c-><c- n>std</c-><c- o>::</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;&amp;</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>TQual</c-><c- p>,</c-> <c- n>UQual</c-><c- o>></c-> <c- p>{</c->
+  <c- k>using</c-> <c- n>type</c-> <c- o>=</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>common_reference_t</c-><c- o>&lt;</c-><c- n>TQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>></c-><c- p>,</c-> <c- n>UQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;&amp;>></c-><c- p>...</c-><c- o>></c-><c- p>;</c->
+<c- p>};</c->
+
+<c- c1>// lvalue reference to rvalue reference</c->
+<c- k>template</c-><c- o>&lt;</c-><c- n>class</c-><c- p>...</c-> <c- n>Ts</c-><c- o>></c->
+<c- n>requires</c-> <c- p>(</c-><c- n>requires</c-> <c- p>{</c-> <c- k>typename</c-> <c- n>common_type_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>,</c-> <c- n>remove_reference_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>>&amp;&amp;></c-><c- p>;</c-> <c- p>}</c-> <c- o>&amp;&amp;</c-> <c- p>...)</c->
+<c- k>struct</c-> <c- n>common_type</c-><c- o>&lt;</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>remove_reference_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>>&amp;&amp;</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>...</c-><c- o>>></c-> <c- p>{</c->
+  <c- k>using</c-> <c- n>type</c-> <c- o>=</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>common_type_t</c-><c- o>&lt;</c-><c- n>remove_reference_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>>&amp;&amp;</c-><c- p>,</c-> <c- n>Ts</c-><c- o>&amp;></c-><c- p>...</c-><c- o>></c-><c- p>;</c->
+<c- p>};</c->
+<c- k>template</c-><c- o>&lt;</c-><c- n>class</c-><c- p>...</c-> <c- n>Ts</c-><c- o>></c->
+<c- n>requires</c-> <c- p>(</c-><c- n>requires</c-> <c- p>{</c-> <c- k>typename</c-> <c- n>common_type_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>,</c-> <c- n>remove_reference_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>>&amp;&amp;></c-><c- p>;</c-> <c- p>}</c-> <c- o>&amp;&amp;</c-> <c- p>...)</c->
+<c- k>struct</c-> <c- n>common_type</c-><c- o>&lt;</c-><c- n>std</c-><c- o>::</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>remove_reference_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>>&amp;&amp;</c-><c- p>...</c-><c- o>>></c->  <c- p>{</c->
+  <c- k>using</c-> <c- n>type</c-> <c- o>=</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>common_type_t</c-><c- o>&lt;</c-><c- n>remove_reference_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>>&amp;&amp;</c-><c- p>,</c-> <c- n>Ts</c-><c- o>&amp;></c-><c- p>...</c-><c- o>></c-><c- p>;</c->
+<c- p>};</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- n>class</c-><c- p>...</c-> <c- n>Ts</c-><c- p>,</c->
+  <c- k>template</c-> <c- o>&lt;</c-><c- n>class</c-><c- o>></c-> <c- k>class</c-> <c- nc>TQual</c-><c- p>,</c-> <c- k>template</c-> <c- o>&lt;</c-><c- n>class</c-><c- o>></c-> <c- k>class</c-> <c- nc>UQual</c-><c- o>></c->
+<c- n>requires</c-> <c- p>(</c-><c- n>requires</c-> <c- p>{</c-> <c- k>typename</c-> <c- n>common_reference_t</c-><c- o>&lt;</c-><c- n>TQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;></c-><c- p>,</c-> <c- n>UQual</c-><c- o>&lt;</c-><c- n>remove_reference_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>>&amp;&amp;>></c-><c- p>;</c-> <c- p>}</c-> <c- o>&amp;&amp;</c-> <c- p>...)</c->
+<c- k>struct</c-> <c- n>basic_common_reference</c-><c- o>&lt;</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>remove_reference_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>>&amp;&amp;</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>TQual</c-><c- p>,</c-> <c- n>UQual</c-><c- o>></c-> <c- p>{</c->
+  <c- k>using</c-> <c- n>type</c-> <c- o>=</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>common_reference_t</c-><c- o>&lt;</c-><c- n>TQual</c-><c- o>&lt;</c-><c- n>remove_reference_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>>&amp;&amp;></c-><c- p>,</c-> <c- n>UQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;>></c-><c- p>...</c-><c- o>></c-><c- p>;</c->
+<c- p>};</c->
+<c- k>template</c-><c- o>&lt;</c-><c- n>class</c-><c- p>...</c-> <c- n>Ts</c-><c- p>,</c->
+  <c- k>template</c-> <c- o>&lt;</c-><c- n>class</c-><c- o>></c-> <c- k>class</c-> <c- nc>TQual</c-><c- p>,</c-> <c- k>template</c-> <c- o>&lt;</c-><c- n>class</c-><c- o>></c-> <c- k>class</c-> <c- nc>UQual</c-><c- o>></c->
+<c- n>requires</c-> <c- p>(</c-><c- n>requires</c-> <c- p>{</c-> <c- k>typename</c-> <c- n>common_reference_t</c-><c- o>&lt;</c-><c- n>TQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;></c-><c- p>,</c-> <c- n>UQual</c-><c- o>&lt;</c-><c- n>remove_reference_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>>&amp;&amp;>></c-><c- p>;</c-> <c- p>}</c-> <c- o>&amp;&amp;</c-> <c- p>...)</c->
+<c- k>struct</c-> <c- n>basic_common_reference</c-><c- o>&lt;</c-><c- n>std</c-><c- o>::</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>remove_reference_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>>&amp;&amp;</c-><c- p>...</c-><c- o>></c-><c- p>,</c-> <c- n>TQual</c-><c- p>,</c-> <c- n>UQual</c-><c- o>></c-> <c- p>{</c->
+  <c- k>using</c-> <c- n>type</c-> <c- o>=</c-> <c- n>tuple</c-><c- o>&lt;</c-><c- n>common_reference_t</c-><c- o>&lt;</c-><c- n>TQual</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>&amp;></c-><c- p>,</c-> <c- n>UQual</c-><c- o>&lt;</c-><c- n>remove_reference_t</c-><c- o>&lt;</c-><c- n>Ts</c-><c- o>>&amp;&amp;>></c-><c- p>...</c-><c- o>></c-><c- p>;</c->
+<c- p>};</c->
+</pre>
+   <h3 class="heading settled" data-level="3.10" id="keys-and-values"><span class="secno">3.10. </span><span class="content"><code class="highlight"><c- n>keys</c-></code> and <code class="highlight"><c- n>values</c-></code></span><a class="self-link" href="#keys-and-values"></a></h3>
+   <h4 class="heading settled" data-level="3.10.1" id="motivation⑥"><span class="secno">3.10.1. </span><span class="content">Motivation</span><a class="self-link" href="#motivation⑥"></a></h4>
+   <p>TODO: Add me.</p>
+   <h4 class="heading settled" data-level="3.10.2" id="implementation"><span class="secno">3.10.2. </span><span class="content">Implementation</span><a class="self-link" href="#implementation"></a></h4>
+   <p>Given an exposition-only tuple extractor (<code class="highlight"><c- n>__get_fn</c-></code>), <code class="highlight"><c- n>keys</c-></code> and <code class="highlight"><c- n>values</c-></code> need only be range
+adaptor objects implemented in terms of <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>transform</c-></code>, rather than range adaptors.</p>
+<pre class="highlight"><c- k>namespace</c-> <c- n>view</c-> <c- p>{</c->
+  <c- k>template</c-><c- o>&lt;</c-><c- b>int</c-> <c- n>X</c-><c- o>></c->
+  <c- n>requires</c-> <c- p>(</c-><c- n>X</c-> <c- o>==</c-> <c- mi>0</c-><c- p>)</c-> <c- o>||</c-> <c- p>(</c-><c- n>X</c-> <c- o>==</c-> <c- mi>1</c-><c- p>)</c->
+  <c- k>struct</c-> <c- n>__get_fn</c-> <c- p>{</c->
+    <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>P</c-><c- o>></c->
+    <c- n>requires</c-> <c- n>pair</c-><c- o>-</c-><c- n>like</c-><c- o>&lt;</c-><c- n>P</c-><c- o>></c->
+    <c- k>constexpr</c-> <c- k>decltype</c-><c- p>(</c-><c- k>auto</c-><c- p>)</c-> <c- k>operator</c-><c- p>()(</c-><c- n>P</c-><c- o>&amp;&amp;</c-> <c- n>p</c-><c- p>)</c-> <c- k>const</c->
+    <c- p>{</c->
+      <c- k>using</c-> <c- n>T</c-> <c- o>=</c-> <c- k>decltype</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>X</c-><c- o>></c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>P</c-><c- o>></c-><c- p>(</c-><c- n>p</c-><c- p>)));</c->
+      <c- k>return</c-> <c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>get</c-><c- o>&lt;</c-><c- n>X</c-><c- o>></c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>P</c-><c- o>></c-><c- p>(</c-><c- n>p</c-><c- p>)));</c->
+    <c- p>}</c->
+  <c- p>};</c->
+
+  <c- kr>inline</c-> <c- k>constexpr</c-> <c- k>auto</c-> <c- n>keys</c-> <c- o>=</c-> <c- n>view</c-><c- o>::</c-><c- n>transform</c-><c- p>(</c-><c- n>__get_fn</c-><c- o>&lt;</c-><c- mi>0</c-><c- o>></c-><c- p>{});</c->
+  <c- kr>inline</c-> <c- k>constexpr</c-> <c- k>auto</c-> <c- n>values</c-> <c- o>=</c-> <c- n>view</c-><c- o>::</c-><c- n>transform</c-><c- p>(</c-><c- n>__get_fn</c-><c- o>&lt;</c-><c- mi>1</c-><c- o>></c-><c- p>{});</c->
+<c- p>}</c-> <c- c1>// namespace view</c->
+</pre>
+   <h3 class="heading settled" data-level="3.11" id="introducing-associated-types-for-ranges"><span class="secno">3.11. </span><span class="content">Introducing associated types for ranges</span><a class="self-link" href="#introducing-associated-types-for-ranges"></a></h3>
+   <p><b>Note: This section was formerly titled <i>Reviewing <code class="highlight"><c- n>iter_value_t</c-></code>, etc., and introducing <code class="highlight"><c- n>range_value_t</c-></code>, etc.</i> in P1035R1, but the current title is more accurate.</b></p>
+   <p><a data-link-type="biblio" href="#biblio-p1037">[P1037]</a> introduced <code class="highlight"><c- n>iter_difference_t</c-></code>, <code class="highlight"><c- n>iter_value_t</c-></code>, <code class="highlight"><c- n>iter_reference_t</c-></code>, and <code class="highlight"><c- n>iter_rvalue_reference_t</c-></code>, which dispatch to templates that correclty identify the associated
+types for iterators (formerly known as iterator traits). The current mechanism supports iterators,
+but not ranges. For example, in order to extract an range’s value type, we are required to do one of
+three things:</p>
    <ol>
-    <li data-md>
-     <p><code class="highlight"><c- n>zip_with_view</c-><c- p>{</c-><c- n>F</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>(</c-><c- n>args</c-><c- p>)...}</c-></code>, if all parameters in the parameter pack <code class="highlight"><c- n>remove_cvref_t</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>...</c-></code> model <code class="highlight"><c- n>InputRange</c-></code>, and if <code class="highlight"><c- n>F</c-></code> models <code class="highlight"><c- n>RegularInvocable</c-><c- o>&lt;</c-><c- n>iter_reference_t</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>remove_cvref_t</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>>>></c-><c- p>...</c-><c- o>></c-></code>.</p>
-    <li data-md>
-     <p>Otherwise, <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip_with</c-><c- p>(</c-><c- n>F</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>(</c-><c- n>args</c-><c- p>)...)</c-></code> is ill-formed.</p>
+    <li> Use the traditional <code class="highlight"><c- k>typename</c-> <c- n>T</c-><c- o>::</c-><c- n>value_type</c-></code>. As we have had template aliases since C++11,
+      this has probably been abandoned in many projects (not cited). 
+    <li>
+      Define our own associated type à la 
+<pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- o>></c->
+<c- n>requires</c-> <c- n>requires</c-> <c- p>{</c-> <c- k>typename</c-> <c- n>T</c-><c- o>::</c-><c- n>value_type</c-><c- p>;</c-> <c- p>}</c->
+<c- k>using</c-> <c- n>value_type</c-> <c- o>=</c-> <c- k>typename</c-> <c- n>T</c-><c- o>::</c-><c- n>value_type</c-><c- p>;</c->
+</pre>
+     <p>This was apparently possible in the Ranges TS (albeit in much more detail) <a data-link-type="biblio" href="#biblio-iterassoctypesvalue_type">[iter.assoc.types.value_type]</a>, but P1037 has redefined <code class="highlight"><c- n>value_type_t</c-></code> as <code class="highlight"><c- n>iter_value_t</c-></code>, which
+focuses on iterators, rather than anything defining <code class="highlight"><c- n>value_type</c-></code> alias. We <i>could</i> do this in
+C++20, but we then risk <code class="highlight"><c- n>R</c-><c- o>::</c-><c- n>value_type</c-></code> being different to <code class="highlight"><c- n>R</c-><c- o>::</c-><c- n>iterator</c-><c- o>::</c-><c- n>value_type</c-></code> (consider <code class="highlight"><c- n>vector</c-><c- o>&lt;</c-><c- b>int</c-> <c- k>const</c-><c- o>>::</c-><c- n>value_type</c-></code> and <code class="highlight"><c- n>vector</c-><c- o>&lt;</c-><c- b>int</c-> <c- k>const</c-><c- o>>::</c-><c- n>iterator</c-><c- o>::</c-><c- n>value_type</c-></code>, which are <code class="highlight"><c- b>int</c-> <c- k>const</c-></code> and <code class="highlight"><c- b>int</c-></code>, respectively)<a data-link-type="biblio" href="#biblio-value_type">[value_type]</a>.</p>
+    <li> Use <code class="highlight"><c- n>iter_value_t</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>R</c-><c- o>>></c-></code>, which what we probably want, and is also a mouthful. 
    </ol>
-   <h3 class="heading settled" data-level="3.11" id="viewzip"><span class="secno">3.11. </span><span class="content"><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip</c-></code></span><a class="self-link" href="#viewzip"></a></h3>
-   <p>The name <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip</c-></code> denotes a range adptor object. Let <code class="highlight"><c- n>Args</c-><c- o>&amp;&amp;</c-><c- p>...</c-></code> be a parameter pack, with <code class="highlight"><c- n>args</c-><c- p>...</c-></code> as its pack expansion. Then, the expression <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>(</c-><c- n>args</c-><c- p>)...)</c-></code> is
-expression-equivalent to:</p>
-   <ol>
-    <li data-md>
-     <p><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip_with</c-><c- p>{</c-><c- n>make_pair</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>(</c-><c- n>args</c-><c- p>)...}</c-></code>, if <code class="highlight"><c- k>sizeof</c-><c- p>...(</c-><c- n>Args</c-><c- p>)</c-> <c- o>==</c-> <c- mi>2</c-></code>, and both
-parameters in the parameter pack <code class="highlight"><c- n>remove_cvref_t</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>...</c-></code> model <code class="highlight"><c- n>InputRange</c-></code>.</p>
-    <li data-md>
-     <p><code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip_with</c-><c- p>{</c-><c- n>make_tuple</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>(</c-><c- n>args</c-><c- p>)...}</c-></code>, if <code class="highlight"><c- k>sizeof</c-><c- p>...(</c-><c- n>Args</c-><c- p>)</c-> <c- o>!=</c-> <c- mi>2</c-></code>, and all
-parameters in the parameter pack <code class="highlight"><c- n>remove_cvref_t</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>...</c-></code> model <code class="highlight"><c- n>InputRange</c-></code>.</p>
-    <li data-md>
-     <p>Otherwise, <code class="highlight"><c- n>view</c-><c- o>::</c-><c- n>zip</c-><c- p>(</c-><c- n>std</c-><c- o>::</c-><c- n>forward</c-><c- o>&lt;</c-><c- n>Args</c-><c- o>></c-><c- p>(</c-><c- n>args</c-><c- p>)...)</c-></code> is ill-formed.</p>
-   </ol>
-   <h3 class="heading settled" data-level="3.12" id="reviewing-iter_value_t-etc-and-introducing-range_value_t-etc"><span class="secno">3.12. </span><span class="content">Reviewing <code class="highlight"><c- n>iter_value_t</c-></code>, etc., and introducing <code class="highlight"><c- n>range_value_t</c-></code>, etc.</span><a class="self-link" href="#reviewing-iter_value_t-etc-and-introducing-range_value_t-etc"></a></h3>
-   <p>P1035 also proposes to review <code class="highlight"><c- n>iter_value_t</c-></code> on ranges, and to introduce a new <code class="highlight"><c- n>range_value_t</c-></code>, if
-it is deemed appropriate.</p>
-   <p>TODO (released before San Diego).</p>
+   <p>When discussing extending <code class="highlight"><c- n>iter_value_t</c-></code> so that it can also operate on ranges, Casey Carter had
+this to say:</p>
+   <blockquote>
+     What should <code class="highlight"><c- n>iter_value_t</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code> be when <code class="highlight"><c- n>T</c-></code> is an iterator with value type <code class="highlight"><c- n>U</c-></code> and a range with
+   value type <code class="highlight"><c- n>V</c-></code>? 
+    <p>Alternately: What is <code class="highlight"><c- n>iter_value_t</c-><c- o>&lt;</c-><c- n>array</c-><c- o>&lt;</c-><c- k>const</c-> <c- b>int</c-><c- o>>></c-></code>? <code class="highlight"><c- n>array</c-><c- o>&lt;</c-><c- k>const</c-> <c- b>int</c-><c- o>>::</c-><c- n>value_type</c-></code> is <code class="highlight"><c- k>const</c-> <c- b>int</c-></code>, but <code class="highlight"><c- n>iter_value_t</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>array</c-><c- o>&lt;</c-><c- k>const</c-> <c- b>int</c-><c- o>>></c-></code> is <code class="highlight"><c- b>int</c-></code>.</p>
+    <p>Specific examples aside, early attempts to make the associated type aliases "polymorphic" kept
+   running into ambiguities that we had to disambiguate or simply declare broken.</p>
+    <p>I’d rather see <code class="highlight"><c- n>range_value_t</c-></code> et al proposed.</p>
+   </blockquote>
+   <p>P1035 introduces shorthands for <code class="highlight"><c- n>iter_foo_t</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>R</c-><c- o>>></c-></code> as <code class="highlight"><c- n>range_foo_t</c-><c- o>&lt;</c-><c- n>R</c-><c- o>></c-></code>, which in turn have
+been taken from range-v3.</p>
+<pre class="language-cpp highlight"><c- k>template</c-><c- o>&lt;</c-><c- n>Range</c-> <c- n>R</c-><c- o>></c->
+<c- k>using</c-> <c- n>range_difference_t</c-> <c- o>=</c-> <c- n>iter_difference_t</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>R</c-><c- o>>></c-><c- p>;</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- n>Range</c-> <c- n>R</c-><c- o>></c->
+<c- k>using</c-> <c- n>range_size_t</c-> <c- o>=</c-> <c- n>make_unsigned_t</c-><c- o>&lt;</c-><c- n>range_difference_t</c-><c- o>&lt;</c-><c- n>R</c-><c- o>>></c-><c- p>;</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- n>InputRange</c-> <c- n>R</c-><c- o>></c->
+<c- k>using</c-> <c- n>range_value_t</c-> <c- o>=</c-> <c- n>iter_value_t</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>R</c-><c- o>>></c-><c- p>;</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- n>InputRange</c-> <c- n>R</c-><c- o>></c->
+<c- k>using</c-> <c- n>range_reference_t</c-> <c- o>=</c-> <c- n>iter_reference_t</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>R</c-><c- o>>></c-><c- p>;</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- n>InputRange</c-> <c- n>R</c-><c- o>></c->
+<c- k>using</c-> <c- n>range_rvalue_reference_t</c-> <c- o>=</c-> <c- n>iter_rvalue_reference_t</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>R</c-><c- o>>></c-><c- p>;</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- n>Range</c-> <c- n>R</c-><c- o>></c->
+<c- n>requires</c-> <c- n>Same</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>R</c-><c- o>></c-><c- p>,</c-> <c- n>sentinel_t</c-><c- o>&lt;</c-><c- n>R</c-><c- o>>></c->
+<c- k>using</c-> <c- n>range_common_iterator_t</c-> <c- o>=</c-> <c- n>common_iterator</c-><c- o>&lt;</c-><c- n>iterator_t</c-><c- o>&lt;</c-><c- n>R</c-><c- o>></c-><c- p>,</c-> <c- n>sentinel_t</c-><c- o>&lt;</c-><c- n>R</c-><c- o>>></c-><c- p>;</c->
+</pre>
+   <p>These have an enormous amount of usage in range-v3, and will ensure consistency between generic code
+that uses ranges and generic code that uses iterators (which are essential for underpinning all
+range abstractions in C++).</p>
   </main>
 <script>
 (function() {
@@ -2538,10 +3074,16 @@ it is deemed appropriate.</p>
    <dd>Casey Carter &amp; others. <a href=" https://github.com/CaseyCarter/cmcstl2">cmcstl2 C++ library</a>. URL: <a href=" https://github.com/CaseyCarter/cmcstl2"> https://github.com/CaseyCarter/cmcstl2</a>
    <dt id="biblio-convolution">[CONVOLUTION]
    <dd>Wikipedia. <a href="https://en.wikipedia.org/wiki/Convolution_(computer_science)">Convolution</a>. URL: <a href="https://en.wikipedia.org/wiki/Convolution_(computer_science)">https://en.wikipedia.org/wiki/Convolution_(computer_science)</a>
+   <dt id="biblio-iterassoctypesvalue_type">[ITER.ASSOC.TYPES.VALUE_TYPE]
+   <dd>Eric Niebler; Casey Carter. <a href="https://timsong-cpp.github.io/cppwp/ranges-ts/iterator.assoc.types.value_type">ISO/IEC TS 21425:2017 C++ Extensions for Ranges</a>. URL: <a href="https://timsong-cpp.github.io/cppwp/ranges-ts/iterator.assoc.types.value_type">https://timsong-cpp.github.io/cppwp/ranges-ts/iterator.assoc.types.value_type</a>
    <dt id="biblio-p0789">[P0789]
    <dd>Eric Niebler. <a href="https://wg21.link/p0789">Range Adaptors and Utilities</a>. URL: <a href="https://wg21.link/p0789">https://wg21.link/p0789</a>
    <dt id="biblio-p0836">[P0836]
    <dd>Gordon Brown; et al. <a href="https://wg21.link/p0836">P0836 Introduce Parallelism to the Ranges TS</a>. URL: <a href="https://wg21.link/p0836">https://wg21.link/p0836</a>
+   <dt id="biblio-p1037">[P1037]
+   <dd>Eric Niebler; Casey Carter. <a href="https://wg21.link/p1037">Deep Integration of the Ranges TS</a>. URL: <a href="https://wg21.link/p1037">https://wg21.link/p1037</a>
    <dt id="biblio-range-v3">[RANGE-V3]
    <dd>Eric Niebler &amp; others. <a href="https://github.com/ericniebler/range-v3">ranges-v3 C++ library</a>. URL: <a href="https://github.com/ericniebler/range-v3">https://github.com/ericniebler/range-v3</a>
+   <dt id="biblio-value_type">[VALUE_TYPE]
+   <dd><a href="https://godbolt.org/z/xkcREX">static_assert(not is_same_v&lt;vector&lt;int const>::value_type, vector&lt;int const>::iterator::value_type>)</a>. URL: <a href="https://godbolt.org/z/xkcREX">https://godbolt.org/z/xkcREX</a>
   </dl>
