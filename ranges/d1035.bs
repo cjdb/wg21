@@ -41,8 +41,7 @@ Date: 2018-10-08
 We would like to acknowledge the following people for their assistance with this proposal:
 
 * Eric Niebler, for providing [[range-v3]] as a reference implementation.
-* Tim Song for their reviews of P1035.
-
+* Steve Downey and Tim Song for their reviews of P1035.
 
 # Motivation
 
@@ -456,7 +455,7 @@ constexpr auto begin() const requires Range<const R> && RandomAccessRange<const 
 ```
 
 4. <i>Effects</i>: Equivalent to `return ranges::next(ranges::begin(base_), count_, ranges::end(base_));`.
-5. _Remarks_: In order to provide the amortized constant time complexity required by the
+5. <i>Remarks</i>: In order to provide the amortized constant time complexity required by the
     Range concept, this function caches the result within the `drop_view` for use on
     subsequent calls.
 
@@ -962,6 +961,191 @@ This isn't an ideal approach, but some of the finer details of `zip_with_view` t
 of `zip_view` are still being worked out, and this should not preclude the usage of zipping ranges
 for maximum composability.
 
+### Problems with `std::pair` and `std::tuple`
+
+`zip_view` requires a value type to store the values of the iterators to the ranges that are
+iterated over, and a reference type to access those values via an iterator to the range.
+Additionally, the concept "`Writable` wants `const` proxy references to be assignable, so we need a
+tuple-like type with `const`-qualified assignment operators"[[cmcstl2/zip_view]].
+
+Both range-v3 and the cmcstl2 implementation above use an exposition-only type derived from
+`std::tuple` (both) or `std::pair` (range-v3 only) that permits a `CommonReference` between
+`tuple<Ts...>&` (an lvalue reference to the value type) and `tuple<Ts&...>` (the perceived reference
+type). This is deemed to be a hack by both Eric Niebler and Casey Carter; a careful reader might
+notice that the above implementation specifies this as `__tuple_hack` (which has conveniently been
+left out of P1035).
+
+Adding a third (and possibly fourth) tuple type that is exposition-only is <i>not</i> ideal: this
+requires extensions to both `pair` and `tuple` so that they are compatible with `__tuple_hack` and
+`__pair_hack`, specialisations for all tuple utilities will be required, and overloads to `get`,
+`apply`, etc. are also necessary.
+
+Alternatively, we can provide an implicit conversion from `tuple<Ts...>&` to `tuple<Ts&...>`, and
+ensure that a `common_reference` exists (à la `basic_common_reference`), and similarly for the other
+reference types.
+
+<xmp>
+template<class... Ts>
+struct tuple {
+	// ...
+
+	constexpr tuple const& operator=(tuple<_Elements...> const&)
+	requires (__stl2::Assignable<_Elements const&, _Elements const&> and ...);
+
+	constexpr tuple const& operator=(tuple<_Elements...>&&)
+	requires (__stl2::Assignable<_Elements const&, _Elements> and ...);
+
+	template<class... Us>
+	requires sizeof...(Ts) == sizeof...(Us) and (Assignable<Ts const&, Us const&> and ...)
+	constexpr tuple const& operator=(tuple<Us...> const& other) const;
+
+	template<class... Us>
+	requires sizeof...(Ts) == sizeof...(Us) and (Assignable<Ts const&, Us const&> and ...)
+	constexpr tuple const& operator=(tuple<Us...>&& other) const;
+
+	constexpr operator tuple<remove_reference_t<_Elements>&...>() noexcept;
+	constexpr operator tuple<remove_reference_t<_Elements> const&...>() const noexcept;
+	constexpr operator tuple<remove_reference_t<_Elements>&&...>() noexcept;
+	constexpr operator tuple<remove_reference_t<_Elements> const&&...>() const noexcept;
+};
+
+template<class... Ts>
+requires (requires { typename common_type_t<Ts, Ts&>; } && ...)
+struct common_type<tuple<Ts&...>, std::tuple<Ts...>> {
+	using type = tuple<common_type_t<Ts&, Ts>...>;
+};
+template<class... Ts>
+requires (requires { typename common_type_t<Ts, Ts&>; } && ...)
+struct common_type<std::tuple<Ts...>, tuple<Ts&...>>	{
+	using type = tuple<common_type_t<Ts&, Ts>...>;
+};
+
+template<class... Ts,
+	template <class> class TQual, template <class> class UQual>
+requires (requires { typename common_reference_t<TQual<Ts>, UQual<Ts&>>; } && ...)
+struct basic_common_reference<tuple<Ts&...>, std::tuple<Ts...>, TQual, UQual> {
+	using type = tuple<common_reference_t<TQual<Ts&>, UQual<Ts>>...>;
+};
+template<class... Ts,
+	template <class> class TQual, template <class> class UQual>
+requires (requires { typename common_reference_t<TQual<Ts>, UQual<Ts&>>; } && ...)
+struct basic_common_reference<std::tuple<Ts...>, tuple<Ts&...>, TQual, UQual> {
+	using type = tuple<common_reference_t<TQual<Ts>, UQual<Ts&>>...>;
+};
+
+// lvalue to rvalue reference
+template<class... Ts>
+requires (requires { typename common_type_t<Ts, Ts&&>; } && ...)
+struct common_type<tuple<Ts&&...>, std::tuple<Ts...>> {
+	using type = tuple<common_type_t<Ts&&, Ts>...>;
+};
+template<class... Ts>
+requires (requires { typename common_type_t<Ts, Ts&&>; } && ...)
+struct common_type<std::tuple<Ts...>, tuple<Ts&&...>>	{
+	using type = tuple<common_type_t<Ts&&, Ts>...>;
+};
+
+template<class... Ts,
+	template <class> class TQual, template <class> class UQual>
+requires (requires { typename common_reference_t<TQual<Ts>, UQual<Ts&&>>; } && ...)
+struct basic_common_reference<tuple<Ts&&...>, std::tuple<Ts...>, TQual, UQual> {
+	using type = tuple<common_reference_t<TQual<Ts&&>, UQual<Ts>>...>;
+};
+template<class... Ts,
+	template <class> class TQual, template <class> class UQual>
+requires (requires { typename common_reference_t<TQual<Ts>, UQual<Ts&&>>; } && ...)
+struct basic_common_reference<std::tuple<Ts...>, tuple<Ts&&...>, TQual, UQual> {
+	using type = tuple<common_reference_t<TQual<Ts>, UQual<Ts&&>>...>;
+};
+
+// lvalue reference to rvalue reference
+template<class... Ts>
+requires (requires { typename common_type_t<Ts&, remove_reference_t<Ts>&&>; } && ...)
+struct common_type<tuple<remove_reference_t<Ts>&&...>, std::tuple<Ts&...>> {
+	using type = tuple<common_type_t<remove_reference_t<Ts>&&, Ts&>...>;
+};
+template<class... Ts>
+requires (requires { typename common_type_t<Ts&, remove_reference_t<Ts>&&>; } && ...)
+struct common_type<std::tuple<Ts&...>, tuple<remove_reference_t<Ts>&&...>>	{
+	using type = tuple<common_type_t<remove_reference_t<Ts>&&, Ts&>...>;
+};
+
+template<class... Ts,
+	template <class> class TQual, template <class> class UQual>
+requires (requires { typename common_reference_t<TQual<Ts&>, UQual<remove_reference_t<Ts>&&>>; } && ...)
+struct basic_common_reference<tuple<remove_reference_t<Ts>&&...>, std::tuple<Ts&...>, TQual, UQual> {
+	using type = tuple<common_reference_t<TQual<remove_reference_t<Ts>&&>, UQual<Ts&>>...>;
+};
+template<class... Ts,
+	template <class> class TQual, template <class> class UQual>
+requires (requires { typename common_reference_t<TQual<Ts&>, UQual<remove_reference_t<Ts>&&>>; } && ...)
+struct basic_common_reference<std::tuple<Ts&...>, tuple<remove_reference_t<Ts>&&...>, TQual, UQual> {
+	using type = tuple<common_reference_t<TQual<Ts&>, UQual<remove_reference_t<Ts>&&>>...>;
+};
+</xmp>
+
+#### Pros and cons for fixing `tuple` (and possibly `pair`)
+
+<table>
+	<tr>
+		<th>Pros</th>
+		<th>Cons</th>
+	</tr>
+	<tr>
+		<td>
+			Exactly one `tuple` and one `pair` exist. 
+		</td>
+		<td>
+			Consider this code:
+<xmp>
+constexpr std::tuple<int&, double&> bad_code(int i)
+{
+  auto t = std::tuple<int, double>{i, 0.0};
+  return t;
+}
+
+int main()
+{
+	auto const t = bad_code(4); // BOOM! Undefined behaviour.
+	auto const u = bad_code(6);
+	auto const tu = std::get<0>(t) + std::get<0>(u);
+	CHECK(tu == 10);
+}
+</xmp>
+
+This program is undefined; GCC's `-Wuninitialized` flag identifies this, and when coupled with
+`-Werror`, can force a build to fail (this is good if, and only if `-Werror` is enabled for this
+warning). A naive programmer mightn't be aware that they're calling a conversion operator.
+
+While this may not be motivation for LEWG to avoid making the changes to `tuple` directly, it is
+certainly important to be aware of this issue.
+		</td>
+	</tr>
+</table>
+
+#### Pros and cons for introducing an exposition-only `__tuple_hack` (and possibly `__pair_hack`)
+
+<table>
+	<tr>
+		<th>Pros</th>
+		<th>Cons</th>
+	</tr>
+	<tr>
+		<td>Dangling issue resolved (users can't directly use exposition-only types).</td>
+		<td>More library maintainer maintenance.</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td>More overloads for `std::get`, `tuple_cat`, etc.</td>
+	</tr>
+</table>
+
+#### Ensure `tuple` and `pair` assignment operators are `constexpr`
+
+To ensure that the `constexpr`-ness of `zip_view` is not accidentally inhibited, this paper also
+requests that there be some discussion on making the assignment operators of `pair` and `tuple`
+`constexpr`.
+
 ### Example implementation
 
 The following implementation has been taken from cmcstl2:
@@ -1309,191 +1493,6 @@ struct __zip_fn {
 inline constexpr __zip_fn zip{};
 </xmp>
 
-### Problems with `std::pair` and `std::tuple`
-
-`zip_view` requires a value type to store the values of the iterators to the ranges that are
-iterated over, and a reference type to access those values via an iterator to the range.
-Additionally, the concept "`Writable` wants `const` proxy references to be assignable, so we need a
-tuple-like type with `const`-qualified assignment operators"[[cmcstl2/zip_view]].
-
-Both range-v3 and the cmcstl2 implementation above use an exposition-only type derived from
-`std::tuple` (both) or `std::pair` (range-v3 only) that permits a `CommonReference` between
-`tuple<Ts...>&` (an lvalue reference to the value type) and `tuple<Ts&...>` (the perceived reference
-type). This is deemed to be a hack by both Eric Niebler and Casey Carter; a careful reader might
-notice that the above implementation specifies this as `__tuple_hack` (which has conveniently been
-left out of P1035).
-
-Adding a third (and possibly fourth) tuple type that is exposition-only is <i>not</i> ideal: this
-requires extensions to both `pair` and `tuple` so that they are compatible with `__tuple_hack` and
-`__pair_hack`, specialisations for all tuple utilities will be required, and overloads to `get`,
-`apply`, etc. are also necessary.
-
-Alternatively, we can provide an implicit conversion from `tuple<Ts...>&` to `tuple<Ts&...>`, and
-ensure that a `common_reference` exists (à la `basic_common_reference`), and similarly for the other
-reference types.
-
-<xmp>
-template<class... Ts>
-struct tuple {
-	// ...
-
-	constexpr tuple const& operator=(tuple<_Elements...> const&)
-	requires (__stl2::Assignable<_Elements const&, _Elements const&> and ...);
-
-	constexpr tuple const& operator=(tuple<_Elements...>&&)
-	requires (__stl2::Assignable<_Elements const&, _Elements> and ...);
-
-	template<class... Us>
-	requires sizeof...(Ts) == sizeof...(Us) and (Assignable<Ts const&, Us const&> and ...)
-	constexpr tuple const& operator=(tuple<Us...> const& other) const;
-
-	template<class... Us>
-	requires sizeof...(Ts) == sizeof...(Us) and (Assignable<Ts const&, Us const&> and ...)
-	constexpr tuple const& operator=(tuple<Us...>&& other) const;
-
-	constexpr operator tuple<remove_reference_t<_Elements>&...>() noexcept;
-	constexpr operator tuple<remove_reference_t<_Elements> const&...>() const noexcept;
-	constexpr operator tuple<remove_reference_t<_Elements>&&...>() noexcept;
-	constexpr operator tuple<remove_reference_t<_Elements> const&&...>() const noexcept;
-};
-
-template<class... Ts>
-requires (requires { typename common_type_t<Ts, Ts&>; } && ...)
-struct common_type<tuple<Ts&...>, std::tuple<Ts...>> {
-	using type = tuple<common_type_t<Ts&, Ts>...>;
-};
-template<class... Ts>
-requires (requires { typename common_type_t<Ts, Ts&>; } && ...)
-struct common_type<std::tuple<Ts...>, tuple<Ts&...>>	{
-	using type = tuple<common_type_t<Ts&, Ts>...>;
-};
-
-template<class... Ts,
-	template <class> class TQual, template <class> class UQual>
-requires (requires { typename common_reference_t<TQual<Ts>, UQual<Ts&>>; } && ...)
-struct basic_common_reference<tuple<Ts&...>, std::tuple<Ts...>, TQual, UQual> {
-	using type = tuple<common_reference_t<TQual<Ts&>, UQual<Ts>>...>;
-};
-template<class... Ts,
-	template <class> class TQual, template <class> class UQual>
-requires (requires { typename common_reference_t<TQual<Ts>, UQual<Ts&>>; } && ...)
-struct basic_common_reference<std::tuple<Ts...>, tuple<Ts&...>, TQual, UQual> {
-	using type = tuple<common_reference_t<TQual<Ts>, UQual<Ts&>>...>;
-};
-
-// lvalue to rvalue reference
-template<class... Ts>
-requires (requires { typename common_type_t<Ts, Ts&&>; } && ...)
-struct common_type<tuple<Ts&&...>, std::tuple<Ts...>> {
-	using type = tuple<common_type_t<Ts&&, Ts>...>;
-};
-template<class... Ts>
-requires (requires { typename common_type_t<Ts, Ts&&>; } && ...)
-struct common_type<std::tuple<Ts...>, tuple<Ts&&...>>	{
-	using type = tuple<common_type_t<Ts&&, Ts>...>;
-};
-
-template<class... Ts,
-	template <class> class TQual, template <class> class UQual>
-requires (requires { typename common_reference_t<TQual<Ts>, UQual<Ts&&>>; } && ...)
-struct basic_common_reference<tuple<Ts&&...>, std::tuple<Ts...>, TQual, UQual> {
-	using type = tuple<common_reference_t<TQual<Ts&&>, UQual<Ts>>...>;
-};
-template<class... Ts,
-	template <class> class TQual, template <class> class UQual>
-requires (requires { typename common_reference_t<TQual<Ts>, UQual<Ts&&>>; } && ...)
-struct basic_common_reference<std::tuple<Ts...>, tuple<Ts&&...>, TQual, UQual> {
-	using type = tuple<common_reference_t<TQual<Ts>, UQual<Ts&&>>...>;
-};
-
-// lvalue reference to rvalue reference
-template<class... Ts>
-requires (requires { typename common_type_t<Ts&, remove_reference_t<Ts>&&>; } && ...)
-struct common_type<tuple<remove_reference_t<Ts>&&...>, std::tuple<Ts&...>> {
-	using type = tuple<common_type_t<remove_reference_t<Ts>&&, Ts&>...>;
-};
-template<class... Ts>
-requires (requires { typename common_type_t<Ts&, remove_reference_t<Ts>&&>; } && ...)
-struct common_type<std::tuple<Ts&...>, tuple<remove_reference_t<Ts>&&...>>	{
-	using type = tuple<common_type_t<remove_reference_t<Ts>&&, Ts&>...>;
-};
-
-template<class... Ts,
-	template <class> class TQual, template <class> class UQual>
-requires (requires { typename common_reference_t<TQual<Ts&>, UQual<remove_reference_t<Ts>&&>>; } && ...)
-struct basic_common_reference<tuple<remove_reference_t<Ts>&&...>, std::tuple<Ts&...>, TQual, UQual> {
-	using type = tuple<common_reference_t<TQual<remove_reference_t<Ts>&&>, UQual<Ts&>>...>;
-};
-template<class... Ts,
-	template <class> class TQual, template <class> class UQual>
-requires (requires { typename common_reference_t<TQual<Ts&>, UQual<remove_reference_t<Ts>&&>>; } && ...)
-struct basic_common_reference<std::tuple<Ts&...>, tuple<remove_reference_t<Ts>&&...>, TQual, UQual> {
-	using type = tuple<common_reference_t<TQual<Ts&>, UQual<remove_reference_t<Ts>&&>>...>;
-};
-</xmp>
-
-#### Pros and cons for fixing `tuple` (and possibly `pair`)
-
-<table>
-	<tr>
-		<th>Pros</th>
-		<th>Cons</th>
-	</tr>
-	<tr>
-		<td>
-			Exactly one `tuple` and one `pair` exist. 
-		</td>
-		<td>
-			Consider this code:
-<xmp>
-constexpr std::tuple<int&, double&> bad_code(int i)
-{
-  auto t = std::tuple<int, double>{i, 0.0};
-  return t;
-}
-
-int main()
-{
-	auto const t = bad_code(4); // BOOM! Undefined behaviour.
-	auto const u = bad_code(6);
-	auto const tu = std::get<0>(t) + std::get<0>(u);
-	CHECK(tu == 10);
-}
-</xmp>
-
-This program is undefined; GCC's `-Wuninitialized` flag identifies this, and when coupled with
-`-Werror`, can force a build to fail (this is good if, and only if `-Werror` is enabled for this
-warning). A naive programmer mightn't be aware that they're calling a conversion operator.
-
-While this may not be motivation for LEWG to avoid making the changes to `tuple` directly, it is
-certainly important to be aware of this issue.
-		</td>
-	</tr>
-</table>
-
-#### Pros and cons for introducing an exposition-only `__tuple_hack` (and possibly `__pair_hack`)
-
-<table>
-	<tr>
-		<th>Pros</th>
-		<th>Cons</th>
-	</tr>
-	<tr>
-		<td>Dangling issue resolved (users can't directly use exposition-only types).</td>
-		<td>More library maintainer maintenance.</td>
-	</tr>
-	<tr>
-		<td></td>
-		<td>More overloads for `std::get`, `tuple_cat`, etc.</td>
-	</tr>
-</table>
-
-#### Ensure `tuple` and `pair` assignment operators are `constexpr`
-
-To ensure that the `constexpr`-ness of `zip_view` is not accidentally inhibited, this paper also
-requests that there be some discussion on making the assignment operators of `pair` and `tuple`
-`constexpr`.
-
 ## `keys` and `values`
 
 ### Motivation
@@ -1613,6 +1612,118 @@ using range_common_iterator_t = common_iterator<iterator_t<R>, sentinel_t<R>>;
 These have an enormous amount of usage in range-v3, and will ensure consistency between generic code
 that uses ranges and generic code that uses iterators (which are essential for underpinning all
 range abstractions in C++).
+
+## `repeat_view`
+
+<b>Note: this was a late addition to compensate for the removal of `zip_with_view`.</b>
+
+### Motivation
+
+`repeat_view` is a range adatpor that takes an object of type `T` and repeats it indefinitely. It is
+useful when one wishes to compose an operation that makes the repeated value the subject of the
+operation, rather than a part of that operation.
+
+<table>
+	<tr>
+		<td>Without `repeat`</td>
+		<td>With `repeat`</td>
+	</tr>
+	<tr>
+		<td>
+<xmp>
+auto ax = x | view::transform([&a](auto const& x){ return a * x; });
+</xmp>
+		</td>
+		<td>
+<xmp>
+auto ax = view::zip(view::repeat(a), x) | view::transform(pair_mult);
+</xmp>
+		</td>
+	</tr>
+</table>
+
+Unlike the first example, the `repeat` example is not subject to the lifetime of `a`.
+
+### Interface
+
+<xmp>
+template<CopyConstructible T>
+requires is_object_v<T>
+class repeat_view : private __semiregular<T>
+                  , public view_interface<repeat_view<T>> {
+   using storage_t = __semiregular<T>; // exposition-only
+public:
+   repeat_view() = default;
+
+   template<ConvertibleTo<T> U>
+   requires (not Same<repeat_view, U>)
+   explicit constexpr repeat_view(U&& u) noexcept(is_nothrow_move_constructible_v<T, U>)
+
+   constexpr T& value() noexcept;
+   constexpr const T& value() noexcept;
+
+   constexpr auto begin() noexcept;
+   constexpr auto begin() const noexcept;
+
+   constexpr unreachable end() const noexcept;
+};
+
+template<class T>
+repeat_view(T) -> repeat_view<T>;
+</xmp>
+
+#### `repeat_view` constructors
+
+```cpp
+template<ConvertibleTo<T> U>
+requires (not Same<repeat_view, U>)
+explicit constexpr repeat_view(U&& u) noexcept(is_nothrow_move_constructible_v<T, U>);
+```
+
+1. <i>Effects</i>: Equivalent to `storage_t{std::forward<U>(u)}`.
+
+#### `repeat_view` conversion
+
+```cpp
+constexpr T& value() noexcept;
+constexpr const T& value() noexcept;
+```
+
+2. <i>Effects</i>: Equivalent to `return get();`.
+
+#### `repeat_view` begin
+
+```cpp
+constexpr auto begin() noexcept;
+constexpr auto begin() const noexcept;
+```
+
+3. <i>Effects</i>: Returns an object of an unspecified type that models `RandomAccessIterator` and
+    indirectly references the value `repeat_view` is constructed with. A program that dereferences an
+    iterator to a default-constructed `repeat_view` is undefined.
+
+#### `repeat_view` end
+
+4. <i>Effects</i>: Equivalent to `return {};`.
+
+### `view::repeat`
+
+The name `view::repeat` denotes a range adaptor object. Let `E` be an expression such that type `T`
+is `decltype((E))`. Then, the expression `view::repeat(E)` is expression-equivalent to:
+
+1. `repeat_view{E}` if `T` is an object type that models `CopyConstructible`.
+2. Otherwise `vieww::repeat` is ill-formed.
+
+### `view::repeat_n`
+
+The name `view::repeat_n` denotes a range adaptor object. Let `E` be an expression such that type
+`T` is `decltype((E))` and let `N` be an expression such that type `I` is `decltype((I))`. Then, the
+expression `view::repeat_n(E, N)` is expression-equivalent to:
+
+1. `view::repeat(E) | view::take(N)` if `T` is an object type that models `Constructible`, `I`
+    models `Integral`, and `N >= 0`.
+2. Otherwise the expression `view::repeat_n(E, N)` is undefined if `N < 0`.
+3. Otherwise the expression `view::repeat_n(E, N)` is ill-formed.
 
 <pre class=biblio>
 {
