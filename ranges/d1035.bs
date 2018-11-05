@@ -16,12 +16,33 @@ Line Numbers: no
 Date: 2018-10-08
 </pre>
 
+# Changes
+
+## From R1 to R2
+
+* Expanded acknowledgements and co-authors.
+* Removed `zip_with_view`.
+* Added `zip_view`.
+* Added `keys` and `values`.
+* Added content for associated types for ranges.
+* Added `repeat_view` to compensate for the absence of `zip_with_view`.
+
+## From R0 to R1
+
+* Revised `istream_range`.
+	* Renamed to `basic_istream_view`.
+	* Introduced some relevant concepts.
+* Introduced `drop_view`, `take_while_view`, `drop_while_view`.
+* Teased `zip_with_view`.
+* Teased associated types for ranges.
+
 # Acknowledgements
 
-I would like to acknowledge the following people for their assistance with this proposal:
+We would like to acknowledge the following people for their assistance with this proposal:
 
-1. Casey Carter, for reviewing all submissions to [[cmcstl2]] and providing feedback that enabled the proposed range adaptors to have high-quality implementations.
-2. Eric Niebler, for providing [[range-v3]] as a reference implementation.
+* Eric Niebler, for providing [[range-v3]] as a reference implementation.
+* Tim Song for their reviews of P1035.
+
 
 # Motivation
 
@@ -1411,13 +1432,81 @@ struct basic_common_reference<std::tuple<Ts&...>, tuple<remove_reference_t<Ts>&&
 };
 </xmp>
 
+#### Pros and cons for fixing `tuple` (and possibly `pair`)
 
+<table>
+	<tr>
+		<th>Pros</th>
+		<th>Cons</th>
+	</tr>
+	<tr>
+		<td>
+			Exactly one `tuple` and one `pair` exist. 
+		</td>
+		<td>
+			Consider this code:
+<xmp>
+constexpr std::tuple<int&, double&> bad_code(int i)
+{
+  auto t = std::tuple<int, double>{i, 0.0};
+  return t;
+}
+
+int main()
+{
+	auto const t = bad_code(4); // BOOM! Undefined behaviour.
+	auto const u = bad_code(6);
+	auto const tu = std::get<0>(t) + std::get<0>(u);
+	CHECK(tu == 10);
+}
+</xmp>
+
+This program is undefined; GCC's `-Wuninitialized` flag identifies this, and when coupled with
+`-Werror`, can force a build to fail (this is good if, and only if `-Werror` is enabled for this
+warning). A naive programmer mightn't be aware that they're calling a conversion operator.
+
+While this may not be motivation for LEWG to avoid making the changes to `tuple` directly, it is
+certainly important to be aware of this issue.
+		</td>
+	</tr>
+</table>
+
+#### Pros and cons for introducing an exposition-only `__tuple_hack` (and possibly `__pair_hack`)
+
+<table>
+	<tr>
+		<th>Pros</th>
+		<th>Cons</th>
+	</tr>
+	<tr>
+		<td>Dangling issue resolved (users can't directly use exposition-only types).</td>
+		<td>More library maintainer maintenance.</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td>More overloads for `std::get`, `tuple_cat`, etc.</td>
+	</tr>
+</table>
+
+#### Ensure `tuple` and `pair` assignment operators are `constexpr`
+
+To ensure that the `constexpr`-ness of `zip_view` is not accidentally inhibited, this paper also
+requests that there be some discussion on making the assignment operators of `pair` and `tuple`
+`constexpr`.
 
 ## `keys` and `values`
 
 ### Motivation
 
-TODO: Add me.
+It is frequent to want to iterate over the keys or the values of an associative container. There is
+currently no easy way to do that. It can be approximated using `ranges::view::transform`, given how
+frequently such operation is needed we think their addition would make manipulation of associative
+containers easier by more clearly expressing the intent.
+
+These views have been part of ranges-v3 and we also have implemented them in cmcstl2. A lot of
+languages and frameworks (notably JS, Python, Qt, Java, [[Boost.Range]]) offer methods to extract
+the keys or values of an associative container, often through `.keys()` and `.values()` operations,
+respectively.
 
 ### Implementation
 
@@ -1565,6 +1654,10 @@ range abstractions in C++).
 "value_type": {
     "title": "static_assert(not is_same_v<vector<int const>::value_type, vector<int const>::iterator::value_type>)",
     "href": "https://godbolt.org/z/xkcREX"
+},
+"Boost.Range": {
+	"title": "Boost.Range",
+	"href": "https://www.boost.org/doc/libs/1_68_0/libs/range/doc/html/range/reference/adaptors/reference/map_values.html#range.reference.adaptors.reference.map_values.map_values_example"
 }
 }
 </pre>   
