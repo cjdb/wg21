@@ -18,6 +18,219 @@ Date: 2018-10-08
 
 # Changes
 
+## San Diego Polls
+
+The following polls were taken by LEWG during the San Diego meeting.
+
+<table>
+   <tr>
+      <th>Abbreviation</th>
+      <th>SF</th>
+      <th>F</th>
+      <th>N</th>
+      <th>A</th>
+      <th>SA</th>
+   </tr>
+   <tr>
+      <td>Term</td>
+      <td>Strongly Favour</td>
+      <td>Favour</td>
+      <td>Neutral</td>
+      <td>Against</td>
+      <td>Strongly Against</td>
+   </tr>
+</table>
+
+> We want to prioritize `basic_istream_view` for C++20 in Kona.
+
+<table>
+   <tr>
+      <th>SF</th>
+      <th>F</th>
+      <th>N</th>
+      <th>A</th>
+      <th>SA</th>
+   </tr>
+   <tr>
+      <td>0</td>
+      <td>2</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+   <tr>
+</table>
+
+> We want to prioritize addition of `range_difference_t`, `range_value_t`, `range_reference_t`,
+    `range_rvalue_reference_t` for C++20 in Kona.
+
+<table>
+   <tr>
+      <th>SF</th>
+      <th>F</th>
+      <th>N</th>
+      <th>A</th>
+      <th>SA</th>
+   </tr>
+   <tr>
+      <td>0</td>
+      <td>2</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+   </tr>
+</table>
+
+> We want to prioritize `take_while_view` for C++20 in Kona.
+
+<table>
+   <tr>
+      <th>SF</th>
+      <th>F</th>
+      <th>N</th>
+      <th>A</th>
+      <th>SA</th>
+   </tr>
+   <tr>
+      <td>2</td>
+      <td>9</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+   </tr>
+</table>
+
+> We want to prioritize `drop_view` for C++20 in Kona.
+
+<table>
+   <tr>
+      <th>SF</th>
+      <th>F</th>
+      <th>N</th>
+      <th>A</th>
+      <th>SA</th>
+   </tr>
+   <tr>
+      <td>3</td>
+      <td>5</td>
+      <td>5</td>
+      <td>0</td>
+      <td>0</td>
+   </tr>
+</table>
+
+> We want to prioritize `drop_while_view` for C++20 in Kona.
+
+<table>
+   <tr>
+      <th>SF</th>
+      <th>F</th>
+      <th>N</th>
+      <th>A</th>
+      <th>SA</th>
+   </tr>
+   <tr>
+      <td>2</td>
+      <td>6</td>
+      <td>5</td>
+      <td>0</td>
+      <td>0</td>
+   </tr>
+</table>
+
+> We prefer types for `keys_view` and `values_view` (in addition).
+
+<table>
+   <tr>
+      <th>SF</th>
+      <th>F</th>
+      <th>N</th>
+      <th>A</th>
+      <th>SA</th>
+   </tr>
+   <tr>
+      <td>0</td>
+      <td>10</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+   </tr>
+</table>
+
+> We want to prioritize `keys()` and `values()` (and their type forms) for C++20 in Kona.
+
+<table>
+   <tr>
+      <th>SF</th>
+      <th>F</th>
+      <th>N</th>
+      <th>A</th>
+      <th>SA</th>
+   </tr>
+   <tr>
+      <td>5</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+   </tr>
+</table>
+
+> Approval
+
+<table>
+   <tr>
+      <th>Result</th>
+      <th>Poll</th>
+   </tr>
+   <tr>
+      <td>9</td>
+      <td>Add conversions (`const`-qualified assignments) to `pair`/`tuple`</td>
+   </tr>
+   <tr>
+      <td>6</td>
+      <td>Use a hidden implementation detail type</td>
+   </tr>
+   <tr>
+      <td>5</td>
+      <td>Ask EWG to fix proxy references (`zip` doesn’t happen for C++23 or worse)</td>
+   </tr>
+   <tr>
+      <td>0</td>
+      <td>Do not want `zip()`</td>
+   </tr>
+   <tr>
+      <td>14</td>
+      <td>Ask EWG to fix proxy references, and decouple from `zip`</td>
+   </tr>
+</table>
+
+> Interest in `zip_longest()` (where the value type is `tuple<optional<T>...>` or `tuple<T...>` with
+    some value)
+
+<table>
+   <tr>
+      <th>SF</th>
+      <th>F</th>
+      <th>N</th>
+      <th>A</th>
+      <th>SA</th>
+   </tr>
+   <tr>
+      <td>2</td>
+      <td>3</td>
+      <td>5</td>
+      <td>3</td>
+      <td>0</td>
+   </tr>
+</table>
+
+## From R2 to R3
+
+* Added above polls.
+* Removed `range_size_t` and `range_common_iterator_t`.
+* Added 'Post-San Diego notes' sections to add extra justification (grep for this heading).
+* Replaced contract-specified pre-conditions with text-specified pre-conditions.
+
 ## From R1 to R2
 
 * Expanded acknowledgements and co-authors.
@@ -890,6 +1103,8 @@ basic_istream_view<T, CharT, Traits> istream_view(basic_istream<CharT, Traits>& 
 
 #### Concept `StreamExtractable`
 
+
+
 ```cpp
 template<class T, class CharT = char, class Traits = char_traits<CharT>>
 concept StreamExtractable =
@@ -1095,9 +1310,6 @@ been taken from range-v3.
 template<Range R>
 using range_difference_t = iter_difference_t<iterator_t<R>>;
 
-template<Range R>
-using range_size_t = make_unsigned_t<range_difference_t<R>>;
-
 template<InputRange R>
 using range_value_t = iter_value_t<iterator_t<R>>;
 
@@ -1106,10 +1318,6 @@ using range_reference_t = iter_reference_t<iterator_t<R>>;
 
 template<InputRange R>
 using range_rvalue_reference_t = iter_rvalue_reference_t<iterator_t<R>>;
-
-template<Range R>
-requires Same<iterator_t<R>, sentinel_t<R>>
-using range_common_iterator_t = common_iterator<iterator_t<R>, sentinel_t<R>>;
 ```
 
 These have an enormous amount of usage in range-v3, and will ensure consistency between generic code
@@ -1242,7 +1450,7 @@ template <View R, class Pred>
 requires
    InputRange<R> &&
    is_object_v<Pred> &&
-   IndirectUnaryPredicate<const Pred, iterator_t<R>
+   IndirectUnaryPredicate<const Pred, iterator_t<R>>
 class take_while_view : public view_interface<take_while_view<R, Pred>> {
    template<bool> class __sentinel; // exposition-only
 public:
@@ -1269,6 +1477,11 @@ private:
 template<class R, class Pred>
 take_while_view(R&&, Pred) -> take_while_view<all_view<R>, Pred>;
 ```
+
+#### Post-San Diego notes
+
+A remark was made in San Diego that `is_object_v<Pred>` is an unnecessary requirement. If we look to
+`filter_view` and `transform_view` as prior example, we see that both require invocable objects.
 
 #### `take_while_view` constructors
 
@@ -1435,11 +1648,11 @@ class drop_view : public view_interface<drop_view<R>> {
    using D = iter_difference_t<iterator_t<R>>; // exposition-only
 public:
    drop_view();
-   constexpr drop_view(R base, D count) [[expects: 0 < count]];
+   constexpr drop_view(R base, D count);
 
    template<ViewableRange O>
    requires constructible-from-range<R, O>
-   constexpr drop_view(O&& o, D count) [[expects: 0 < count]];
+   constexpr drop_view(O&& o, D count);
 
    constexpr R base() const;
 
@@ -1462,19 +1675,21 @@ drop_view(R&&, iter_difference_t<iterator_t<R>>) -> drop_view<all_view<R>>;
 #### `drop_view` constructor
 
 ```cpp
-constexpr drop_view(R base, D count) [[expects: 0 < count]];
+constexpr drop_view(R base, D count);
 ```
 
 1. <i>Effects</i>: Initialises `base_` with `base` and `count_` with `count`.
+2. <i>Expects</i>: `0 < count`.
 
 ```cpp
 template<ViewableRange O>
 requires constructible-from-range<R, O>
-constexpr drop_view(O&& o, D count) [[expects: 0 < count]];
+constexpr drop_view(O&& o, D count);
 ```
 
-2. <i>Effects</i>: Initialises `base_` with `view::all(std::forward<O>(o))` and `count_` with
+3. <i>Effects</i>: Initialises `base_` with `view::all(std::forward<O>(o))` and `count_` with
     `count`.
+4. <i>Expects</i>: `0 < count`.
 
 #### `drop_view` conversion
 
@@ -1482,7 +1697,7 @@ constexpr drop_view(O&& o, D count) [[expects: 0 < count]];
 constexpr R base() const;
 ```
 
-3. <i>Effects</i>: Equivalent to `return base_`.
+5. <i>Effects</i>: Equivalent to `return base_`.
 
 #### `drop_view` range begin
 
@@ -1491,8 +1706,8 @@ constexpr auto begin() requires (!(simple-view<R> && RandomAccessRange<R>));
 constexpr auto begin() const requires Range<const R> && RandomAccessRange<const R>;
 ```
 
-4. <i>Effects</i>: Equivalent to `return ranges::next(ranges::begin(base_), count_, ranges::end(base_));`.
-5. <i>Remarks</i>: In order to provide the amortized constant time complexity required by the
+6. <i>Effects</i>: Equivalent to `return ranges::next(ranges::begin(base_), count_, ranges::end(base_));`.
+7. <i>Remarks</i>: In order to provide the amortized constant time complexity required by the
     Range concept, the first overload caches the result within the `drop_view` for use on
     subsequent calls.
 
@@ -1503,7 +1718,7 @@ constexpr auto end() requires (!simple-view<R>);
 constexpr auto end() const requires Range<const R>;
 ```
 
-6. <i>Effects</i>: Equivalent to `return ranges::end(base_);`.
+8. <i>Effects</i>: Equivalent to `return ranges::end(base_);`.
 
 #### `drop_view` size
 
@@ -1512,7 +1727,7 @@ constexpr auto size() requires (!simple-view<R>) && SizedRange<R>;
 constexpr auto size() const requires SizedRange<const R>;
 ```
 
-7. Equivalent to:
+9. Equivalent to:
 
 ```cpp
 auto const size = ranges::size(base_);
@@ -1632,7 +1847,8 @@ constexpr auto begin();
 5. <i>Effects</i>: Equivalent to `return ranges::find_if_not(base_, std::ref(pred_));`.
 6. <i>Remarks</i>: In order to provide the amortized constant time complexity required by the `Range`
     concept, the first overload caches the result within the `drop_while_view` for use on subsequent
-    calls.
+    calls. Without this, applying a `reverse_view` over a `drop_view` would have quadratic iteration
+    complexity.
 
 #### `drop_while_view` end
 
