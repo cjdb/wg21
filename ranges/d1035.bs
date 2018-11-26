@@ -226,10 +226,16 @@ The following polls were taken by LEWG during the San Diego meeting.
 
 ## From R2 to R3
 
-* Added above polls.
+* Added the above polls.
 * Removed `range_size_t` and `range_common_iterator_t`.
 * Added 'Post-San Diego notes' sections to add extra justification (grep for this heading).
 * Replaced contract-specified pre-conditions with text-specified pre-conditions.
+* Removed concept `StreamInsertable`, as it is not relevant to the contents of this paper.
+* Replaced concept `StreamExtractable` with exposition-only concept `stream-extractable`.
+   * This was done, in part, to balance the fact that a concept would exist for `operator>>` but not
+     `operator<<`.
+* Replaced pros and cons of `__tuple_hack` with `const`-qualified overloads for `std::tuple` and
+  `std::pair`.
 
 ## From R1 to R2
 
@@ -536,62 +542,6 @@ struct basic_common_reference<tuple<Ts&...>, tuple<remove_reference_t<Ts>&&...>,
    using type = tuple<common_reference_t<TQual<Ts&>, UQual<remove_reference_t<Ts>&&>>...>;
 };
 </xmp>
-
-#### Pros and cons for fixing `tuple` (and possibly `pair`)
-
-<table>
-   <tr>
-      <th>Pros</th>
-      <th>Cons</th>
-   </tr>
-   <tr>
-      <td>
-         Exactly one `tuple` and one `pair` exist.
-      </td>
-      <td>
-         Consider this code:
-<xmp>
-constexpr tuple<int&, double&> bad_code(int i)
-{
-  auto t = tuple<int, double>{i, 0.0};
-  return t;
-}
-
-int main()
-{
-   auto const t = bad_code(4); // BOOM! Undefined behaviour.
-   auto const u = bad_code(6);
-   auto const tu = std::get<0>(t) + std::get<0>(u);
-   CHECK(tu == 10);
-}
-</xmp>
-
-This program is undefined; GCC's `-Wuninitialized` flag identifies this, and when coupled with
-`-Werror`, can force a build to fail (this is good if, and only if `-Werror` is enabled for this
-warning). A naive programmer mightn't be aware that they're calling a conversion operator.
-
-While this may not be motivation for LEWG to avoid making the changes to `tuple` directly, it is
-certainly important to be aware of this issue.
-      </td>
-   </tr>
-</table>
-
-#### Pros and cons for introducing an exposition-only `__tuple_hack` (and possibly `__pair_hack`)
-
-<table>
-   <tr>
-      <th>Pros</th>
-      <th>Cons</th>
-   </tr>
-   <tr>
-      <td>Dangling issue resolved (users can't directly use exposition-only types).</td>
-      <td>More library maintainer maintenance.</td>
-   </tr>
-   <tr>
-      <td></td>
-      <td>More overloads for `std::get`, `tuple_cat`, etc.</td>
-   </tr>
-</table>
 
 #### Ensure `tuple` and `pair` assignment operators are `constexpr`
 
@@ -1076,13 +1026,10 @@ input into the back of `v`". There is less to read (and type!), and the code is 
 
 ```cpp
 template<class T, class CharT = char, class Traits = char_traits<CharT>>
-concept StreamExtractable = see-below;
-
-template<class T, class CharT = char, class Traits = char_traits<CharT>>
-concept StreamInsertable = see-below;
+concept stream-extractable = see below; // exposition only
 
 template<Semiregular Val, class CharT, class Traits = char_traits<CharT>>
-requires StreamExtractable<Val, CharT, Traits>
+requires stream-extractable<Val, CharT, Traits>
 class basic_istream_view : public view_interface<basic_istream_view<Val, CharT, Traits>> {
 public:
    basic_istream_view() = default;
@@ -1101,13 +1048,14 @@ template<class T, class CharT, class Traits>
 basic_istream_view<T, CharT, Traits> istream_view(basic_istream<CharT, Traits>& in);
 ```
 
-#### Concept `StreamExtractable`
+#### Exposition-only concept `stream-extractable`
 
-
+The exposition-only concept `stream-extractable` checks that the input type is compatible with the
+`istream` operator model.
 
 ```cpp
 template<class T, class CharT = char, class Traits = char_traits<CharT>>
-concept StreamExtractable =
+concept stream-extractable = // exposition only
    requires(basic_istream<CharT, Traits>& is, T& t) {
       { is >> t } -> Same<basic_istream<CharT, Traits>>&;
    };
@@ -1115,25 +1063,13 @@ concept StreamExtractable =
 
 1. <i>Remarks</i>: `std::addressof(is) == std::addressof(is << t)`.
 
-#### Concept `StreamInsertable`
-
-```cpp
-template<class T, class CharT = char, class Traits = char_traits<CharT>>
-concept StreamInsertable =
-   requires(basic_ostream<CharT, Traits>& os, const T& t) {
-      { os << t } -> Same<basic_ostream<CharT, Traits>>&;
-   };
-```
-
-2. <i>Remarks</i>: `std::addressof(os) == std::addressof(os >> t)`.
-
 #### `basic_istream_view` constructor
 
 ```cpp
 explicit constexpr basic_istream_view(basic_istream<CharT, Traits>& stream);
 ```
 
-3. <i>Effects</i>: Initialises `stream_` to `std::addressof(stream)`.
+2. <i>Effects</i>: Initialises `stream_` to `std::addressof(stream)`.
 
 #### `basic_istream_view` begin
 
@@ -1141,7 +1077,7 @@ explicit constexpr basic_istream_view(basic_istream<CharT, Traits>& stream);
 constexpr auto begin();
 ```
 
-4. <i>Effects</i>: Equivalent to
+3. <i>Effects</i>: Equivalent to
 
 ```cpp
 *stream_ >> object_;
@@ -1154,7 +1090,7 @@ return __iterator{*this};
 constexpr default_sentinel end() const noexcept;
 ```
 
-5. <i>Returns</i>: `default_sentinel{}`.
+4. <i>Returns</i>: `default_sentinel{}`.
 
 #### `basic_istream_view::__iterator`
 
@@ -1190,7 +1126,7 @@ private:
 explicit constexpr __iterator(basic_istream_view<Val>& parent) noexcept;
 ```
 
-6. <i>Effects</i>: Initialises `parent_` with `std::addressof(parent_)`.
+5. <i>Effects</i>: Initialises `parent_` with `std::addressof(parent_)`.
 
 #### `basic_istream_view::__iterator` next
 
@@ -1199,7 +1135,7 @@ __iterator& operator++();
 void operator++(int);
 ```
 
-7. <i>Effects</i>: Equivalent to
+6. <i>Effects</i>: Equivalent to
 
 ```cpp
 *parent_->stream_ >> parent_->object_;
@@ -1211,7 +1147,7 @@ void operator++(int);
 Val& operator*() const;
 ```
 
-8. <i>Effects</i>: Equivalent to `return parent_->value_;`
+7. <i>Effects</i>: Equivalent to `return parent_->value_;`
 
 #### `basic_istream_view::__iterator` comparison functions
 
@@ -1219,25 +1155,25 @@ Val& operator*() const;
 friend bool operator==(__iterator x, default_sentinel);
 ```
 
-9. <i>Effects</i>: Equivalent to `return !*x.parent_->stream_;`.
+8. <i>Effects</i>: Equivalent to `return !*x.parent_->stream_;`.
 
 ```cpp
 friend bool operator==(default_sentinel y, __iterator x);
 ```
 
-10. <i>Returns</i>: `x == y`.
+9. <i>Returns</i>: `x == y`.
 
 ```cpp
 friend bool operator!=(__iterator x, default_sentinel y);
 ```
 
-11. <i>Returns</i>: `!(x == y)`.
+10. <i>Returns</i>: `!(x == y)`.
 
 ```cpp
 friend bool operator!=(default_sentinel y, __iterator x);
 ```
 
-12. <i>Returns</i>: `!(x == y)`.
+11. <i>Returns</i>: `!(x == y)`.
 
 
 #### `basic_istream_view` factory
@@ -1247,7 +1183,7 @@ template<class T, class CharT, class Traits>
 basic_istream_view<T, CharT, Traits> istream_view(basic_istream<CharT, Traits>& s);
 ```
 
-13. <i>Effects</i>: Equivalent to `return basic_istream_view<T, CharT, Traits>{s};`.
+12. <i>Effects</i>: Equivalent to `return basic_istream_view<T, CharT, Traits>{s};`.
 
 ## Introducing associated types for ranges
 
