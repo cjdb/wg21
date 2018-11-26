@@ -1,7 +1,7 @@
 <pre class='metadata'>
 Title: Input range adaptors
 Shortname: D1035
-Level: 2
+Level: 3
 Status: D
 Group: wg21
 Editor: Christopher Di Bella, cjdb.ns@gmail.com
@@ -227,15 +227,21 @@ The following polls were taken by LEWG during the San Diego meeting.
 ## From R2 to R3
 
 * Added the above polls.
-* Removed `range_size_t` and `range_common_iterator_t`.
-* Added 'Post-San Diego notes' sections to add extra justification (grep for this heading).
+* Removed `range_size_t` and `range_common_iterator_t` from the associated types.
+* Added justification for why `is_object_v` is necessary for `take_while_view`.
 * Replaced contract-specified pre-conditions with text-specified pre-conditions.
 * Removed concept `StreamInsertable`, as it is not relevant to the contents of this paper.
 * Replaced concept `StreamExtractable` with exposition-only concept `stream-extractable`.
-   * This was done, in part, to balance the fact that a concept would exist for `operator>>` but not
-     `operator<<`.
+    * This was done, in part, to balance the fact that a concept would exist for `operator>>` but not
+         `operator<<`.
 * Replaced pros and cons of `__tuple_hack` with `const`-qualified overloads for `std::tuple` and
-  `std::pair`.
+    necessary `common_type` and `basic_common_type` specialisations.
+
+### Changes promised for R4
+
+* Apply additions to `std::tuple` to `std::pair` also.
+* Considering `zip_longest`.
+* Changes to `keys` and `values`.
 
 ## From R1 to R2
 
@@ -470,76 +476,43 @@ struct tuple {
 
 template<class... Ts>
 requires (requires { typename common_type_t<Ts, Ts&>; } && ...)
-struct common_type<tuple<Ts&...>, tuple<Ts...>> {
+struct common_type<tuple<Ts&...>, std::tuple<Ts...>> {
    using type = tuple<common_type_t<Ts&, Ts>...>;
 };
 template<class... Ts>
 requires (requires { typename common_type_t<Ts, Ts&>; } && ...)
-struct common_type<tuple<Ts...>, tuple<Ts&...>>   {
+struct common_type<std::tuple<Ts...>, tuple<Ts&...>>	{
    using type = tuple<common_type_t<Ts&, Ts>...>;
-};
-
-template<class... Ts,
-   template <class> class TQual, template <class> class UQual>
-requires (requires { typename common_reference_t<TQual<Ts>, UQual<Ts&>>; } && ...)
-struct basic_common_reference<tuple<Ts&...>, tuple<Ts...>, TQual, UQual> {
-   using type = tuple<common_reference_t<TQual<Ts&>, UQual<Ts>>...>;
-};
-template<class... Ts,
-   template <class> class TQual, template <class> class UQual>
-requires (requires { typename common_reference_t<TQual<Ts>, UQual<Ts&>>; } && ...)
-struct basic_common_reference<tuple<Ts...>, tuple<Ts&...>, TQual, UQual> {
-   using type = tuple<common_reference_t<TQual<Ts>, UQual<Ts&>>...>;
 };
 
 // lvalue to rvalue reference
 template<class... Ts>
-requires (requires { typename common_type_t<Ts, Ts&&>; } && ...)
-struct common_type<tuple<Ts&&...>, tuple<Ts...>> {
-   using type = tuple<common_type_t<Ts&&, Ts>...>;
+requires (requires { typename common_type_t<Ts, remove_reference_t<Ts>&&>; } && ...)
+struct common_type<tuple<remove_reference_t<Ts>&&...>, std::tuple<Ts...>> {
+   using type = tuple<common_type_t<remove_reference_t<Ts>&&, Ts>...>;
 };
 template<class... Ts>
-requires (requires { typename common_type_t<Ts, Ts&&>; } && ...)
-struct common_type<tuple<Ts...>, tuple<Ts&&...>>   {
-   using type = tuple<common_type_t<Ts&&, Ts>...>;
+requires (requires { typename common_type_t<Ts, remove_reference_t<Ts>&&>; } && ...)
+struct common_type<std::tuple<Ts...>, tuple<remove_reference_t<Ts>&&...>>	{
+   using type = tuple<common_type_t<remove_reference_t<Ts>&&, Ts>...>;
 };
 
 template<class... Ts,
    template <class> class TQual, template <class> class UQual>
-requires (requires { typename common_reference_t<TQual<Ts>, UQual<Ts&&>>; } && ...)
-struct basic_common_reference<tuple<Ts&&...>, tuple<Ts...>, TQual, UQual> {
-   using type = tuple<common_reference_t<TQual<Ts&&>, UQual<Ts>>...>;
+requires (requires { typename common_reference_t<TQual<Ts>, UQual<remove_reference_t<Ts>&&>>; } && ...)
+struct basic_common_reference<tuple<remove_reference_t<Ts>&&...>, std::tuple<Ts...>, TQual, UQual> {
+   using type = tuple<common_reference_t<TQual<remove_reference_t<Ts>&&>, UQual<Ts>>...>;
 };
 template<class... Ts,
    template <class> class TQual, template <class> class UQual>
-requires (requires { typename common_reference_t<TQual<Ts>, UQual<Ts&&>>; } && ...)
-struct basic_common_reference<tuple<Ts...>, tuple<Ts&&...>, TQual, UQual> {
-   using type = tuple<common_reference_t<TQual<Ts>, UQual<Ts&&>>...>;
+requires (requires { typename common_reference_t<TQual<Ts>, UQual<remove_reference_t<Ts>&&>>; } && ...)
+struct basic_common_reference<std::tuple<Ts...>, tuple<remove_reference_t<Ts>&&...>, TQual, UQual> {
+   using type = tuple<common_reference_t<TQual<Ts>, UQual<remove_reference_t<Ts>&&>>...>;
 };
 
-// lvalue reference to rvalue reference
-template<class... Ts>
-requires (requires { typename common_type_t<Ts&, remove_reference_t<Ts>&&>; } && ...)
-struct common_type<tuple<remove_reference_t<Ts>&&...>, tuple<Ts&...>> {
-   using type = tuple<common_type_t<remove_reference_t<Ts>&&, Ts&>...>;
-};
-template<class... Ts>
-requires (requires { typename common_type_t<Ts&, remove_reference_t<Ts>&&>; } && ...)
-struct common_type<tuple<Ts&...>, tuple<remove_reference_t<Ts>&&...>>   {
-   using type = tuple<common_type_t<remove_reference_t<Ts>&&, Ts&>...>;
-};
-
-template<class... Ts,
-   template <class> class TQual, template <class> class UQual>
-requires (requires { typename common_reference_t<TQual<Ts&>, UQual<remove_reference_t<Ts>&&>>; } && ...)
-struct basic_common_reference<tuple<remove_reference_t<Ts>&&...>, tuple<Ts&...>, TQual, UQual> {
-   using type = tuple<common_reference_t<TQual<remove_reference_t<Ts>&&>, UQual<Ts&>>...>;
-};
-template<class... Ts,
-   template <class> class TQual, template <class> class UQual>
-requires (requires { typename common_reference_t<TQual<Ts&>, UQual<remove_reference_t<Ts>&&>>; } && ...)
-struct basic_common_reference<tuple<Ts&...>, tuple<remove_reference_t<Ts>&&...>, TQual, UQual> {
-   using type = tuple<common_reference_t<TQual<Ts&>, UQual<remove_reference_t<Ts>&&>>...>;
+template<template<class> class TQual, template <class> class UQual>
+struct basic_common_reference<tuple<>, tuple<>, TQual, UQual> {
+   using type = tuple<>;
 };
 </xmp>
 
