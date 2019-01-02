@@ -1,0 +1,186 @@
+<pre class='metadata'>
+Title: repeat_view
+Shortname: D1387
+Level: 0
+Status: D
+Group: wg21
+Editor: Christopher Di Bella, cjdb.ns@gmail.com
+URL: https://wg21.link/p1035
+Abstract: D1387 proposes to introduce repeat_view to C++.
+Audience: LEWG
+Markup Shorthands: markdown yes
+Default Highlight: CPP
+Line Numbers: no
+Date: 2018-10-08
+</pre>
+
+# Motivation
+
+P0789 introduces:
+
+* `empty_view`, which produces an empty range
+* `single_view`, which produces a range with exactly one element
+
+It would be convenient to have a range that produces an infinite number of elements of the same
+value.
+
+# Proposal
+
+## `repeat_view`
+
+1. The purpose of `repeat_view` is to produce an infinite range that contains a single specified
+    value.
+
+2. <i>[Example</i>:
+
+```cpp
+repeat_view r{42};
+for (int i : r | view::take(4)) {
+  cout << i; // prints 42 42 42 42
+}
+```
+<i>-- end example]</i>
+
+```cpp
+template<CopyConstructible T>
+requires is_object_v<T>
+class repeat_view : public view_interface<repeat_view<T>> {
+  template<bool is_const> class iterator; // exposition-only
+  semiregular<T> value_;                  // exposition-only
+public:
+  repeat_view() = default;
+
+  template<ConvertibleTo<T> U>
+  requires (!Same<U, repeat_view>)
+  explicit constexpr repeat_view(U&& value);
+
+  constexpr T& value() noexcept;
+  constexpr const T& value() const noexcept;
+
+  constexpr iterator<false> begin() noexcept;
+  constexpr iterator<true> begin() const noexcept;
+
+  constexpr unreachable end() const noexcept { return {}; }
+};
+
+template<class T>
+repeat_view(T) -> repeat_view<T>;
+```
+
+```cpp
+template<ConvertibleTo<T> U>
+requires (!Same<U, repeat_view>)
+explicit constexpr repeat_view(U&& value);
+```
+
+1. <i>Effects</i>: Initialises `value_` with `std::forward<U>(value)`.
+
+```cpp
+constexpr T& value() noexcept;
+constexpr const T& value() const noexcept;
+```
+
+2. <i>Effects</i>: Equivalent to: `return *value_;`.
+
+```cpp
+constexpr iterator<false> begin() noexcept;
+```
+
+3. <i>Returns</i>: `iterator<false>{*this}`.
+
+```cpp
+constexpr iterator<true> begin() const noexcept;
+```
+
+4. <i>Returns</i>: `iterator<true>{*this}`.
+
+### `repeat_view::iterator`
+
+<i>Editor's note: this is exposition-only.</i>
+
+```cpp
+template<class T>
+template<bool is_const>
+class repeat_view<T>::iterator {
+   using E = conditional_t<is_const, const T, T>;
+   friend iterator<true>;
+   E* value_;
+public:
+   using iterator_category = bidirectional_iterator;
+   using value_type = T;
+   using difference_type = iter_difference_t<T*>;
+
+   iterator() = default;
+
+   constexpr explicit iterator(repeat_view& r) noexcept
+   requires (!is_const);
+
+   constexpr explicit iterator(const repeat_view& r) noexcept
+   requires is_const;
+
+   constexpr iterator(const iterator<!is_const>& other) noexcept
+   requires is_const;
+
+   constexpr E& operator*() const noexcept
+   { return *value_; }
+   constexpr E* operator->() const noexcept
+   { return value_; }
+
+   constexpr iterator& operator++() noexcept
+   { return *this; }
+   constexpr iterator& operator++(int) noexcept
+   { return *this; }
+
+   constexpr iterator& operator--() noexcept
+   { return *this; }
+   constexpr iterator& operator--(int) noexcept
+   { return *this; }
+
+   template<bool is_bool2>
+   constexpr friend bool operator==(const iterator&, const iterator<is_bool2>&) noexcept
+   { return true; }
+   template<bool is_bool2>
+   constexpr friend bool operator!=(const iterator& x, const iterator<is_bool2>& y) noexcept
+   { return !(x == y); }
+
+   template<bool is_bool2>
+   constexpr friend difference_type distance(const iterator&, const iterator<is_bool2>&) noexcept
+   { return 0; }
+};
+```
+
+```cpp
+constexpr explicit iterator(repeat_view& r) noexcept
+requires (!is_const);
+
+constexpr explicit iterator(const repeat_view& r) noexcept
+requires is_const;
+```
+
+1. <i>Effects</i>: Initialises `value_` with the address of `r.value_`.
+
+```cpp
+constexpr iterator(const iterator<!is_const>& other) noexcept
+requires is_const;
+```
+
+2. <i>Effects</i>: Initialises `value_` with `other.value_`.
+
+## `view::repeat`
+
+The name `view::repeat` denotes a range adaptor object. Let `E` be an expression such that type `T`
+is `decltype((E))`. Then, the expression `view::repeat(E)` is expression-equivalent to:
+
+1. `repeat_view{E}` if `T` models `CopyConstructible` and satisfies `is_object_v`.
+2. Otherwise `view::repeat(E)` is ill-formed.
+
+# Poll
+
+D1387 would like to poll:
+
+1. We want `repeat_view` in C++20.
+2. We want `repeat_view` in C++23.
+
+# Implementation
+
+There exists an implementation of `repeat_view` in both range-v3 and cmcstl2.
