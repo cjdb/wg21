@@ -1,0 +1,38 @@
+<pre class='metadata'>
+Title: Work Items in the Context of SG20
+Shortname: DXXXX
+Level: 0
+Status: D
+Group: wg21
+Editor: Christopher Di Bella, cjdb.ns@gmail.com
+URL: https://wg21.link/pxxxxry
+Abstract: DXXXX defines what is meant by a requested 'work item' in the context of SG20, and how these work items are to be published.
+Audience: SG20
+Markup Shorthands: markdown yes
+Default Highlight: CPP
+Line Numbers: no
+Date: 2019-01-21
+</pre>
+
+# What does 'work item' mean in this context?
+
+The ISO definition for a 'New Work Item Proposal (NWIP)' is as follows:
+
+> Idea for a new standard that is submitted for vote in the relevant TC or SC. To be accepted, a
+> majority of P-members must vote in favour and a minimum number of those must commit to play an
+> active part in the project. If accepted, it becomes an approved work item (AWI).
+
+Roughly speaking, an official ISO Work Item is a request to JTC1/SC22 for a Technical Specification.
+
+Given P1231's aversion for creating guidelines in the form of technical specifications, DXXXX does
+not request such a formal process. Instead, DXXXX requests SG20 consider publishing a set of
+guidelines for the proposed topic.
+
+# How is the 'work item' to be published?
+
+Similarly to the C++ Core Guidelines, DXXXX proposes that each work item is published as its own
+document on GitHub (possibly with an associated GitHub pages webpage). This will allow for easy
+issue tracking, work assignment, and project management.
+
+Once SG20 is comfortable with a revision of a particular document, it should be voted on by SG20 to
+send to WG21 for publication as a Standing Document in some fashion.
