@@ -1,0 +1,398 @@
+<pre class='metadata'>
+Title: Work Item for SG20: Guidelines for Teaching C++ to Beginners
+Shortname: D1389
+Level: 0
+Status: D
+Group: wg21
+Editor: Christopher Di Bella, cjdb.ns@gmail.com
+URL: https://wg21.link/p1389
+Abstract: D1389 proposes that SG20 creates a work item for guidelines for teaching introductory C++, and a handful of proposed initial guidelines.
+Audience: SG20
+Markup Shorthands: markdown yes
+Default Highlight: CPP
+Line Numbers: no
+Date: 2019-01-21
+</pre>
+
+# Motivation for a set of Teaching Guidelines for Beginners
+
+## Who is a 'beginner'?
+
+The term 'beginner' in D1389 deliberately remains agnostic to programming novices, programmers who
+haven't written C++ at all, and programmers who haven't extensively used C++.
+
+## Why beginner guidelines?
+
+Introducing C++ to beginners is a delicate task, and is how novices develop their first impression
+of the language. Novices should be guided, not by being presented with language features, but rather
+how to write programs using C++. D1389 very strongly advocates for avoiding teaching beginners
+low-level 'things' such as pointers, bit hacking, explicit memory management, raw arrays, threads,
+and so on, in the <i>early</i> stages of their development process. Similarly, beginners do not need
+to be aware of the twenty-or-so fundamental types from the get-go.
+
+In order to prevent overwhelming novices-to-C++, D1389 requests that beginner guidelines recommend
+beginners be exposed to a subset of C++ that encourages designing and engineering programs using the
+lightweight abstractions that set C++ apart from other programming languages.
+
+These guidelines are not necessarily meant to be considered in isolation. For example, Dan Saks has
+mentioned that introducing C++ to C programmers requires care in the first features that are
+introduced, and -- in his experience -- that starting with `std::vector` as a <i>replacement</i> for
+raw arrays early on is often counter-productive. D1389 does not propose a <i>C++ for C programmers</i>
+work item, but recommends a later proposal do exactly that. Teachers designing curricula for
+introducing C++ to C programmers would then be encouraged to encouraged read <i>both</i> guidelines.
+
+# Guidelines
+
+Each of the following subsections is a proposed guideline.
+
+## What are beginner topics?
+
+Beginner topics roughly include introductions to:
+
+* algorithms (sequential and parallel)
+* basic I/O
+* computation constructs in C++ (expressions, sequence, selection, iteration)
+* constexpr
+* containers
+* contracts
+* derived types (for interface reasons -- implementation reasons to be pushed to 'intermediate')
+* error handling (e.g. exceptions, error types)
+* free store (and why you should avoid its direct usage)
+* generic programming (a <i>gentle</i> introduction; rigor saved for 'intermediate')
+* implicit and explicit conversions
+* iterator usage
+* operator overloading
+* product types (and why you should avoid them)
+* program design
+* RAII
+* ranges
+* references
+* run-time polymorphism
+* scope
+* scoped enumerations
+* smart pointer usage
+* sum types (e.g. `std::variant`, `std::optional`, `std::expected`)
+* templates (a <i>gentle</i> introduction; template metaprogramming strictly excluded)
+* testing (see PYYYY)
+* the C++ compilation model
+* the C++ execution model
+* the C++ memory model
+* tooling (e.g. compiler, debugger, package manager)
+* types, objects, variables, and constness
+* using libraries
+* writing and designing functions and lambdas
+* writing and designing classes
+
+This list is sorted alphabetically, not chronologically, and chronological sorting is intended to be
+a discussion point for SG20.
+
+## [basic.types] Basic types
+
+C++ supports a great many built-in types. Depending on the C++ Standard being used, there are as
+many as twenty one fundamental types in C++: eight distinct integer types, at least six distinct
+character types (six in C++11 through C++17, seven in the C++20 WP), three distinct floating-point
+types, `bool`, `void`, and `std::nullptr_t`. Further, there are the compound types, which include
+arrays of objects, functions, possibly cv-qualified pointers, possibly cv-qualified lvalue
+references, and possibly cv-qualified rvalue references, which some consider to be basic types,
+because they are built-in types.
+
+An informal survey of textbooks and university courses done by the author has shown that many
+resources immediately introduce all of the fundamental types sans `std::nullptr_t` and `char8_t`,
+and there are a nonzero amount that very quickly introduce raw arrays, pointers, and references.
+
+### [basic.types.primary] Primary types
+
+C++ novices rarely -- if ever -- have any need for more than a handful of types. In order to reduce
+the cognitive load on beginners, avoid introducing more than one of each fundamental type, postpone
+references until there is a relevant use-case, and avoid raw arrays and pointers for as long as
+possible.
+
+The table below recommends these as the primary types for beginners.
+
+<table>
+   <tr>
+      <th>Abstract type</th>
+      <th><center>Pre-C++20 type</center></th>
+      <th><center>Post-C++20 type</center></th>
+   </tr>
+   <tr>
+      <td>Integer</td>
+      <td><center><code>int</code></center></td>
+      <td><center><code>int</code></center></td>
+   </tr>
+   <tr>
+      <td>Floating-point</td>
+      <td><center><code>double</code></center></td>
+      <td><center><code>double</code></center></td>
+   </tr>
+   <tr>
+      <td>Boolean</td>
+      <td><center><code>bool</code></center></td>
+      <td><center><code>bool</code></center></td>
+   </tr>
+   <tr>
+      <td>Character</td>
+      <td><center><code>char</code></center></td>
+      <td><center><code>char8_t</code></center></td>
+   </tr>
+   <tr>
+      <td>String</td>
+      <td><center><code>std::string</code></center></td>
+      <td><center><code>std::u8string</code></center></td>
+   </tr>
+   <tr>
+      <td>Sequence container</td>
+      <td><center><code>std::vector</code></center></td>
+      <td><center><code>std::vector</code></center></td>
+   </tr>
+   <tr>
+      <td>Associative container</td>
+      <td><center><code>std::map</code></center></td>
+      <td><center><code>std::map</code></center></td>
+   </tr>
+</table>
+
+The distinction between pre-C++20 and C++20 is simply the acknowldgement of UTF-8. This is not to
+suggest that students should be introduced to the details of UTF-8 any earlier, but rather to get
+the idea of UTF-8 support on their radar, so that when they need to care about locales, they won't
+need to shift from thinking about why `char` is insufficient in the current programming world: they
+can just start using what they are already familiar with.
+
+
+
+## [prolong] Prolong features until there is a genuine use-case
+
+[basic.types] explicitly recommends avoiding the introduction of most fundamental types early on,
+as there is no use-case. Similarly, raw arrays, pointers, and even references are not considered
+members of [basic.types], as students will not appreciate them.
+
+### [prolong.references] References
+The author has found multiple resources that introduce pointers or references in the following
+fashion:
+
+```cpp
+// replicated introduction, not from an actual source
+int i = 0;
+int& r = i;
+
+std::cout << "i == " << i << "\n"
+   "r == " << r << '\n';
+i = 5;
+std::cout << "i == " << i << "\n"
+   "r == " << r << '\n';
+
+r = -5;
+std::cout << "i == " << i << "\n"
+   "r == " << r << '\n';
+```
+
+The above code offers no context for why references are necessary: only that reading and modifying
+`r` is synonymous to reading and modifying `i`, respectively. Without a genuine use-case, references
+can make seem C++ look rather quirky! Instead, it is recommended that students be exposed to
+references in a practical fashion, such as when passing parameters to functions.
+
+### [prolong.pointers] Pointers
+
+Given that pointers solve a similar problem to references in terms of indirection, they share what
+is mentioned in [prolong.pointers]. While pointers are an important part of C++ programming, their
+use-cases have been severely diminished thanks to references and abstractions such as `vector` and
+`map`.
+
+References should definitely precede pointers by quite some time. This simplifies the idea of using
+C++ by eliminating syntax that often isn't necessary. Kate Gregory expands on this idea in
+[[Stop-Teaching-C]].
+
+### [prolong.iterators] Iterators
+
+Iterators are a fundamental part of the standard library, which means that they can't be avoided in
+the context of standard library usage. The suggested guideline is for initial iterator usage:
+
+```cpp
+auto const date_taken = date{
+   year{2019},
+   month::january,
+   day{21}
+};
+// find gets a result                        // result != end(images) asks "did we find an image?"
+if (auto result = find(images, date, &image::date); result != end(images)) {
+   // 'training wheels'; *result gets the image, but then we go back to references to avoid
+   // funky syntax
+   auto& found = *result;
+   display(found);
+}
+// can't use result outside of the condition
+```
+
+## [tools] Tools
+
+### [tools.compilers] Use an up-to-date compiler
+
+TODO
+
+#### [tools.multiple.compilers] Use two or more competing compilers
+
+TODO
+
+### [tools.debugger] Introduce a debugger early
+
+TODO
+
+### [tools.package.management] Use a package manager
+
+TODO
+
+### [tools.build.system] Use a build system
+
+TODO
+
+## Appreciation for C++
+
+### History
+
+Do not introduce historical aspects of C++ in the forefront of C++ education. This includes:
+
+> "C++ was developed by Bjarne Stroustrup in 1983 at Bell Labs as an extension to C and was
+> previously known as 'C with Classes'..."
+
+<i>-- paraphrased introduction to C++ from many textbooks and courses informally surveyed by the
+author.</i>
+
+> "In the past we used SFINAE, which looks like *this*, now we use concepts..."
+
+> "`int x[] = {0, 1, 2, ...}` is called an array and is how you store a group of objects..."
+
+> "`printf` is used to write to screen..."
+
+<i>-- paraphrased introductions to topics the author has seen.</i>
+
+C with Classes was the immediate predecessor to C++, not an alternative name. This kind of statement
+helps embed the idea that C++ is simply 'C plus more', which is detrimental to a beginner's
+development of C++. It also incorrectly captures C++'s essence, which is not merely an extension to
+C, but also a <i>fusion</i> of ideals from Simula[[PPP]][[dne]] to support high-level abstractions
+in a lightweight fashion. In the author's experience, prematurely and inaccurately capturing the
+history of C++ gets programmers experienced with C into the mindset that programs engineered using
+C++ should be written in the image of C programs, and those who lack experience with C thinking that
+knowledge of C is a prerequisite.
+
+While there is a very long history of C in C++[[dne]], this is not beneficial to beginners up-front,
+and should be pushed to a later time when students are able to appreciate history without first
+being exposed to the error-prone ways of the past. C++ programmers will eventually need to work with
+older code (pre-C++17 code is abundant), or write code that has C interoperability, and thus
+developing an appreciation for C++'s history is imperative (sic).
+
+D1389 makes the case for it not to be in the first handful of sessions.
+
+### C++ in the Real World
+
+C++ has a broad range of applications. A non-exhaustive list of domains that C++ is used in can
+be found below, a large portion of which are derived from[[applications]].
+
+* embedded System on a Chips (e.g. Renesas' R-Car H3[[rcar]]) 
+* financial systems (e.g. Morgan Stanley; Bloomberg[[bloomberg]]; IMC Financial Markets[[imc]])
+* graphics programming (e.g. Adobe technologies [[adobe]]; Mentor Graphics [[mentor]])
+* middleware solutions (Codeplay Software[[codeplay]]; id Tech 4[[id4]])
+* operating systems (e.g. Windows[[win32]]; macOS)
+* scientific computing (e.g. CERN)
+* space technologies (e.g. NASA's Mars Rovers, James Webb Telescope)
+* video games (e.g. Creative Assembly)
+
+It is recommended that teachers briefly introduce a domain to their students during each session.
+This practice has helped to broaden student appreciation for the usage of C++ in industry. Embedding
+use-cases into classes to show "this has practical value in the real world" should be considered.
+
+# Acknowledgements
+
+I'd like to thank Gordon Brown, ..., Bjarne Stroustrup for reviewing.
+
+# Appendix A: Resources for Teaching Beginners
+
+## Programming -- Principles and Practice Using C++
+
+* <b>Author</b>: Bjarne Stroustrup
+* <a href="http://stroustrup.com/programming.html">Webpage</a>
+* <a href="http://stroustrup.com/Programming">Teacher notes and author advice</a>
+
+## A Tour of C++
+
+## Stop Teaching C
+
+# Appendix B: Glossary
+
+* <b>Session</b>: A unit of teaching. In a week-long C++ course, this might refer to hours or days.
+    In a single semester of university, it refers to one full week (includes lectures, tutorials,
+    and labs). In a textbook, a session is a single chapter.
+* <b>Work item</b>: Please refer to [[P1388]].
+
+<pre class=biblio>
+{
+"dne": {
+   "title": "The Design and Evolution of C++",
+   "authors": "Bjarne Stroustrup",
+   "href": "http://stroustrup.com/dne.html"
+},
+"PPP": {
+   "title": "Programming -- Principles and Practice Using C++",
+   "edition": "Second",
+   "authors": "Bjarne Stroustrup",
+   "href": "http://stroustrup.com/programming.html"
+},
+"P1388": {
+   "title": "P1388 Work Items in the Context of SG20",
+   "authors": "Christopher Di Bella",
+   "href": "https://wg21.link/p1388"
+},
+"rcar": {
+   "title": "R-Car",
+   "authors": "Renesas",
+   "href": "https://www.renesas.com/eu/en/products/automotive/automotive-lsis/r-car.html"
+},
+"bloomberg": {
+   "title": "How Bloomberg is advancing C++ at scale",
+   "author": "Bloomberg Professional",
+   "date": "2016-08-23",
+   "href": "https://www.bloomberg.com/professional/blog/bloomberg-advancing-c-scale/"
+},
+"imc": {
+   "title": "IMC Summer of Code 2016",
+   "authors": "IMC Financial Markets",
+   "date": "2016",
+   "href": "https://www.boost.org/community/imc_summer_of_code_2016.html"
+},
+"adobe": {
+   "title": "GitHub for Adobe, Inc.",
+   "authors": "Adobe, Inc.",
+   "href": "https://github.com/adobe?utf8=%E2%9C%93&q=&type=&language=c%2B%2B"
+},
+"mentor": {
+   "title": "Mentor",
+   "authors": "Mentor Graphics",
+   "href": "https://www.mentor.com/"
+},
+"win32": {
+   "title": "In which language is the Windows operating system written?",
+   "authors": "Ken Gregg",
+   "publisher": "Quora.com",
+   "href": "https://qr.ae/TUnniF"
+},
+"codeplay": {
+   "title": "Codeplay -- The Heterogeneous Systems Experts",
+   "authors": "Codeplay Software, Ltd.",
+   "href": "https://codeplay.com/"
+},
+"id4": {
+   "title": "DOOM-3-BFG",
+   "authors": "id Software",
+   "href": "https://github.com/id-Software/DOOM-3-BFG"
+},
+"applications": {
+   "title": "C++ Applications",
+   "authors": "Bjarne Stroustrup",
+   "href": "http://http://stroustrup.com/applications.html"
+},
+"Stop-Teaching-C": {
+   "title": "CppCon 2015: Stop Teaching C",
+   "authors": "Kate Gregory",
+   "href": "https://youtu.be/YnWhqhNdYyk"
+}
+}
+</pre>
