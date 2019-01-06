@@ -67,6 +67,7 @@ intended to be a discussion point for SG20.
 * designing and using classes
 * error handling (e.g. exceptions through helper functions, error types such as `std::optional` and `std::expected`)
 * implicit and explicit conversions
+* include directive
 * iterator usage (simply comparison to `end(r)` and `*i`)
 * modules
 * operator overloading
@@ -235,15 +236,69 @@ the context of standard library usage. The suggested guideline is for initial it
 if (auto result = find(images, date, &image::date); result != end(images)) {
    // 'training wheels'; *result gets the image, but then we go back to references to avoid
    // funky syntax beyond operator* as a 'get' function.
-   auto& found = *result;
-   display(found);
+   auto const& read = *result;
+   display(read);
+
+   auto& read_write = *result;
+   change_hue(read_write, hue);
+   display(read_write)
 }
 // can't use result outside of the condition
 ```
 
-## [projects] Projects
+There has been a comment on why `display(*result)` is not directly applied. The above guideline does
+two things:
+
+1. Keeps students away from the quirky syntax of iterators. Default to references.
+2. Gets students into the mindest that an iterator's `operator*` returns a reference.
+
+### [prolong.concept.definitions] Concept definitions
+
+Designing a concept is a lot of work, and is arguably an advanced topic; the world's foremost
+experts on the topic have stated that designing effective concepts comes after one has studied the
+details of algorithms. Even the definition for `EqualityComparable` is much more than just checking
+that `a == b` and `a != b` are syntactically possible.
+
+This recommendation does not preculude the introduction of <i>using</i> existing concepts.
+
+### [prolong.cpp] C Preprocessor
+
+Excludes `#include`, which is necessary until modules are in C++.
 
 TODO
+
+## Style practices
+
+### [style.guide] Use a style guide
+
+* Recommended style guide: [C++ Core Guidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines).
+* See also: [Use a code formatter](#toolscodeformatter-use-a-code-formatter)
+* See also: [Use a linter](#toolslinter-use-linters)
+
+TODO (why?)
+
+### [style.`ALL_CAPS`] Avoid `ALL_CAPS` names
+
+The use of `ALL_CAPS` is commonly reserved for macros. Developer tools, such as compilers and IDEs
+are able to quickly detect when a programmer is trying to write to something that is read-only (e.g.
+a constant).
+
+Associated Core Guidelines:
+    * [Enum.5: Don’t use ALL_CAPS for enumerators](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Renum-caps)
+    * [ES.9: Avoid ALL_CAPS names](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Res-not-CAPS)
+    * [ES.32: Use ALL_CAPS for all macro names](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Res-ALL_CAPS)
+    * [NL.9: Use ALL_CAPS for macro names only](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rl-all-caps)
+
+<i>
+<b>Editor's note:</b> Due to the lack of consensus, no other naming guidelines are made for variable
+or type names. `ALL_CAPS` are the exception because there appears to be a large enough consensus
+across multiple well-known style guides (Core Guidelines, Google Style Guide, and Mozilla Coding
+Style).
+</i>
+
+## [projects] Projects
+
+TODO (what?, why?, how?, where?, when?, how many?)
 
 ## [tools] Tools
 
