@@ -1230,7 +1230,7 @@ Possible extra rowspan handling
   <meta content="Bikeshed version 30dbdcf66519991ec52011cac10c49a7b5b449c5" name="generator">
   <link href="https://wg21.link/p1389" rel="canonical">
   <link href="https://isocpp.org/favicon.ico" rel="icon">
-  <meta content="ea00ea80c08f84e016300df16aa8ba1d79572c8b" name="document-revision">
+  <meta content="ee369be42685f2ac7620c041d44a19d191ad2305" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1502,13 +1502,14 @@ pre .property::before, pre .property::after {
          <ol class="toc">
           <li><a href="#toolsmultiplecompilers-use-two-or-more-competing-compilers"><span class="secno">2.5.1.1</span> <span class="content">[tools.multiple.compilers] Use two or more competing compilers</span></a>
          </ol>
-        <li><a href="#toolsdebugger-introduce-a-debugger-early"><span class="secno">2.5.2</span> <span class="content">[tools.debugger] Introduce a debugger early</span></a>
-        <li><a href="#toolspackagemanagement-use-a-package-manager"><span class="secno">2.5.3</span> <span class="content">[tools.package.management] Use a package manager</span></a>
-        <li><a href="#toolsbuildsystem-use-a-build-system"><span class="secno">2.5.4</span> <span class="content">[tools.build.system] Use a build system</span></a>
-        <li><a href="#toolscompilerexplorer-use-compiler-explorer"><span class="secno">2.5.5</span> <span class="content">[tools.compiler.explorer] Use Compiler Explorer</span></a>
-        <li><a href="#toolscodeformatter-use-a-code-formatter"><span class="secno">2.5.6</span> <span class="content">[tools.code.formatter] Use a code formatter</span></a>
-        <li><a href="#toolslinter-use-linters"><span class="secno">2.5.7</span> <span class="content">[tools.linter] Use linters</span></a>
-        <li><a href="#toolsruntimeanalysis-use-run-time-analysers-eg-addresssanitizer-when-teaching-free-store"><span class="secno">2.5.8</span> <span class="content">[tools.runtime.analysis] Use run-time analysers (e.g. AddressSanitizer) when teaching free store</span></a>
+        <li><a href="#toolscompilerwarnings-use-a-high-level-of-warnings-and-enable-warnings-as-error-mode"><span class="secno">2.5.2</span> <span class="content">[tools.compiler.warnings] Use a high level of warnings and enable 'warnings as error' mode</span></a>
+        <li><a href="#toolsdebugger-introduce-a-debugger-early"><span class="secno">2.5.3</span> <span class="content">[tools.debugger] Introduce a debugger early</span></a>
+        <li><a href="#toolspackagemanagement-use-a-package-manager"><span class="secno">2.5.4</span> <span class="content">[tools.package.management] Use a package manager</span></a>
+        <li><a href="#toolsbuildsystem-use-a-build-system"><span class="secno">2.5.5</span> <span class="content">[tools.build.system] Use a build system</span></a>
+        <li><a href="#toolscompilerexplorer-use-compiler-explorer"><span class="secno">2.5.6</span> <span class="content">[tools.compiler.explorer] Use Compiler Explorer</span></a>
+        <li><a href="#toolscodeformatter-use-a-code-formatter"><span class="secno">2.5.7</span> <span class="content">[tools.code.formatter] Use a code formatter</span></a>
+        <li><a href="#toolslinter-use-linters"><span class="secno">2.5.8</span> <span class="content">[tools.linter] Use linters</span></a>
+        <li><a href="#toolsruntimeanalysis-use-run-time-analysers-especially-when-teaching-free-store"><span class="secno">2.5.9</span> <span class="content">[tools.runtime.analysis] Use run-time analysers, especially when teaching free store</span></a>
        </ol>
       <li>
        <a href="#appreciation-for-c"><span class="secno">2.6</span> <span class="content">Appreciation for C++</span></a>
@@ -1520,7 +1521,11 @@ pre .property::before, pre .property::after {
     <li>
      <a href="#student-outcomes"><span class="secno">3</span> <span class="content">Student outcomes</span></a>
      <ol class="toc">
-      <li><a href="#tool-outcomes"><span class="secno">3.1</span> <span class="content">Tool outcomes</span></a>
+      <li><a href="#containers"><span class="secno">3.1</span> <span class="content">Containers</span></a>
+      <li><a href="#algorithms-and-ranges"><span class="secno">3.2</span> <span class="content">Algorithms and ranges</span></a>
+      <li><a href="#error-handling"><span class="secno">3.3</span> <span class="content">Error handling</span></a>
+      <li><a href="#testing"><span class="secno">3.4</span> <span class="content">Testing</span></a>
+      <li><a href="#tool-outcomes"><span class="secno">3.5</span> <span class="content">Tool outcomes</span></a>
      </ol>
     <li><a href="#acknowledgements"><span class="secno">4</span> <span class="content">Acknowledgements</span></a>
     <li>
@@ -1775,32 +1780,54 @@ the context of standard library usage. The suggested guideline is for initial it
 <pre class="language-cpp highlight"><c- c1>// find gets a result                        // result != end(images) asks "did we find an image?"</c->
 <c- k>if</c-> <c- p>(</c-><c- k>auto</c-> <c- n>result</c-> <c- o>=</c-> <c- n>find</c-><c- p>(</c-><c- n>images</c-><c- p>,</c-> <c- n>date</c-><c- p>,</c-> <c- o>&amp;</c-><c- n>image</c-><c- o>::</c-><c- n>date</c-><c- p>);</c-> <c- n>result</c-> <c- o>!=</c-> <c- n>end</c-><c- p>(</c-><c- n>images</c-><c- p>))</c-> <c- p>{</c->
    <c- c1>// 'training wheels'; *result gets the image, but then we go back to references to avoid</c->
-   <c- c1>// funky syntax</c->
+   <c- c1>// funky syntax beyond operator* as a 'get' function.</c->
    <c- k>auto</c-><c- o>&amp;</c-> <c- n>found</c-> <c- o>=</c-> <c- o>*</c-><c- n>result</c-><c- p>;</c->
    <c- n>display</c-><c- p>(</c-><c- n>found</c-><c- p>);</c->
 <c- p>}</c->
 <c- c1>// can’t use result outside of the condition</c->
 </pre>
    <h3 class="heading settled" data-level="2.4" id="projects-projects"><span class="secno">2.4. </span><span class="content">[projects] Projects</span><a class="self-link" href="#projects-projects"></a></h3>
+   <p>TODO</p>
    <h3 class="heading settled" data-level="2.5" id="tools-tools"><span class="secno">2.5. </span><span class="content">[tools] Tools</span><a class="self-link" href="#tools-tools"></a></h3>
    <h4 class="heading settled" data-level="2.5.1" id="toolscompilers-use-an-up-to-date-compiler"><span class="secno">2.5.1. </span><span class="content">[tools.compilers] Use an up-to-date compiler</span><a class="self-link" href="#toolscompilers-use-an-up-to-date-compiler"></a></h4>
-   <p>TODO</p>
+   <p>... even if you are not teaching the latest C++</p>
+   <ul>
+    <li data-md>
+     <p>Most recent GCC: version 8</p>
+    <li data-md>
+     <p>Most recent Clang: version 7</p>
+    <li data-md>
+     <p>Most recent MSVC: version 2017 (with updates)</p>
+   </ul>
+   <p>TODO (why?)</p>
    <h5 class="heading settled" data-level="2.5.1.1" id="toolsmultiplecompilers-use-two-or-more-competing-compilers"><span class="secno">2.5.1.1. </span><span class="content">[tools.multiple.compilers] Use two or more competing compilers</span><a class="self-link" href="#toolsmultiplecompilers-use-two-or-more-competing-compilers"></a></h5>
-   <p>TODO</p>
-   <h4 class="heading settled" data-level="2.5.2" id="toolsdebugger-introduce-a-debugger-early"><span class="secno">2.5.2. </span><span class="content">[tools.debugger] Introduce a debugger early</span><a class="self-link" href="#toolsdebugger-introduce-a-debugger-early"></a></h4>
-   <p>TODO</p>
-   <h4 class="heading settled" data-level="2.5.3" id="toolspackagemanagement-use-a-package-manager"><span class="secno">2.5.3. </span><span class="content">[tools.package.management] Use a package manager</span><a class="self-link" href="#toolspackagemanagement-use-a-package-manager"></a></h4>
-   <p>TODO</p>
-   <h4 class="heading settled" data-level="2.5.4" id="toolsbuildsystem-use-a-build-system"><span class="secno">2.5.4. </span><span class="content">[tools.build.system] Use a build system</span><a class="self-link" href="#toolsbuildsystem-use-a-build-system"></a></h4>
-   <p>TODO</p>
-   <h4 class="heading settled" data-level="2.5.5" id="toolscompilerexplorer-use-compiler-explorer"><span class="secno">2.5.5. </span><span class="content">[tools.compiler.explorer] Use Compiler Explorer</span><a class="self-link" href="#toolscompilerexplorer-use-compiler-explorer"></a></h4>
-   <p>TODO</p>
-   <h4 class="heading settled" data-level="2.5.6" id="toolscodeformatter-use-a-code-formatter"><span class="secno">2.5.6. </span><span class="content">[tools.code.formatter] Use a code formatter</span><a class="self-link" href="#toolscodeformatter-use-a-code-formatter"></a></h4>
-   <p>TODO</p>
-   <h4 class="heading settled" data-level="2.5.7" id="toolslinter-use-linters"><span class="secno">2.5.7. </span><span class="content">[tools.linter] Use linters</span><a class="self-link" href="#toolslinter-use-linters"></a></h4>
-   <p>TODO</p>
-   <h4 class="heading settled" data-level="2.5.8" id="toolsruntimeanalysis-use-run-time-analysers-eg-addresssanitizer-when-teaching-free-store"><span class="secno">2.5.8. </span><span class="content">[tools.runtime.analysis] Use run-time analysers (e.g. AddressSanitizer) when teaching free store</span><a class="self-link" href="#toolsruntimeanalysis-use-run-time-analysers-eg-addresssanitizer-when-teaching-free-store"></a></h4>
-   <p>TODO</p>
+   <p>TODO (why?)</p>
+   <h4 class="heading settled" data-level="2.5.2" id="toolscompilerwarnings-use-a-high-level-of-warnings-and-enable-warnings-as-error-mode"><span class="secno">2.5.2. </span><span class="content">[tools.compiler.warnings] Use a high level of warnings and enable 'warnings as error' mode</span><a class="self-link" href="#toolscompilerwarnings-use-a-high-level-of-warnings-and-enable-warnings-as-error-mode"></a></h4>
+   <ul>
+    <li data-md>
+     <p>Minimum for GCC and Clang: <code class="highlight"><c- o>-</c-><c- n>Wall</c-> <c- o>-</c-><c- n>Wextra</c-> <c- o>-</c-><c- n>pedantic</c-> <c- o>-</c-><c- n>Werror</c-></code></p>
+    <li data-md>
+     <p>Minimum for MSVC: <code class="highlight"><c- o>/</c-><c- n>W3</c-> <c- o>/</c-><c- n>WX</c-></code></p>
+   </ul>
+   <p>TODO (why?)</p>
+   <h4 class="heading settled" data-level="2.5.3" id="toolsdebugger-introduce-a-debugger-early"><span class="secno">2.5.3. </span><span class="content">[tools.debugger] Introduce a debugger early</span><a class="self-link" href="#toolsdebugger-introduce-a-debugger-early"></a></h4>
+   <p>TODO (why?)</p>
+   <h4 class="heading settled" data-level="2.5.4" id="toolspackagemanagement-use-a-package-manager"><span class="secno">2.5.4. </span><span class="content">[tools.package.management] Use a package manager</span><a class="self-link" href="#toolspackagemanagement-use-a-package-manager"></a></h4>
+   <p>TODO (why?)</p>
+   <h4 class="heading settled" data-level="2.5.5" id="toolsbuildsystem-use-a-build-system"><span class="secno">2.5.5. </span><span class="content">[tools.build.system] Use a build system</span><a class="self-link" href="#toolsbuildsystem-use-a-build-system"></a></h4>
+   <p>TODO (why?)</p>
+   <h4 class="heading settled" data-level="2.5.6" id="toolscompilerexplorer-use-compiler-explorer"><span class="secno">2.5.6. </span><span class="content">[tools.compiler.explorer] Use Compiler Explorer</span><a class="self-link" href="#toolscompilerexplorer-use-compiler-explorer"></a></h4>
+   <p>TODO (why?)</p>
+   <h4 class="heading settled" data-level="2.5.7" id="toolscodeformatter-use-a-code-formatter"><span class="secno">2.5.7. </span><span class="content">[tools.code.formatter] Use a code formatter</span><a class="self-link" href="#toolscodeformatter-use-a-code-formatter"></a></h4>
+   <p>Examples: clang-format</p>
+   <p>TODO (why?)</p>
+   <h4 class="heading settled" data-level="2.5.8" id="toolslinter-use-linters"><span class="secno">2.5.8. </span><span class="content">[tools.linter] Use linters</span><a class="self-link" href="#toolslinter-use-linters"></a></h4>
+   <p>Example: clang-tidy</p>
+   <p>TODO (why?)</p>
+   <h4 class="heading settled" data-level="2.5.9" id="toolsruntimeanalysis-use-run-time-analysers-especially-when-teaching-free-store"><span class="secno">2.5.9. </span><span class="content">[tools.runtime.analysis] Use run-time analysers, especially when teaching free store</span><a class="self-link" href="#toolsruntimeanalysis-use-run-time-analysers-especially-when-teaching-free-store"></a></h4>
+   <p>Examples: <code class="highlight"><c- n>AddressSanitizer</c-></code>, <code class="highlight"><c- n>UndefinedBehaviorSanitizer</c-></code></p>
+   <p>Notes: WSL does not play nicely with asan, but a Docker image running inside WSL does.</p>
+   <p>TODO (why?)</p>
    <h3 class="heading settled" data-level="2.6" id="appreciation-for-c"><span class="secno">2.6. </span><span class="content">Appreciation for C++</span><a class="self-link" href="#appreciation-for-c"></a></h3>
    <h4 class="heading settled" data-level="2.6.1" id="history"><span class="secno">2.6.1. </span><span class="content">History</span><a class="self-link" href="#history"></a></h4>
    <p>Do not introduce historical aspects of C++ in the forefront of C++ education. This includes:</p>
@@ -1862,42 +1889,66 @@ This practice has helped to broaden student appreciation for the usage of C++ in
 use-cases into classes to show "this has practical value in the real world" should be considered.</p>
    <h2 class="heading settled" data-level="3" id="student-outcomes"><span class="secno">3. </span><span class="content">Student outcomes</span><a class="self-link" href="#student-outcomes"></a></h2>
    <p>Upon completion, a student should be able to:</p>
-   <h3 class="heading settled" data-level="3.1" id="tool-outcomes"><span class="secno">3.1. </span><span class="content">Tool outcomes</span><a class="self-link" href="#tool-outcomes"></a></h3>
+   <h3 class="heading settled" data-level="3.1" id="containers"><span class="secno">3.1. </span><span class="content">Containers</span><a class="self-link" href="#containers"></a></h3>
+   <p>TODO</p>
+   <h3 class="heading settled" data-level="3.2" id="algorithms-and-ranges"><span class="secno">3.2. </span><span class="content">Algorithms and ranges</span><a class="self-link" href="#algorithms-and-ranges"></a></h3>
+   <p>TODO</p>
+   <h3 class="heading settled" data-level="3.3" id="error-handling"><span class="secno">3.3. </span><span class="content">Error handling</span><a class="self-link" href="#error-handling"></a></h3>
+   <p>TODO</p>
+   <h3 class="heading settled" data-level="3.4" id="testing"><span class="secno">3.4. </span><span class="content">Testing</span><a class="self-link" href="#testing"></a></h3>
+   <p>See PYYYY for now.</p>
+   <h3 class="heading settled" data-level="3.5" id="tool-outcomes"><span class="secno">3.5. </span><span class="content">Tool outcomes</span><a class="self-link" href="#tool-outcomes"></a></h3>
    <ul>
     <li data-md>
      <p>invoke a compiler in debug and release modes</p>
     <li data-md>
      <p>understand why using multiple compilers is important for writing well-formed C++</p>
     <li data-md>
+     <p>understand why a high level of warnings is important for writing well-reasoned C++</p>
+     <ul>
+      <li data-md>
+       <p>understand why enforcing 'warnings as errors' mode is an important step up from just warnings</p>
+     </ul>
+    <li data-md>
      <p>configure a project</p>
+     <ul>
+      <li data-md>
+       <p>add and remove targets using the build system (IDE leverage a good practice)</p>
+      <li data-md>
+       <p>add and remove packages using a package manager</p>
+     </ul>
     <li data-md>
      <p>utilise a debugger, including</p>
      <ul>
       <li data-md>
-       <p>step over</p>
+       <p>setting, disabling, skipping, and deleting breakpoints</p>
       <li data-md>
-       <p>step into</p>
+       <p>setting, disabling, skipping, and deleting watchpoints</p>
       <li data-md>
-       <p>step out</p>
+       <p>continue</p>
       <li data-md>
-       <p>inspect a variable’s contents</p>
+       <p>stepping over</p>
+      <li data-md>
+       <p>stepping into</p>
+      <li data-md>
+       <p>stepping out</p>
+      <li data-md>
+       <p>inspecting a variable’s contents</p>
       <li data-md>
        <p>TUI-mode, if a command-line debugger is being used</p>
      </ul>
     <li data-md>
-     <p>add targets to and remove targets from the build system</p>
-    <li data-md>
-     <p>add and remove packages using a package manager</p>
-    <li data-md>
      <p>navigate Compiler Explorer, including</p>
-    <li data-md>
-     <p>adding source files</p>
-    <li data-md>
-     <p>adding compilers</p>
-    <li data-md>
-     <p>use conformance mode</p>
-    <li data-md>
-     <p>use diff mode</p>
+     <ul>
+      <li data-md>
+       <p>adding source files</p>
+      <li data-md>
+       <p>adding compilers</p>
+      <li data-md>
+       <p>use conformance mode</p>
+      <li data-md>
+       <p>use diff mode</p>
+     </ul>
     <li data-md>
      <p>understand why using a code formatter is a 'best practice'</p>
     <li data-md>

@@ -234,7 +234,7 @@ the context of standard library usage. The suggested guideline is for initial it
 // find gets a result                        // result != end(images) asks "did we find an image?"
 if (auto result = find(images, date, &image::date); result != end(images)) {
    // 'training wheels'; *result gets the image, but then we go back to references to avoid
-   // funky syntax
+   // funky syntax beyond operator* as a 'get' function.
    auto& found = *result;
    display(found);
 }
@@ -243,43 +243,66 @@ if (auto result = find(images, date, &image::date); result != end(images)) {
 
 ## [projects] Projects
 
+TODO
+
 ## [tools] Tools
 
 ### [tools.compilers] Use an up-to-date compiler
 
-TODO
+... even if you are not teaching the latest C++
+
+* Most recent GCC: version 8
+* Most recent Clang: version 7
+* Most recent MSVC: version 2017 (with updates)
+
+TODO (why?)
 
 #### [tools.multiple.compilers] Use two or more competing compilers
 
-TODO
+TODO (why?)
+
+### [tools.compiler.warnings] Use a high level of warnings and enable 'warnings as error' mode
+
+* Minimum for GCC and Clang: `-Wall -Wextra -pedantic -Werror`
+* Minimum for MSVC: `/W3 /WX`
+
+TODO (why?)
 
 ### [tools.debugger] Introduce a debugger early
 
-TODO
+TODO (why?)
 
 ### [tools.package.management] Use a package manager
 
-TODO
+TODO (why?)
 
 ### [tools.build.system] Use a build system
 
-TODO
+TODO (why?)
 
 ### [tools.compiler.explorer] Use Compiler Explorer
 
-TODO
+TODO (why?)
 
 ### [tools.code.formatter] Use a code formatter
 
-TODO
+Examples: clang-format
+
+TODO (why?)
 
 ### [tools.linter] Use linters
 
-TODO
+Example: clang-tidy
 
-### [tools.runtime.analysis] Use run-time analysers (e.g. AddressSanitizer) when teaching free store
+TODO (why?)
 
-TODO
+### [tools.runtime.analysis] Use run-time analysers, especially when teaching free store
+
+Examples: `AddressSanitizer`, `UndefinedBehaviorSanitizer`
+
+Notes: WSL does not play nicely with asan, but a Docker image running inside WSL does.
+
+TODO (why?)
 
 ## Appreciation for C++
 
@@ -341,24 +364,45 @@ use-cases into classes to show "this has practical value in the real world" shou
 
 Upon completion, a student should be able to:
 
+## Containers
+
+TODO
+
+## Algorithms and ranges
+
+TODO
+
+## Error handling
+
+TODO
+
+## Testing
+
+See PYYYY for now.
+
 ## Tool outcomes
 
 * invoke a compiler in debug and release modes
 * understand why using multiple compilers is important for writing well-formed C++
+* understand why a high level of warnings is important for writing well-reasoned C++
+    * understand why enforcing 'warnings as errors' mode is an important step up from just warnings
 * configure a project
+    * add and remove targets using the build system (IDE leverage a good practice)
+    * add and remove packages using a package manager
 * utilise a debugger, including
-    * step over
-    * step into
-    * step out
-    * inspect a variable's contents
+    * setting, disabling, skipping, and deleting breakpoints
+    * setting, disabling, skipping, and deleting watchpoints
+    * continue
+    * stepping over
+    * stepping into
+    * stepping out
+    * inspecting a variable's contents
     * TUI-mode, if a command-line debugger is being used
-* add targets to and remove targets from the build system
-* add and remove packages using a package manager
 * navigate Compiler Explorer, including
-   * adding source files
-   * adding compilers
-   * use conformance mode
-   * use diff mode
+    * adding source files
+    * adding compilers
+    * use conformance mode
+    * use diff mode
 * understand why using a code formatter is a 'best practice'
 * understand why using a code linter is a 'best practice'
 
