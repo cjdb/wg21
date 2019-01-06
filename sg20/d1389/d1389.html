@@ -1227,10 +1227,10 @@ Possible extra rowspan handling
       text-align: center;
     }
   </style>
-  <meta content="Bikeshed version 6dcb46ba8cae3704b42c05bcd8578c92d239786a" name="generator">
+  <meta content="Bikeshed version 30dbdcf66519991ec52011cac10c49a7b5b449c5" name="generator">
   <link href="https://wg21.link/p1389" rel="canonical">
   <link href="https://isocpp.org/favicon.ico" rel="icon">
-  <meta content="db46fa44ad70a01010c76c0064c44b604902ce42" name="document-revision">
+  <meta content="ea00ea80c08f84e016300df16aa8ba1d79572c8b" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1473,7 +1473,14 @@ pre .property::before, pre .property::after {
     <li>
      <a href="#guidelines"><span class="secno">2</span> <span class="content">Guidelines</span></a>
      <ol class="toc">
-      <li><a href="#what-are-beginner-topics"><span class="secno">2.1</span> <span class="content">What are beginner topics?</span></a>
+      <li>
+       <a href="#what-are-beginner-topics"><span class="secno">2.1</span> <span class="content">What are beginner topics?</span></a>
+       <ol class="toc">
+        <li><a href="#stage-1"><span class="secno">2.1.1</span> <span class="content">Stage 1</span></a>
+        <li><a href="#stage-2"><span class="secno">2.1.2</span> <span class="content">Stage 2</span></a>
+        <li><a href="#stage-3"><span class="secno">2.1.3</span> <span class="content">Stage 3</span></a>
+        <li><a href="#stage-4"><span class="secno">2.1.4</span> <span class="content">Stage 4</span></a>
+       </ol>
       <li>
        <a href="#basictypes-basic-types"><span class="secno">2.2</span> <span class="content">[basic.types] Basic types</span></a>
        <ol class="toc">
@@ -1486,34 +1493,52 @@ pre .property::before, pre .property::after {
         <li><a href="#prolongpointers-pointers"><span class="secno">2.3.2</span> <span class="content">[prolong.pointers] Pointers</span></a>
         <li><a href="#prolongiterators-iterators"><span class="secno">2.3.3</span> <span class="content">[prolong.iterators] Iterators</span></a>
        </ol>
+      <li><a href="#projects-projects"><span class="secno">2.4</span> <span class="content">[projects] Projects</span></a>
       <li>
-       <a href="#tools-tools"><span class="secno">2.4</span> <span class="content">[tools] Tools</span></a>
+       <a href="#tools-tools"><span class="secno">2.5</span> <span class="content">[tools] Tools</span></a>
        <ol class="toc">
         <li>
-         <a href="#toolscompilers-use-an-up-to-date-compiler"><span class="secno">2.4.1</span> <span class="content">[tools.compilers] Use an up-to-date compiler</span></a>
+         <a href="#toolscompilers-use-an-up-to-date-compiler"><span class="secno">2.5.1</span> <span class="content">[tools.compilers] Use an up-to-date compiler</span></a>
          <ol class="toc">
-          <li><a href="#toolsmultiplecompilers-use-two-or-more-competing-compilers"><span class="secno">2.4.1.1</span> <span class="content">[tools.multiple.compilers] Use two or more competing compilers</span></a>
+          <li><a href="#toolsmultiplecompilers-use-two-or-more-competing-compilers"><span class="secno">2.5.1.1</span> <span class="content">[tools.multiple.compilers] Use two or more competing compilers</span></a>
          </ol>
-        <li><a href="#toolsdebugger-introduce-a-debugger-early"><span class="secno">2.4.2</span> <span class="content">[tools.debugger] Introduce a debugger early</span></a>
-        <li><a href="#toolspackagemanagement-use-a-package-manager"><span class="secno">2.4.3</span> <span class="content">[tools.package.management] Use a package manager</span></a>
-        <li><a href="#toolsbuildsystem-use-a-build-system"><span class="secno">2.4.4</span> <span class="content">[tools.build.system] Use a build system</span></a>
+        <li><a href="#toolsdebugger-introduce-a-debugger-early"><span class="secno">2.5.2</span> <span class="content">[tools.debugger] Introduce a debugger early</span></a>
+        <li><a href="#toolspackagemanagement-use-a-package-manager"><span class="secno">2.5.3</span> <span class="content">[tools.package.management] Use a package manager</span></a>
+        <li><a href="#toolsbuildsystem-use-a-build-system"><span class="secno">2.5.4</span> <span class="content">[tools.build.system] Use a build system</span></a>
+        <li><a href="#toolscompilerexplorer-use-compiler-explorer"><span class="secno">2.5.5</span> <span class="content">[tools.compiler.explorer] Use Compiler Explorer</span></a>
+        <li><a href="#toolscodeformatter-use-a-code-formatter"><span class="secno">2.5.6</span> <span class="content">[tools.code.formatter] Use a code formatter</span></a>
+        <li><a href="#toolslinter-use-linters"><span class="secno">2.5.7</span> <span class="content">[tools.linter] Use linters</span></a>
+        <li><a href="#toolsruntimeanalysis-use-run-time-analysers-eg-addresssanitizer-when-teaching-free-store"><span class="secno">2.5.8</span> <span class="content">[tools.runtime.analysis] Use run-time analysers (e.g. AddressSanitizer) when teaching free store</span></a>
        </ol>
       <li>
-       <a href="#appreciation-for-c"><span class="secno">2.5</span> <span class="content">Appreciation for C++</span></a>
+       <a href="#appreciation-for-c"><span class="secno">2.6</span> <span class="content">Appreciation for C++</span></a>
        <ol class="toc">
-        <li><a href="#history"><span class="secno">2.5.1</span> <span class="content">History</span></a>
-        <li><a href="#c-in-the-real-world"><span class="secno">2.5.2</span> <span class="content">C++ in the Real World</span></a>
+        <li><a href="#history"><span class="secno">2.6.1</span> <span class="content">History</span></a>
+        <li><a href="#c-in-the-real-world"><span class="secno">2.6.2</span> <span class="content">C++ in the Real World</span></a>
        </ol>
      </ol>
-    <li><a href="#acknowledgements"><span class="secno">3</span> <span class="content">Acknowledgements</span></a>
     <li>
-     <a href="#appendix-a-resources-for-teaching-beginners"><span class="secno"></span> <span class="content">Appendix A: Resources for Teaching Beginners</span></a>
+     <a href="#student-outcomes"><span class="secno">3</span> <span class="content">Student outcomes</span></a>
+     <ol class="toc">
+      <li><a href="#tool-outcomes"><span class="secno">3.1</span> <span class="content">Tool outcomes</span></a>
+     </ol>
+    <li><a href="#acknowledgements"><span class="secno">4</span> <span class="content">Acknowledgements</span></a>
+    <li>
+     <a href="#appendix-a-resources-for-students"><span class="secno"></span> <span class="content">Appendix A: Resources for Students</span></a>
      <ol class="toc">
       <li><a href="#programming----principles-and-practice-using-c"><span class="secno"></span> <span class="content">Programming -- Principles and Practice Using C++</span></a>
       <li><a href="#a-tour-of-c"><span class="secno"></span> <span class="content">A Tour of C++</span></a>
-      <li><a href="#stop-teaching-c"><span class="secno"></span> <span class="content">Stop Teaching C</span></a>
      </ol>
-    <li><a href="#appendix-b-glossary"><span class="secno"></span> <span class="content">Appendix B: Glossary</span></a>
+    <li>
+     <a href="#appendix-b-resources-for-teachers"><span class="secno"></span> <span class="content">Appendix B: Resources for Teachers</span></a>
+     <ol class="toc">
+      <li><a href="#stop-teaching-c"><span class="secno"></span> <span class="content">Stop Teaching C</span></a>
+      <li><a href="#how-to-teach-c-and-influence-a-generation"><span class="secno"></span> <span class="content">How to Teach C++ and Influence a Generation</span></a>
+      <li><a href="#the-design-and-evolution-of-c"><span class="secno"></span> <span class="content">The Design and Evolution of C++</span></a>
+      <li><a href="#history-of-programming-languages-ii"><span class="secno"></span> <span class="content">History of Programming Languages II</span></a>
+      <li><a href="#history-of-programming-languages-iii"><span class="secno"></span> <span class="content">History of Programming Languages III</span></a>
+     </ol>
+    <li><a href="#appendix-c-glossary"><span class="secno"></span> <span class="content">Appendix C: Glossary</span></a>
     <li>
      <a href="#references"><span class="secno"></span> <span class="content">References</span></a>
      <ol class="toc">
@@ -1544,7 +1569,13 @@ introducing C++ to C programmers would then be encouraged to encouraged read <i>
    <h2 class="heading settled" data-level="2" id="guidelines"><span class="secno">2. </span><span class="content">Guidelines</span><a class="self-link" href="#guidelines"></a></h2>
    <p>Each of the following subsections is a proposed guideline.</p>
    <h3 class="heading settled" data-level="2.1" id="what-are-beginner-topics"><span class="secno">2.1. </span><span class="content">What are beginner topics?</span><a class="self-link" href="#what-are-beginner-topics"></a></h3>
-   <p>Beginner topics roughly include introductions to:</p>
+   <p>We divide beginner topics into three stages. Each stage represents prerequisite knowledge for the
+next stage. The contents of a particular stage might be revised in later stages. For example, error
+handling is necessary in Stage 1, but the topic should be re-visited later on so that error handling
+is addressed in-depth.</p>
+   <p>Beyond the stage partitions, these lists are sorted alphabetically. Chronological sorting is
+intended to be a discussion point for SG20.</p>
+   <h4 class="heading settled" data-level="2.1.1" id="stage-1"><span class="secno">2.1.1. </span><span class="content">Stage 1</span><a class="self-link" href="#stage-1"></a></h4>
    <ul>
     <li data-md>
      <p>algorithms (sequential and parallel)</p>
@@ -1559,62 +1590,82 @@ introducing C++ to C programmers would then be encouraged to encouraged read <i>
     <li data-md>
      <p>contracts</p>
     <li data-md>
-     <p>derived types (for interface reasons -- implementation reasons to be pushed to <a class="property" data-link-type="propdesc">intermediate</a>)</p>
+     <p>designing and using functions and lambdas</p>
     <li data-md>
-     <p>error handling (e.g. exceptions, error types)</p>
+     <p>designing and using classes</p>
     <li data-md>
-     <p>free store (and why you should avoid its direct usage)</p>
-    <li data-md>
-     <p>generic programming (a <i>gentle</i> introduction; rigor saved for <a class="property" data-link-type="propdesc">intermediate</a>)</p>
+     <p>error handling (e.g. exceptions through helper functions, error types such as <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>optional</c-></code> and <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>expected</c-></code>)</p>
     <li data-md>
      <p>implicit and explicit conversions</p>
     <li data-md>
-     <p>iterator usage</p>
+     <p>iterator usage (simply comparison to <code class="highlight"><c- n>end</c-><c- p>(</c-><c- n>r</c-><c- p>)</c-></code> and <code class="highlight"><c- o>*</c-><c- n>i</c-></code>)</p>
+    <li data-md>
+     <p>modules</p>
     <li data-md>
      <p>operator overloading</p>
     <li data-md>
-     <p>product types (and why you should avoid them)</p>
-    <li data-md>
      <p>program design</p>
-    <li data-md>
-     <p>RAII</p>
     <li data-md>
      <p>ranges</p>
     <li data-md>
      <p>references</p>
     <li data-md>
-     <p>run-time polymorphism</p>
-    <li data-md>
-     <p>scope</p>
-    <li data-md>
      <p>scoped enumerations</p>
-    <li data-md>
-     <p>smart pointer usage</p>
-    <li data-md>
-     <p>sum types (e.g. <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>variant</c-></code>, <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>optional</c-></code>, <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>expected</c-></code>)</p>
-    <li data-md>
-     <p>templates (a <i>gentle</i> introduction; template metaprogramming strictly excluded)</p>
     <li data-md>
      <p>testing (see PYYYY)</p>
     <li data-md>
      <p>the C++ compilation model</p>
     <li data-md>
-     <p>the C++ execution model</p>
-    <li data-md>
      <p>the C++ memory model</p>
+    <li data-md>
+     <p>the C++ execution model</p>
     <li data-md>
      <p>tooling (e.g. compiler, debugger, package manager)</p>
     <li data-md>
-     <p>types, objects, variables, and constness</p>
+     <p>types, objects, variables, and <code class="highlight"><c- k>const</c-></code></p>
+   </ul>
+   <h4 class="heading settled" data-level="2.1.2" id="stage-2"><span class="secno">2.1.2. </span><span class="content">Stage 2</span><a class="self-link" href="#stage-2"></a></h4>
+   <ul>
+    <li data-md>
+     <p>derived types (for interface reasons -- implementation reasons to be pushed to <a class="property" data-link-type="propdesc">intermediate</a>)</p>
+    <li data-md>
+     <p>exceptions</p>
+    <li data-md>
+     <p>run-time polymorphism</p>
+    <li data-md>
+     <p>scope</p>
+    <li data-md>
+     <p>smart pointer use</p>
     <li data-md>
      <p>using libraries</p>
-    <li data-md>
-     <p>writing and designing functions and lambdas</p>
-    <li data-md>
-     <p>writing and designing classes</p>
    </ul>
-   <p>This list is sorted alphabetically, not chronologically, and chronological sorting is intended to be
-a discussion point for SG20.</p>
+   <h4 class="heading settled" data-level="2.1.3" id="stage-3"><span class="secno">2.1.3. </span><span class="content">Stage 3</span><a class="self-link" href="#stage-3"></a></h4>
+   <ul>
+    <li data-md>
+     <p>free store (and why you should avoid its direct usage)</p>
+    <li data-md>
+     <p>iterator use beyond Stage 1</p>
+    <li data-md>
+     <p>generic programming (a <i>gentle</i> introduction; rigor saved for <a class="property" data-link-type="propdesc">intermediate</a>)</p>
+    <li data-md>
+     <p>product types (and why you should avoid them)</p>
+    <li data-md>
+     <p>RAII</p>
+    <li data-md>
+     <p>sum types (e.g. <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>variant</c-></code>)</p>
+    <li data-md>
+     <p>templates (a <i>gentle</i> introduction; template metaprogramming strictly excluded)</p>
+   </ul>
+   <h4 class="heading settled" data-level="2.1.4" id="stage-4"><span class="secno">2.1.4. </span><span class="content">Stage 4</span><a class="self-link" href="#stage-4"></a></h4>
+   <ul>
+    <li data-md>
+     <p>interoperability with C</p>
+    <li data-md>
+     <p>interoperability with older C++ projects</p>
+   </ul>
+   <p>It is no accident that Stage 1 is significantly larger than Stages 2, 3, and 4 combined. A large
+portion of the contents of Stage 1 are chosen to help students develop both confidence in their use
+of C++ and a strong appreciation for designing and implementing programs using C++.</p>
    <h3 class="heading settled" data-level="2.2" id="basictypes-basic-types"><span class="secno">2.2. </span><span class="content">[basic.types] Basic types</span><a class="self-link" href="#basictypes-basic-types"></a></h3>
    <p>C++ supports a great many built-in types. Depending on the C++ Standard being used, there are as
 many as twenty one fundamental types in C++: eight distinct integer types, at least six distinct
@@ -1714,19 +1765,14 @@ can make seem C++ look rather quirky! Instead, it is recommended that students b
 references in a practical fashion, such as when passing parameters to functions.</p>
    <h4 class="heading settled" data-level="2.3.2" id="prolongpointers-pointers"><span class="secno">2.3.2. </span><span class="content">[prolong.pointers] Pointers</span><a class="self-link" href="#prolongpointers-pointers"></a></h4>
    <p>Given that pointers solve a similar problem to references in terms of indirection, they share what
-is mentioned in [prolong.pointers]. While pointers are an important part of C++ programming, their
+is mentioned in [prolong.references]. While pointers are an important part of C++ programming, their
 use-cases have been severely diminished thanks to references and abstractions such as <code class="highlight"><c- n>vector</c-></code> and <code class="highlight"><c- n>map</c-></code>.</p>
    <p>References should definitely precede pointers by quite some time. This simplifies the idea of using
 C++ by eliminating syntax that often isn’t necessary. Kate Gregory expands on this idea in <a data-link-type="biblio" href="#biblio-stop-teaching-c">[Stop-Teaching-C]</a>.</p>
    <h4 class="heading settled" data-level="2.3.3" id="prolongiterators-iterators"><span class="secno">2.3.3. </span><span class="content">[prolong.iterators] Iterators</span><a class="self-link" href="#prolongiterators-iterators"></a></h4>
    <p>Iterators are a fundamental part of the standard library, which means that they can’t be avoided in
 the context of standard library usage. The suggested guideline is for initial iterator usage:</p>
-<pre class="language-cpp highlight"><c- k>auto</c-> <c- k>const</c-> <c- n>date_taken</c-> <c- o>=</c-> <c- n>date</c-><c- p>{</c->
-   <c- n>year</c-><c- p>{</c-><c- mi>2019</c-><c- p>},</c->
-   <c- n>month</c-><c- o>::</c-><c- n>january</c-><c- p>,</c->
-   <c- n>day</c-><c- p>{</c-><c- mi>21</c-><c- p>}</c->
-<c- p>};</c->
-<c- c1>// find gets a result                        // result != end(images) asks "did we find an image?"</c->
+<pre class="language-cpp highlight"><c- c1>// find gets a result                        // result != end(images) asks "did we find an image?"</c->
 <c- k>if</c-> <c- p>(</c-><c- k>auto</c-> <c- n>result</c-> <c- o>=</c-> <c- n>find</c-><c- p>(</c-><c- n>images</c-><c- p>,</c-> <c- n>date</c-><c- p>,</c-> <c- o>&amp;</c-><c- n>image</c-><c- o>::</c-><c- n>date</c-><c- p>);</c-> <c- n>result</c-> <c- o>!=</c-> <c- n>end</c-><c- p>(</c-><c- n>images</c-><c- p>))</c-> <c- p>{</c->
    <c- c1>// 'training wheels'; *result gets the image, but then we go back to references to avoid</c->
    <c- c1>// funky syntax</c->
@@ -1735,19 +1781,28 @@ the context of standard library usage. The suggested guideline is for initial it
 <c- p>}</c->
 <c- c1>// can’t use result outside of the condition</c->
 </pre>
-   <h3 class="heading settled" data-level="2.4" id="tools-tools"><span class="secno">2.4. </span><span class="content">[tools] Tools</span><a class="self-link" href="#tools-tools"></a></h3>
-   <h4 class="heading settled" data-level="2.4.1" id="toolscompilers-use-an-up-to-date-compiler"><span class="secno">2.4.1. </span><span class="content">[tools.compilers] Use an up-to-date compiler</span><a class="self-link" href="#toolscompilers-use-an-up-to-date-compiler"></a></h4>
+   <h3 class="heading settled" data-level="2.4" id="projects-projects"><span class="secno">2.4. </span><span class="content">[projects] Projects</span><a class="self-link" href="#projects-projects"></a></h3>
+   <h3 class="heading settled" data-level="2.5" id="tools-tools"><span class="secno">2.5. </span><span class="content">[tools] Tools</span><a class="self-link" href="#tools-tools"></a></h3>
+   <h4 class="heading settled" data-level="2.5.1" id="toolscompilers-use-an-up-to-date-compiler"><span class="secno">2.5.1. </span><span class="content">[tools.compilers] Use an up-to-date compiler</span><a class="self-link" href="#toolscompilers-use-an-up-to-date-compiler"></a></h4>
    <p>TODO</p>
-   <h5 class="heading settled" data-level="2.4.1.1" id="toolsmultiplecompilers-use-two-or-more-competing-compilers"><span class="secno">2.4.1.1. </span><span class="content">[tools.multiple.compilers] Use two or more competing compilers</span><a class="self-link" href="#toolsmultiplecompilers-use-two-or-more-competing-compilers"></a></h5>
+   <h5 class="heading settled" data-level="2.5.1.1" id="toolsmultiplecompilers-use-two-or-more-competing-compilers"><span class="secno">2.5.1.1. </span><span class="content">[tools.multiple.compilers] Use two or more competing compilers</span><a class="self-link" href="#toolsmultiplecompilers-use-two-or-more-competing-compilers"></a></h5>
    <p>TODO</p>
-   <h4 class="heading settled" data-level="2.4.2" id="toolsdebugger-introduce-a-debugger-early"><span class="secno">2.4.2. </span><span class="content">[tools.debugger] Introduce a debugger early</span><a class="self-link" href="#toolsdebugger-introduce-a-debugger-early"></a></h4>
+   <h4 class="heading settled" data-level="2.5.2" id="toolsdebugger-introduce-a-debugger-early"><span class="secno">2.5.2. </span><span class="content">[tools.debugger] Introduce a debugger early</span><a class="self-link" href="#toolsdebugger-introduce-a-debugger-early"></a></h4>
    <p>TODO</p>
-   <h4 class="heading settled" data-level="2.4.3" id="toolspackagemanagement-use-a-package-manager"><span class="secno">2.4.3. </span><span class="content">[tools.package.management] Use a package manager</span><a class="self-link" href="#toolspackagemanagement-use-a-package-manager"></a></h4>
+   <h4 class="heading settled" data-level="2.5.3" id="toolspackagemanagement-use-a-package-manager"><span class="secno">2.5.3. </span><span class="content">[tools.package.management] Use a package manager</span><a class="self-link" href="#toolspackagemanagement-use-a-package-manager"></a></h4>
    <p>TODO</p>
-   <h4 class="heading settled" data-level="2.4.4" id="toolsbuildsystem-use-a-build-system"><span class="secno">2.4.4. </span><span class="content">[tools.build.system] Use a build system</span><a class="self-link" href="#toolsbuildsystem-use-a-build-system"></a></h4>
+   <h4 class="heading settled" data-level="2.5.4" id="toolsbuildsystem-use-a-build-system"><span class="secno">2.5.4. </span><span class="content">[tools.build.system] Use a build system</span><a class="self-link" href="#toolsbuildsystem-use-a-build-system"></a></h4>
    <p>TODO</p>
-   <h3 class="heading settled" data-level="2.5" id="appreciation-for-c"><span class="secno">2.5. </span><span class="content">Appreciation for C++</span><a class="self-link" href="#appreciation-for-c"></a></h3>
-   <h4 class="heading settled" data-level="2.5.1" id="history"><span class="secno">2.5.1. </span><span class="content">History</span><a class="self-link" href="#history"></a></h4>
+   <h4 class="heading settled" data-level="2.5.5" id="toolscompilerexplorer-use-compiler-explorer"><span class="secno">2.5.5. </span><span class="content">[tools.compiler.explorer] Use Compiler Explorer</span><a class="self-link" href="#toolscompilerexplorer-use-compiler-explorer"></a></h4>
+   <p>TODO</p>
+   <h4 class="heading settled" data-level="2.5.6" id="toolscodeformatter-use-a-code-formatter"><span class="secno">2.5.6. </span><span class="content">[tools.code.formatter] Use a code formatter</span><a class="self-link" href="#toolscodeformatter-use-a-code-formatter"></a></h4>
+   <p>TODO</p>
+   <h4 class="heading settled" data-level="2.5.7" id="toolslinter-use-linters"><span class="secno">2.5.7. </span><span class="content">[tools.linter] Use linters</span><a class="self-link" href="#toolslinter-use-linters"></a></h4>
+   <p>TODO</p>
+   <h4 class="heading settled" data-level="2.5.8" id="toolsruntimeanalysis-use-run-time-analysers-eg-addresssanitizer-when-teaching-free-store"><span class="secno">2.5.8. </span><span class="content">[tools.runtime.analysis] Use run-time analysers (e.g. AddressSanitizer) when teaching free store</span><a class="self-link" href="#toolsruntimeanalysis-use-run-time-analysers-eg-addresssanitizer-when-teaching-free-store"></a></h4>
+   <p>TODO</p>
+   <h3 class="heading settled" data-level="2.6" id="appreciation-for-c"><span class="secno">2.6. </span><span class="content">Appreciation for C++</span><a class="self-link" href="#appreciation-for-c"></a></h3>
+   <h4 class="heading settled" data-level="2.6.1" id="history"><span class="secno">2.6.1. </span><span class="content">History</span><a class="self-link" href="#history"></a></h4>
    <p>Do not introduce historical aspects of C++ in the forefront of C++ education. This includes:</p>
    <blockquote>
     <p>"C++ was developed by Bjarne Stroustrup in 1983 at Bell Labs as an extension to C and was
@@ -1779,7 +1834,7 @@ being exposed to the error-prone ways of the past. C++ programmers will eventual
 older code (pre-C++17 code is abundant), or write code that has C interoperability, and thus
 developing an appreciation for C++'s history is imperative (sic).</p>
    <p>D1389 makes the case for it not to be in the first handful of sessions.</p>
-   <h4 class="heading settled" data-level="2.5.2" id="c-in-the-real-world"><span class="secno">2.5.2. </span><span class="content">C++ in the Real World</span><a class="self-link" href="#c-in-the-real-world"></a></h4>
+   <h4 class="heading settled" data-level="2.6.2" id="c-in-the-real-world"><span class="secno">2.6.2. </span><span class="content">C++ in the Real World</span><a class="self-link" href="#c-in-the-real-world"></a></h4>
    <p>C++ has a broad range of applications. A non-exhaustive list of domains that C++ is used in can
 be found below, a large portion of which are derived from<a data-link-type="biblio" href="#biblio-applications">[applications]</a>.</p>
    <ul>
@@ -1792,20 +1847,65 @@ be found below, a large portion of which are derived from<a data-link-type="bibl
     <li data-md>
      <p>middleware solutions (Codeplay Software<a data-link-type="biblio" href="#biblio-codeplay">[codeplay]</a>; id Tech 4<a data-link-type="biblio" href="#biblio-id4">[id4]</a>)</p>
     <li data-md>
-     <p>operating systems (e.g. Windows<a data-link-type="biblio" href="#biblio-win32">[win32]</a>; macOS)</p>
+     <p>operating systems (e.g. Windows<a data-link-type="biblio" href="#biblio-win32">[win32]</a>)</p>
     <li data-md>
      <p>scientific computing (e.g. CERN)</p>
     <li data-md>
      <p>space technologies (e.g. NASA’s Mars Rovers, James Webb Telescope)</p>
     <li data-md>
      <p>video games (e.g. Creative Assembly)</p>
+    <li data-md>
+     <p>web-based technologies (e.g. Google, Facebook, Amazon)</p>
    </ul>
    <p>It is recommended that teachers briefly introduce a domain to their students during each session.
 This practice has helped to broaden student appreciation for the usage of C++ in industry. Embedding
 use-cases into classes to show "this has practical value in the real world" should be considered.</p>
-   <h2 class="heading settled" data-level="3" id="acknowledgements"><span class="secno">3. </span><span class="content">Acknowledgements</span><a class="self-link" href="#acknowledgements"></a></h2>
-   <p>I’d like to thank Gordon Brown, ..., Bjarne Stroustrup for reviewing.</p>
-   <h2 class="heading settled" id="appendix-a-resources-for-teaching-beginners"><span class="content">Appendix A: Resources for Teaching Beginners</span><a class="self-link" href="#appendix-a-resources-for-teaching-beginners"></a></h2>
+   <h2 class="heading settled" data-level="3" id="student-outcomes"><span class="secno">3. </span><span class="content">Student outcomes</span><a class="self-link" href="#student-outcomes"></a></h2>
+   <p>Upon completion, a student should be able to:</p>
+   <h3 class="heading settled" data-level="3.1" id="tool-outcomes"><span class="secno">3.1. </span><span class="content">Tool outcomes</span><a class="self-link" href="#tool-outcomes"></a></h3>
+   <ul>
+    <li data-md>
+     <p>invoke a compiler in debug and release modes</p>
+    <li data-md>
+     <p>understand why using multiple compilers is important for writing well-formed C++</p>
+    <li data-md>
+     <p>configure a project</p>
+    <li data-md>
+     <p>utilise a debugger, including</p>
+     <ul>
+      <li data-md>
+       <p>step over</p>
+      <li data-md>
+       <p>step into</p>
+      <li data-md>
+       <p>step out</p>
+      <li data-md>
+       <p>inspect a variable’s contents</p>
+      <li data-md>
+       <p>TUI-mode, if a command-line debugger is being used</p>
+     </ul>
+    <li data-md>
+     <p>add targets to and remove targets from the build system</p>
+    <li data-md>
+     <p>add and remove packages using a package manager</p>
+    <li data-md>
+     <p>navigate Compiler Explorer, including</p>
+    <li data-md>
+     <p>adding source files</p>
+    <li data-md>
+     <p>adding compilers</p>
+    <li data-md>
+     <p>use conformance mode</p>
+    <li data-md>
+     <p>use diff mode</p>
+    <li data-md>
+     <p>understand why using a code formatter is a 'best practice'</p>
+    <li data-md>
+     <p>understand why using a code linter is a 'best practice'</p>
+   </ul>
+   <h2 class="heading settled" data-level="4" id="acknowledgements"><span class="secno">4. </span><span class="content">Acknowledgements</span><a class="self-link" href="#acknowledgements"></a></h2>
+   <p>I’d like to thank Gordon Brown, ..., Bjarne Stroustrup, and JC van Winkel for reviewing.</p>
+   <h2 class="heading settled" id="appendix-a-resources-for-students"><span class="content">Appendix A: Resources for Students</span><a class="self-link" href="#appendix-a-resources-for-students"></a></h2>
    <h3 class="heading settled" id="programming----principles-and-practice-using-c"><span class="content">Programming -- Principles and Practice Using C++</span><a class="self-link" href="#programming----principles-and-practice-using-c"></a></h3>
    <ul>
     <li data-md>
@@ -1816,8 +1916,49 @@ use-cases into classes to show "this has practical value in the real world" shou
      <p><a href="http://stroustrup.com/Programming">Teacher notes and author advice</a></p>
    </ul>
    <h3 class="heading settled" id="a-tour-of-c"><span class="content">A Tour of C++</span><a class="self-link" href="#a-tour-of-c"></a></h3>
+   <ul>
+    <li data-md>
+     <p><b>Author</b>: Bjarne Stroustrup</p>
+    <li data-md>
+     <p><a href="http://stroustrup.com/tour2.html">Webpage</a></p>
+   </ul>
+   <h2 class="heading settled" id="appendix-b-resources-for-teachers"><span class="content">Appendix B: Resources for Teachers</span><a class="self-link" href="#appendix-b-resources-for-teachers"></a></h2>
    <h3 class="heading settled" id="stop-teaching-c"><span class="content">Stop Teaching C</span><a class="self-link" href="#stop-teaching-c"></a></h3>
-   <h2 class="heading settled" id="appendix-b-glossary"><span class="content">Appendix B: Glossary</span><a class="self-link" href="#appendix-b-glossary"></a></h2>
+   <ul>
+    <li data-md>
+     <p><b>Author</b>: Kate Gregory</p>
+    <li data-md>
+     <p><a href="https://youtu.be/YnWhqhNdYyk">Video</a></p>
+   </ul>
+   <h3 class="heading settled" id="how-to-teach-c-and-influence-a-generation"><span class="content">How to Teach C++ and Influence a Generation</span><a class="self-link" href="#how-to-teach-c-and-influence-a-generation"></a></h3>
+   <ul>
+    <li data-md>
+     <p><b>Author</b>: Christopher Di Bella</p>
+    <li data-md>
+     <p><a href="https://youtu.be/3AkPd9Nt2Aw">Video</a></p>
+   </ul>
+   <h3 class="heading settled" id="the-design-and-evolution-of-c"><span class="content">The Design and Evolution of C++</span><a class="self-link" href="#the-design-and-evolution-of-c"></a></h3>
+   <ul>
+    <li data-md>
+     <p><b>Author</b>: Bjarne Stroustrup</p>
+    <li data-md>
+     <p><a href="http://stroustrup.com/dne.html">Webpage</a></p>
+   </ul>
+   <h3 class="heading settled" id="history-of-programming-languages-ii"><span class="content">History of Programming Languages II</span><a class="self-link" href="#history-of-programming-languages-ii"></a></h3>
+   <ul>
+    <li data-md>
+     <p><b>Author</b>: Bjarne Stroustrup</p>
+    <li data-md>
+     <p><a href="http://stroustrup.com/hopl2.pdf">Paper</a></p>
+   </ul>
+   <h3 class="heading settled" id="history-of-programming-languages-iii"><span class="content">History of Programming Languages III</span><a class="self-link" href="#history-of-programming-languages-iii"></a></h3>
+   <ul>
+    <li data-md>
+     <p><b>Author</b>: Bjarne Stroustrup</p>
+    <li data-md>
+     <p><a href="http://stroustrup.com/hopl-almost-final.pdf">Paper</a></p>
+   </ul>
+   <h2 class="heading settled" id="appendix-c-glossary"><span class="content">Appendix C: Glossary</span><a class="self-link" href="#appendix-c-glossary"></a></h2>
    <ul>
     <li data-md>
      <p><b>Session</b>: A unit of teaching. In a week-long C++ course, this might refer to hours or days.
@@ -1962,7 +2103,7 @@ and labs). In a textbook, a session is a single chapter.</p>
    <dt id="biblio-adobe">[ADOBE]
    <dd>Adobe, Inc.. <a href="https://github.com/adobe?utf8=%E2%9C%93&amp;q=&amp;type=&amp;language=c%2B%2B">GitHub for Adobe, Inc.</a>. URL: <a href="https://github.com/adobe?utf8=%E2%9C%93&amp;q=&amp;type=&amp;language=c%2B%2B">https://github.com/adobe?utf8=%E2%9C%93&amp;q=&amp;type=&amp;language=c%2B%2B</a>
    <dt id="biblio-applications">[APPLICATIONS]
-   <dd>Bjarne Stroustrup. <a href="http://http://stroustrup.com/applications.html">C++ Applications</a>. URL: <a href="http://http://stroustrup.com/applications.html">http://http://stroustrup.com/applications.html</a>
+   <dd>Bjarne Stroustrup. <a href="http://stroustrup.com/applications.html">C++ Applications</a>. URL: <a href="http://stroustrup.com/applications.html">http://stroustrup.com/applications.html</a>
    <dt id="biblio-bloomberg">[BLOOMBERG]
    <dd><a href="https://www.bloomberg.com/professional/blog/bloomberg-advancing-c-scale/">How Bloomberg is advancing C++ at scale</a>. 2016-08-23. URL: <a href="https://www.bloomberg.com/professional/blog/bloomberg-advancing-c-scale/">https://www.bloomberg.com/professional/blog/bloomberg-advancing-c-scale/</a>
    <dt id="biblio-codeplay">[CODEPLAY]
