@@ -5,6 +5,7 @@ Level: 0
 Status: D
 Group: wg21
 Editor: Christopher Di Bella, cjdb.ns@gmail.com
+Editor: Simon Brand, simon.brand@microsoft.com
 URL: https://wg21.link/p1389
 Abstract: D1389 proposes that SG20 creates a work item for guidelines for teaching introductory C++, and a handful of proposed initial guidelines.
 Audience: SG20
@@ -55,17 +56,18 @@ is addressed in-depth.
 Beyond the stage partitions, these lists are sorted alphabetically. Chronological sorting is
 intended to be a discussion point for SG20.
 
-### Stage 1
+### Stage 1 (fundamentals)
 
-* algorithms (sequential and parallel)
+* algorithms (sequential)
 * basic I/O
 * computation constructs in C++ (expressions, sequence, selection, iteration)
-* constexpr
+* `constexpr` variables
 * containers
 * contracts
 * designing and using functions and lambdas
 * designing and using classes
-* error handling (e.g. exceptions through helper functions, error types such as `std::optional` and `std::expected`)
+* error handling (e.g. exceptions through helper functions, error types such as `std::optional` and
+    `std::expected`)
 * implicit and explicit conversions
 * include directive
 * iterator usage (simply comparison to `end(r)` and `*i`)
@@ -82,8 +84,15 @@ intended to be a discussion point for SG20.
 * tooling (e.g. compiler, debugger, package manager)
 * types, objects, variables, and `const`
 
-### Stage 2
+<i>Editor's note: Discussion about `constexpr` as a Stage 1 topic has happened between the author
+and multiple reviewers, suggesting that consensus is lacking on this topic. It is requested that the
+placement of `constexpr` be a discussion point for SG20.</i>
 
+### Stage 2 (todo: name me)
+
+* algorithms (parallel)
+* benchmarking
+* `constexpr` functions
 * derived types (for interface reasons -- implementation reasons to be pushed to 'intermediate')
 * exceptions
 * run-time polymorphism
@@ -91,26 +100,33 @@ intended to be a discussion point for SG20.
 * smart pointer use
 * using libraries
 
-### Stage 3
+### Stage 3 (todo: name me)
 
 * free store (and why you should avoid its direct usage)
 * iterator use beyond Stage 1
 * generic programming (a <i>gentle</i> introduction; rigor saved for 'intermediate')
-* product types (and why you should avoid them)
+* `std::pair` and `std::tuple` (and why you should avoid them)
 * RAII
 * sum types (e.g. `std::variant`)
 * templates (a <i>gentle</i> introduction; template metaprogramming strictly excluded)
 
-### Stage 4
+### Stage 4 (todo: name me)
 
 * interoperability with C
 * interoperability with older C++ projects
+* `std::unordered_map` and `std::hash`
 
 It is no accident that Stage 1 is significantly larger than Stages 2, 3, and 4 combined. A large
 portion of the contents of Stage 1 are chosen to help students develop both confidence in their use
 of C++ and a strong appreciation for designing and implementing programs using C++.
 
-## [basic.types] Basic types
+`std::unordered_map` is considered a Stage 4 topic solely because of the necessary template
+specialisations to have a custom type in the associative container. Students should be thoroughly
+comfortable with templates before they are specialising `std::hash`.
+
+## [types] Types
+
+### [types.basic] Basic types
 
 C++ supports a great many built-in types. Depending on the C++ Standard being used, there are as
 many as twenty one fundamental types in C++: eight distinct integer types, at least six distinct
@@ -124,7 +140,7 @@ An informal survey of textbooks and university courses done by the author has sh
 resources immediately introduce all of the fundamental types sans `std::nullptr_t` and `char8_t`,
 and there are a nonzero amount that very quickly introduce raw arrays, pointers, and references.
 
-### [basic.types.primary] Primary types
+#### [types.basic.primary] Primary types
 
 C++ novices rarely -- if ever -- have any need for more than a handful of types. In order to reduce
 the cognitive load on beginners, avoid introducing more than one of each fundamental type, postpone
@@ -182,7 +198,60 @@ the idea of UTF-8 support on their radar, so that when they need to care about l
 need to shift from thinking about why `char` is insufficient in the current programming world: they
 can just start using what they are already familiar with.
 
+#### [types.basic.conversions] Conversions
 
+Although discouraged whenever possible, conversions in C++ are sometimes necessary, and we cannot
+completely insulate beginners from this. [types.conversions] recommends that beginners be introduced
+to safe conversions (such as promotions) and unsafe conversions (such as implicit narrowing
+conversions).
+
+```cpp
+auto c = 'a';
+auto i = 0;
+
+i = c; // okay, promotion
+c = i; // not okay, implicitly narrows
+
+i = static_cast<int>(c); // okay, but superfluous
+c = static_cast<int>(i); // okay, explicit narrowing
+c = gsl::narrow_cast<int>(i); // better, explicit narrowing with a description
+```
+
+### [types.const] Constness
+
+#### [types.const.constexpr] Encourage `constexpr` values whenever it is possible
+
+`constexpr` is a good way to ensure that values remain constant, and <i>variables</i> that are
+`constexpr` are constant expressions*.
+
+As a general rule, default to `constexpr` unless something can only be known at run-time. `vector`
+and `string` always require run-time knowledge, so they cannot be `const`.
+
+*Recommending `constexpr` does not mean explaining what a constant expression is. This is a separate
+discussion. For now, we can say "known at compile time".
+
+#### [types.const.const] Encourage `const` whenever you can't use `constexpr`
+
+`const` lets us reason about our programs with security and helps us produce more declarative code.
+Rather than suggesting that `const` is applied when you know that a value won't (or can't) change,
+offer `const` as the default, and suggest students <i>remove</i> `const` when they encounter a
+reason to mutate the variable.
+
+<i>Editor's note: [types.const.const] does <b>not</b> suggest introducing lambda-initialisation
+(IILE).</i>
+
+<i>Editor's note: [types.const.const] becomes more and more easy-to-use when ranges are incorporated
+into a program.</i>
+
+#### [types.const.mutable] Don't pan `mutable`
+
+TODO
+
+(should `mutable` even be a topic for beginners? probably a stage 3 topic?)
+
+### [types.monadic] Types with monadic interfaces
+
+TODO (visit after [[P0798]] receives a verdict).
 
 ## [prolong] Prolong features until there is a genuine use-case
 
@@ -267,7 +336,7 @@ Excludes `#include`, which is necessary until modules are in C++.
 
 TODO
 
-## Style practices
+## [style] Style practices
 
 ### [style.guide] Use a style guide
 
@@ -359,9 +428,9 @@ Notes: WSL does not play nicely with asan, but a Docker image running inside WSL
 
 TODO (why?)
 
-## Appreciation for C++
+## [appreciation] Appreciation for C++
 
-### History
+### [appreciation.history] History
 
 Do not introduce historical aspects of C++ in the forefront of C++ education. This includes:
 
@@ -394,9 +463,9 @@ being exposed to the error-prone ways of the past. C++ programmers will eventual
 older code (pre-C++17 code is abundant), or write code that has C interoperability, and thus
 developing an appreciation for C++'s history is imperative (sic).
 
-D1389 makes the case for it not to be in the first handful of sessions.
+D1389 makes the case for it not to be in the first handful of unit.
 
-### C++ in the Real World
+### [appreciation.irl] C++ in the Real World
 
 C++ has a broad range of applications. A non-exhaustive list of domains that C++ is used in can
 be found below, a large portion of which are derived from[[applications]].
@@ -411,9 +480,20 @@ be found below, a large portion of which are derived from[[applications]].
 * video games (e.g. Creative Assembly)
 * web-based technologies (e.g. Google, Facebook, Amazon)
 
-It is recommended that teachers briefly introduce a domain to their students during each session.
+It is recommended that teachers briefly introduce a domain to their students during each unit.
 This practice has helped to broaden student appreciation for the usage of C++ in industry. Embedding
 use-cases into classes to show "this has practical value in the real world" should be considered.
+
+## [meta] Meta-guidelines
+
+This section is <b>not</b> about metaprogramming, but rather about guidelines for teachers to their
+teaching processes.
+
+### [meta.revision] Regularly revise the curriculum
+
+This is a living document, and will often change. It is strongly advised that you revise your
+curriculum between sessions to ensure that it does not stagnate or become out-of-sync with these
+guidelines.
 
 # Student outcomes
 
@@ -478,6 +558,13 @@ I'd like to thank Gordon Brown, ..., Bjarne Stroustrup, and JC van Winkel for re
 * <b>Author</b>: Bjarne Stroustrup
 * <a href="http://stroustrup.com/tour2.html">Webpage</a>
 
+## C++ Reference
+
+* <b>Short review</b>: C++ Reference is an wiki that is maintained by multiple C++ experts, many of
+    whom participate in the standardisation of C++. C++ Reference is a highly navigable reference,
+    with an online compiler so that examples can be experimented with.
+* <a href="https://en.cppreference.com/w/">Webpage</a>
+
 # Appendix B: Resources for Teachers
 
 ## Stop Teaching C
@@ -507,9 +594,13 @@ I'd like to thank Gordon Brown, ..., Bjarne Stroustrup, and JC van Winkel for re
 
 # Appendix C: Glossary
 
-* <b>Session</b>: A unit of teaching. In a week-long C++ course, this might refer to hours or days.
+* <b>Session</b>: A compilation of sessions. For a week-long C++ course, this would refer to the
+    entire course. In a single semester of university, it refers to the full semester. For a
+    textbook, a 'session' refers to the book's 'edition'.
+* <b>Unit</b>: A unit of teaching. In a week-long C++ course, this might refer to hours or days.
     In a single semester of university, it refers to one full week (includes lectures, tutorials,
-    and labs). In a textbook, a session is a single chapter.
+    and labs). In a textbook, a session is a single chapter. <i>Editor's note: the term <b>unit</b>
+    was previously known as <b>session</b>. This has now been changed.</i>
 * <b>Work item</b>: Please refer to [[P1388]].
 
 <pre class=biblio>
@@ -587,6 +678,11 @@ I'd like to thank Gordon Brown, ..., Bjarne Stroustrup, and JC van Winkel for re
    "title": "Proposal for Study Group: C++ Education",
    "authors": "JC van Winkel, Christopher Di Bella",
    "href": "https://wg21.link/p1231"
+},
+"P0798": {
+   "title": "Monadic operations for `std::optional`",
+   "authors": "Simon Brand",
+   "href": "https://wg21.link/p0798"
 }
 }
 </pre>

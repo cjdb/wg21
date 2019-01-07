@@ -1227,10 +1227,10 @@ Possible extra rowspan handling
       text-align: center;
     }
   </style>
-  <meta content="Bikeshed version 30dbdcf66519991ec52011cac10c49a7b5b449c5" name="generator">
+  <meta content="Bikeshed version 6dcb46ba8cae3704b42c05bcd8578c92d239786a" name="generator">
   <link href="https://wg21.link/p1389" rel="canonical">
   <link href="https://isocpp.org/favicon.ico" rel="icon">
-  <meta content="d1c12725e0e14a630a79d81bc53814cbd70a94f2" name="document-revision">
+  <meta content="3c0eb6769eebb6b4183e907f1a9c7a11a84885db" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1445,9 +1445,11 @@ pre .property::before, pre .property::after {
     <dl>
      <dt>This version:
      <dd><a class="u-url" href="https://wg21.link/p1389">https://wg21.link/p1389</a>
-     <dt>Author:
+     <dt>Authors:
      <dd>
       <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:cjdb.ns@gmail.com">Christopher Di Bella</a>
+     <dd>
+      <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:simon.brand@microsoft.com">Simon Brand</a>
      <dt>Audience:
      <dd>SG20
      <dt>Project:
@@ -1476,15 +1478,28 @@ pre .property::before, pre .property::after {
       <li>
        <a href="#what-are-beginner-topics"><span class="secno">2.1</span> <span class="content">What are beginner topics?</span></a>
        <ol class="toc">
-        <li><a href="#stage-1"><span class="secno">2.1.1</span> <span class="content">Stage 1</span></a>
-        <li><a href="#stage-2"><span class="secno">2.1.2</span> <span class="content">Stage 2</span></a>
-        <li><a href="#stage-3"><span class="secno">2.1.3</span> <span class="content">Stage 3</span></a>
-        <li><a href="#stage-4"><span class="secno">2.1.4</span> <span class="content">Stage 4</span></a>
+        <li><a href="#stage-1-fundamentals"><span class="secno">2.1.1</span> <span class="content">Stage 1 (fundamentals)</span></a>
+        <li><a href="#stage-2-todo-name-me"><span class="secno">2.1.2</span> <span class="content">Stage 2 (todo: name me)</span></a>
+        <li><a href="#stage-3-todo-name-me"><span class="secno">2.1.3</span> <span class="content">Stage 3 (todo: name me)</span></a>
+        <li><a href="#stage-4-todo-name-me"><span class="secno">2.1.4</span> <span class="content">Stage 4 (todo: name me)</span></a>
        </ol>
       <li>
-       <a href="#basictypes-basic-types"><span class="secno">2.2</span> <span class="content">[basic.types] Basic types</span></a>
+       <a href="#types-types"><span class="secno">2.2</span> <span class="content">[types] Types</span></a>
        <ol class="toc">
-        <li><a href="#basictypesprimary-primary-types"><span class="secno">2.2.1</span> <span class="content">[basic.types.primary] Primary types</span></a>
+        <li>
+         <a href="#typesbasic-basic-types"><span class="secno">2.2.1</span> <span class="content">[types.basic] Basic types</span></a>
+         <ol class="toc">
+          <li><a href="#typesbasicprimary-primary-types"><span class="secno">2.2.1.1</span> <span class="content">[types.basic.primary] Primary types</span></a>
+          <li><a href="#typesbasicconversions-conversions"><span class="secno">2.2.1.2</span> <span class="content">[types.basic.conversions] Conversions</span></a>
+         </ol>
+        <li>
+         <a href="#typesconst-constness"><span class="secno">2.2.2</span> <span class="content">[types.const] Constness</span></a>
+         <ol class="toc">
+          <li><a href="#typesconstconstexpr-encourage-constexpr-values-whenever-it-is-possible"><span class="secno">2.2.2.1</span> <span class="content">[types.const.constexpr] Encourage <code class="highlight"><c- k>constexpr</c-></code> values whenever it is possible</span></a>
+          <li><a href="#typesconstconst-encourage-const-whenever-you-cant-use-constexpr"><span class="secno">2.2.2.2</span> <span class="content">[types.const.const] Encourage <code class="highlight"><c- k>const</c-></code> whenever you can’t use <code class="highlight"><c- k>constexpr</c-></code></span></a>
+          <li><a href="#typesconstmutable-dont-pan-mutable"><span class="secno">2.2.2.3</span> <span class="content">[types.const.mutable] Don’t pan <code class="highlight"><c- k>mutable</c-></code></span></a>
+         </ol>
+        <li><a href="#typesmonadic-types-with-monadic-interfaces"><span class="secno">2.2.3</span> <span class="content">[types.monadic] Types with monadic interfaces</span></a>
        </ol>
       <li>
        <a href="#prolong-prolong-features-until-there-is-a-genuine-use-case"><span class="secno">2.3</span> <span class="content">[prolong] Prolong features until there is a genuine use-case</span></a>
@@ -1496,7 +1511,7 @@ pre .property::before, pre .property::after {
         <li><a href="#prolongcpp-c-preprocessor"><span class="secno">2.3.5</span> <span class="content">[prolong.cpp] C Preprocessor</span></a>
        </ol>
       <li>
-       <a href="#style-practices"><span class="secno">2.4</span> <span class="content">Style practices</span></a>
+       <a href="#style-style-practices"><span class="secno">2.4</span> <span class="content">[style] Style practices</span></a>
        <ol class="toc">
         <li><a href="#styleguide-use-a-style-guide"><span class="secno">2.4.1</span> <span class="content">[style.guide] Use a style guide</span></a>
         <li><a href="#styleall_caps-avoid-all_caps-names"><span class="secno">2.4.2</span> <span class="content">[style.<code class="highlight"><c- n>ALL_CAPS</c-></code>] Avoid <code class="highlight"><c- n>ALL_CAPS</c-></code> names</span></a>
@@ -1520,10 +1535,15 @@ pre .property::before, pre .property::after {
         <li><a href="#toolsruntimeanalysis-use-run-time-analysers-especially-when-teaching-free-store"><span class="secno">2.6.9</span> <span class="content">[tools.runtime.analysis] Use run-time analysers, especially when teaching free store</span></a>
        </ol>
       <li>
-       <a href="#appreciation-for-c"><span class="secno">2.7</span> <span class="content">Appreciation for C++</span></a>
+       <a href="#appreciation-appreciation-for-c"><span class="secno">2.7</span> <span class="content">[appreciation] Appreciation for C++</span></a>
        <ol class="toc">
-        <li><a href="#history"><span class="secno">2.7.1</span> <span class="content">History</span></a>
-        <li><a href="#c-in-the-real-world"><span class="secno">2.7.2</span> <span class="content">C++ in the Real World</span></a>
+        <li><a href="#appreciationhistory-history"><span class="secno">2.7.1</span> <span class="content">[appreciation.history] History</span></a>
+        <li><a href="#appreciationirl-c-in-the-real-world"><span class="secno">2.7.2</span> <span class="content">[appreciation.irl] C++ in the Real World</span></a>
+       </ol>
+      <li>
+       <a href="#meta-meta-guidelines"><span class="secno">2.8</span> <span class="content">[meta] Meta-guidelines</span></a>
+       <ol class="toc">
+        <li><a href="#metarevision-regularly-revise-the-curriculum"><span class="secno">2.8.1</span> <span class="content">[meta.revision] Regularly revise the curriculum</span></a>
        </ol>
      </ol>
     <li>
@@ -1541,6 +1561,7 @@ pre .property::before, pre .property::after {
      <ol class="toc">
       <li><a href="#programming----principles-and-practice-using-c"><span class="secno"></span> <span class="content">Programming -- Principles and Practice Using C++</span></a>
       <li><a href="#a-tour-of-c"><span class="secno"></span> <span class="content">A Tour of C++</span></a>
+      <li><a href="#c-reference"><span class="secno"></span> <span class="content">C++ Reference</span></a>
      </ol>
     <li>
      <a href="#appendix-b-resources-for-teachers"><span class="secno"></span> <span class="content">Appendix B: Resources for Teachers</span></a>
@@ -1588,16 +1609,16 @@ handling is necessary in Stage 1, but the topic should be re-visited later on so
 is addressed in-depth.</p>
    <p>Beyond the stage partitions, these lists are sorted alphabetically. Chronological sorting is
 intended to be a discussion point for SG20.</p>
-   <h4 class="heading settled" data-level="2.1.1" id="stage-1"><span class="secno">2.1.1. </span><span class="content">Stage 1</span><a class="self-link" href="#stage-1"></a></h4>
+   <h4 class="heading settled" data-level="2.1.1" id="stage-1-fundamentals"><span class="secno">2.1.1. </span><span class="content">Stage 1 (fundamentals)</span><a class="self-link" href="#stage-1-fundamentals"></a></h4>
    <ul>
     <li data-md>
-     <p>algorithms (sequential and parallel)</p>
+     <p>algorithms (sequential)</p>
     <li data-md>
      <p>basic I/O</p>
     <li data-md>
      <p>computation constructs in C++ (expressions, sequence, selection, iteration)</p>
     <li data-md>
-     <p>constexpr</p>
+     <p><code class="highlight"><c- k>constexpr</c-></code> variables</p>
     <li data-md>
      <p>containers</p>
     <li data-md>
@@ -1639,8 +1660,17 @@ intended to be a discussion point for SG20.</p>
     <li data-md>
      <p>types, objects, variables, and <code class="highlight"><c- k>const</c-></code></p>
    </ul>
-   <h4 class="heading settled" data-level="2.1.2" id="stage-2"><span class="secno">2.1.2. </span><span class="content">Stage 2</span><a class="self-link" href="#stage-2"></a></h4>
+   <p><i>Editor’s note: Discussion about <code class="highlight"><c- k>constexpr</c-></code> as a Stage 1 topic has happened between the author
+and multiple reviewers, suggesting that consensus is lacking on this topic. It is requested that the
+placement of <code class="highlight"><c- k>constexpr</c-></code> be a discussion point for SG20.</i></p>
+   <h4 class="heading settled" data-level="2.1.2" id="stage-2-todo-name-me"><span class="secno">2.1.2. </span><span class="content">Stage 2 (todo: name me)</span><a class="self-link" href="#stage-2-todo-name-me"></a></h4>
    <ul>
+    <li data-md>
+     <p>algorithms (parallel)</p>
+    <li data-md>
+     <p>benchmarking</p>
+    <li data-md>
+     <p><code class="highlight"><c- k>constexpr</c-></code> functions</p>
     <li data-md>
      <p>derived types (for interface reasons -- implementation reasons to be pushed to <a class="property" data-link-type="propdesc">intermediate</a>)</p>
     <li data-md>
@@ -1654,7 +1684,7 @@ intended to be a discussion point for SG20.</p>
     <li data-md>
      <p>using libraries</p>
    </ul>
-   <h4 class="heading settled" data-level="2.1.3" id="stage-3"><span class="secno">2.1.3. </span><span class="content">Stage 3</span><a class="self-link" href="#stage-3"></a></h4>
+   <h4 class="heading settled" data-level="2.1.3" id="stage-3-todo-name-me"><span class="secno">2.1.3. </span><span class="content">Stage 3 (todo: name me)</span><a class="self-link" href="#stage-3-todo-name-me"></a></h4>
    <ul>
     <li data-md>
      <p>free store (and why you should avoid its direct usage)</p>
@@ -1663,7 +1693,7 @@ intended to be a discussion point for SG20.</p>
     <li data-md>
      <p>generic programming (a <i>gentle</i> introduction; rigor saved for <a class="property" data-link-type="propdesc">intermediate</a>)</p>
     <li data-md>
-     <p>product types (and why you should avoid them)</p>
+     <p><code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>pair</c-></code> and <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>tuple</c-></code> (and why you should avoid them)</p>
     <li data-md>
      <p>RAII</p>
     <li data-md>
@@ -1671,17 +1701,23 @@ intended to be a discussion point for SG20.</p>
     <li data-md>
      <p>templates (a <i>gentle</i> introduction; template metaprogramming strictly excluded)</p>
    </ul>
-   <h4 class="heading settled" data-level="2.1.4" id="stage-4"><span class="secno">2.1.4. </span><span class="content">Stage 4</span><a class="self-link" href="#stage-4"></a></h4>
+   <h4 class="heading settled" data-level="2.1.4" id="stage-4-todo-name-me"><span class="secno">2.1.4. </span><span class="content">Stage 4 (todo: name me)</span><a class="self-link" href="#stage-4-todo-name-me"></a></h4>
    <ul>
     <li data-md>
      <p>interoperability with C</p>
     <li data-md>
      <p>interoperability with older C++ projects</p>
+    <li data-md>
+     <p><code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>unordered_map</c-></code> and <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>hash</c-></code></p>
    </ul>
    <p>It is no accident that Stage 1 is significantly larger than Stages 2, 3, and 4 combined. A large
 portion of the contents of Stage 1 are chosen to help students develop both confidence in their use
 of C++ and a strong appreciation for designing and implementing programs using C++.</p>
-   <h3 class="heading settled" data-level="2.2" id="basictypes-basic-types"><span class="secno">2.2. </span><span class="content">[basic.types] Basic types</span><a class="self-link" href="#basictypes-basic-types"></a></h3>
+   <p><code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>unordered_map</c-></code> is considered a Stage 4 topic solely because of the necessary template
+specialisations to have a custom type in the associative container. Students should be thoroughly
+comfortable with templates before they are specialising <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>hash</c-></code>.</p>
+   <h3 class="heading settled" data-level="2.2" id="types-types"><span class="secno">2.2. </span><span class="content">[types] Types</span><a class="self-link" href="#types-types"></a></h3>
+   <h4 class="heading settled" data-level="2.2.1" id="typesbasic-basic-types"><span class="secno">2.2.1. </span><span class="content">[types.basic] Basic types</span><a class="self-link" href="#typesbasic-basic-types"></a></h4>
    <p>C++ supports a great many built-in types. Depending on the C++ Standard being used, there are as
 many as twenty one fundamental types in C++: eight distinct integer types, at least six distinct
 character types (six in C++11 through C++17, seven in the C++20 WP), three distinct floating-point
@@ -1692,7 +1728,7 @@ because they are built-in types.</p>
    <p>An informal survey of textbooks and university courses done by the author has shown that many
 resources immediately introduce all of the fundamental types sans <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>nullptr_t</c-></code> and <code class="highlight"><c- n>char8_t</c-></code>,
 and there are a nonzero amount that very quickly introduce raw arrays, pointers, and references.</p>
-   <h4 class="heading settled" data-level="2.2.1" id="basictypesprimary-primary-types"><span class="secno">2.2.1. </span><span class="content">[basic.types.primary] Primary types</span><a class="self-link" href="#basictypesprimary-primary-types"></a></h4>
+   <h5 class="heading settled" data-level="2.2.1.1" id="typesbasicprimary-primary-types"><span class="secno">2.2.1.1. </span><span class="content">[types.basic.primary] Primary types</span><a class="self-link" href="#typesbasicprimary-primary-types"></a></h5>
    <p>C++ novices rarely -- if ever -- have any need for more than a handful of types. In order to reduce
 the cognitive load on beginners, avoid introducing more than one of each fundamental type, postpone
 references until there is a relevant use-case, and avoid raw arrays and pointers for as long as
@@ -1754,6 +1790,41 @@ suggest that students should be introduced to the details of UTF-8 any earlier, 
 the idea of UTF-8 support on their radar, so that when they need to care about locales, they won’t
 need to shift from thinking about why <code class="highlight"><c- b>char</c-></code> is insufficient in the current programming world: they
 can just start using what they are already familiar with.</p>
+   <h5 class="heading settled" data-level="2.2.1.2" id="typesbasicconversions-conversions"><span class="secno">2.2.1.2. </span><span class="content">[types.basic.conversions] Conversions</span><a class="self-link" href="#typesbasicconversions-conversions"></a></h5>
+   <p>Although discouraged whenever possible, conversions in C++ are sometimes necessary, and we cannot
+completely insulate beginners from this. [types.conversions] recommends that beginners be introduced
+to safe conversions (such as promotions) and unsafe conversions (such as implicit narrowing
+conversions).</p>
+<pre class="language-cpp highlight"><c- k>auto</c-> <c- n>c</c-> <c- o>=</c-> <c- sc>'a'</c-><c- p>;</c->
+<c- k>auto</c-> <c- n>i</c-> <c- o>=</c-> <c- mi>0</c-><c- p>;</c->
+
+<c- n>i</c-> <c- o>=</c-> <c- n>c</c-><c- p>;</c-> <c- c1>// okay, promotion</c->
+<c- n>c</c-> <c- o>=</c-> <c- n>i</c-><c- p>;</c-> <c- c1>// not okay, implicitly narrows</c->
+
+<c- n>i</c-> <c- o>=</c-> <c- k>static_cast</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>(</c-><c- n>c</c-><c- p>);</c-> <c- c1>// okay, but superfluous</c->
+<c- n>c</c-> <c- o>=</c-> <c- k>static_cast</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>(</c-><c- n>i</c-><c- p>);</c-> <c- c1>// okay, explicit narrowing</c->
+<c- n>c</c-> <c- o>=</c-> <c- n>gsl</c-><c- o>::</c-><c- n>narrow_cast</c-><c- o>&lt;</c-><c- b>int</c-><c- o>></c-><c- p>(</c-><c- n>i</c-><c- p>);</c-> <c- c1>// better, explicit narrowing with a description</c->
+</pre>
+   <h4 class="heading settled" data-level="2.2.2" id="typesconst-constness"><span class="secno">2.2.2. </span><span class="content">[types.const] Constness</span><a class="self-link" href="#typesconst-constness"></a></h4>
+   <h5 class="heading settled" data-level="2.2.2.1" id="typesconstconstexpr-encourage-constexpr-values-whenever-it-is-possible"><span class="secno">2.2.2.1. </span><span class="content">[types.const.constexpr] Encourage <code class="highlight"><c- k>constexpr</c-></code> values whenever it is possible</span><a class="self-link" href="#typesconstconstexpr-encourage-constexpr-values-whenever-it-is-possible"></a></h5>
+   <p><code class="highlight"><c- k>constexpr</c-></code> is a good way to ensure that values remain constant, and <i>variables</i> that are <code class="highlight"><c- k>constexpr</c-></code> are constant expressions*.</p>
+   <p>As a general rule, default to <code class="highlight"><c- k>constexpr</c-></code> unless something can only be known at run-time. <code class="highlight"><c- n>vector</c-></code> and <code class="highlight"><c- n>string</c-></code> always require run-time knowledge, so they cannot be <code class="highlight"><c- k>const</c-></code>.</p>
+   <p>*Recommending <code class="highlight"><c- k>constexpr</c-></code> does not mean explaining what a constant expression is. This is a separate
+discussion. For now, we can say "known at compile time".</p>
+   <h5 class="heading settled" data-level="2.2.2.2" id="typesconstconst-encourage-const-whenever-you-cant-use-constexpr"><span class="secno">2.2.2.2. </span><span class="content">[types.const.const] Encourage <code class="highlight"><c- k>const</c-></code> whenever you can’t use <code class="highlight"><c- k>constexpr</c-></code></span><a class="self-link" href="#typesconstconst-encourage-const-whenever-you-cant-use-constexpr"></a></h5>
+   <p><code class="highlight"><c- k>const</c-></code> lets us reason about our programs with security and helps us produce more declarative code.
+Rather than suggesting that <code class="highlight"><c- k>const</c-></code> is applied when you know that a value won’t (or can’t) change,
+offer <code class="highlight"><c- k>const</c-></code> as the default, and suggest students <i>remove</i> <code class="highlight"><c- k>const</c-></code> when they encounter a
+reason to mutate the variable.</p>
+   <p><i>Editor’s note: [types.const.const] does <b>not</b> suggest introducing lambda-initialisation
+(IILE).</i></p>
+   <p><i>Editor’s note: [types.const.const] becomes more and more easy-to-use when ranges are incorporated
+into a program.</i></p>
+   <h5 class="heading settled" data-level="2.2.2.3" id="typesconstmutable-dont-pan-mutable"><span class="secno">2.2.2.3. </span><span class="content">[types.const.mutable] Don’t pan <code class="highlight"><c- k>mutable</c-></code></span><a class="self-link" href="#typesconstmutable-dont-pan-mutable"></a></h5>
+   <p>TODO</p>
+   <p>(should <code class="highlight"><c- k>mutable</c-></code> even be a topic for beginners? probably a stage 3 topic?)</p>
+   <h4 class="heading settled" data-level="2.2.3" id="typesmonadic-types-with-monadic-interfaces"><span class="secno">2.2.3. </span><span class="content">[types.monadic] Types with monadic interfaces</span><a class="self-link" href="#typesmonadic-types-with-monadic-interfaces"></a></h4>
+   <p>TODO (visit after <a data-link-type="biblio" href="#biblio-p0798">[P0798]</a> receives a verdict).</p>
    <h3 class="heading settled" data-level="2.3" id="prolong-prolong-features-until-there-is-a-genuine-use-case"><span class="secno">2.3. </span><span class="content">[prolong] Prolong features until there is a genuine use-case</span><a class="self-link" href="#prolong-prolong-features-until-there-is-a-genuine-use-case"></a></h3>
    <p>[basic.types] explicitly recommends avoiding the introduction of most fundamental types early on,
 as there is no use-case. Similarly, raw arrays, pointers, and even references are not considered
@@ -1817,7 +1888,7 @@ that <code class="highlight"><c- n>a</c-> <c- o>==</c-> <c- n>b</c-></code> and 
    <h4 class="heading settled" data-level="2.3.5" id="prolongcpp-c-preprocessor"><span class="secno">2.3.5. </span><span class="content">[prolong.cpp] C Preprocessor</span><a class="self-link" href="#prolongcpp-c-preprocessor"></a></h4>
    <p>Excludes <code class="highlight"><c- cp>#include</c-></code>, which is necessary until modules are in C++.</p>
    <p>TODO</p>
-   <h3 class="heading settled" data-level="2.4" id="style-practices"><span class="secno">2.4. </span><span class="content">Style practices</span><a class="self-link" href="#style-practices"></a></h3>
+   <h3 class="heading settled" data-level="2.4" id="style-style-practices"><span class="secno">2.4. </span><span class="content">[style] Style practices</span><a class="self-link" href="#style-style-practices"></a></h3>
    <h4 class="heading settled" data-level="2.4.1" id="styleguide-use-a-style-guide"><span class="secno">2.4.1. </span><span class="content">[style.guide] Use a style guide</span><a class="self-link" href="#styleguide-use-a-style-guide"></a></h4>
    <ul>
     <li data-md>
@@ -1889,8 +1960,8 @@ Style). </i></p>
    <p>Examples: <code class="highlight"><c- n>AddressSanitizer</c-></code>, <code class="highlight"><c- n>UndefinedBehaviorSanitizer</c-></code></p>
    <p>Notes: WSL does not play nicely with asan, but a Docker image running inside WSL does.</p>
    <p>TODO (why?)</p>
-   <h3 class="heading settled" data-level="2.7" id="appreciation-for-c"><span class="secno">2.7. </span><span class="content">Appreciation for C++</span><a class="self-link" href="#appreciation-for-c"></a></h3>
-   <h4 class="heading settled" data-level="2.7.1" id="history"><span class="secno">2.7.1. </span><span class="content">History</span><a class="self-link" href="#history"></a></h4>
+   <h3 class="heading settled" data-level="2.7" id="appreciation-appreciation-for-c"><span class="secno">2.7. </span><span class="content">[appreciation] Appreciation for C++</span><a class="self-link" href="#appreciation-appreciation-for-c"></a></h3>
+   <h4 class="heading settled" data-level="2.7.1" id="appreciationhistory-history"><span class="secno">2.7.1. </span><span class="content">[appreciation.history] History</span><a class="self-link" href="#appreciationhistory-history"></a></h4>
    <p>Do not introduce historical aspects of C++ in the forefront of C++ education. This includes:</p>
    <blockquote>
     <p>"C++ was developed by Bjarne Stroustrup in 1983 at Bell Labs as an extension to C and was
@@ -1921,8 +1992,8 @@ and should be pushed to a later time when students are able to appreciate histor
 being exposed to the error-prone ways of the past. C++ programmers will eventually need to work with
 older code (pre-C++17 code is abundant), or write code that has C interoperability, and thus
 developing an appreciation for C++'s history is imperative (sic).</p>
-   <p>D1389 makes the case for it not to be in the first handful of sessions.</p>
-   <h4 class="heading settled" data-level="2.7.2" id="c-in-the-real-world"><span class="secno">2.7.2. </span><span class="content">C++ in the Real World</span><a class="self-link" href="#c-in-the-real-world"></a></h4>
+   <p>D1389 makes the case for it not to be in the first handful of unit.</p>
+   <h4 class="heading settled" data-level="2.7.2" id="appreciationirl-c-in-the-real-world"><span class="secno">2.7.2. </span><span class="content">[appreciation.irl] C++ in the Real World</span><a class="self-link" href="#appreciationirl-c-in-the-real-world"></a></h4>
    <p>C++ has a broad range of applications. A non-exhaustive list of domains that C++ is used in can
 be found below, a large portion of which are derived from<a data-link-type="biblio" href="#biblio-applications">[applications]</a>.</p>
    <ul>
@@ -1945,9 +2016,16 @@ be found below, a large portion of which are derived from<a data-link-type="bibl
     <li data-md>
      <p>web-based technologies (e.g. Google, Facebook, Amazon)</p>
    </ul>
-   <p>It is recommended that teachers briefly introduce a domain to their students during each session.
+   <p>It is recommended that teachers briefly introduce a domain to their students during each unit.
 This practice has helped to broaden student appreciation for the usage of C++ in industry. Embedding
 use-cases into classes to show "this has practical value in the real world" should be considered.</p>
+   <h3 class="heading settled" data-level="2.8" id="meta-meta-guidelines"><span class="secno">2.8. </span><span class="content">[meta] Meta-guidelines</span><a class="self-link" href="#meta-meta-guidelines"></a></h3>
+   <p>This section is <b>not</b> about metaprogramming, but rather about guidelines for teachers to their
+teaching processes.</p>
+   <h4 class="heading settled" data-level="2.8.1" id="metarevision-regularly-revise-the-curriculum"><span class="secno">2.8.1. </span><span class="content">[meta.revision] Regularly revise the curriculum</span><a class="self-link" href="#metarevision-regularly-revise-the-curriculum"></a></h4>
+   <p>This is a living document, and will often change. It is strongly advised that you revise your
+curriculum between sessions to ensure that it does not stagnate or become out-of-sync with these
+guidelines.</p>
    <h2 class="heading settled" data-level="3" id="student-outcomes"><span class="secno">3. </span><span class="content">Student outcomes</span><a class="self-link" href="#student-outcomes"></a></h2>
    <p>Upon completion, a student should be able to:</p>
    <h3 class="heading settled" data-level="3.1" id="containers"><span class="secno">3.1. </span><span class="content">Containers</span><a class="self-link" href="#containers"></a></h3>
@@ -2034,6 +2112,15 @@ use-cases into classes to show "this has practical value in the real world" shou
     <li data-md>
      <p><a href="http://stroustrup.com/tour2.html">Webpage</a></p>
    </ul>
+   <h3 class="heading settled" id="c-reference"><span class="content">C++ Reference</span><a class="self-link" href="#c-reference"></a></h3>
+   <ul>
+    <li data-md>
+     <p><b>Short review</b>: C++ Reference is an wiki that is maintained by multiple C++ experts, many of
+whom participate in the standardisation of C++. C++ Reference is a highly navigable reference,
+with an online compiler so that examples can be experimented with.</p>
+    <li data-md>
+     <p><a href="https://en.cppreference.com/w/">Webpage</a></p>
+   </ul>
    <h2 class="heading settled" id="appendix-b-resources-for-teachers"><span class="content">Appendix B: Resources for Teachers</span><a class="self-link" href="#appendix-b-resources-for-teachers"></a></h2>
    <h3 class="heading settled" id="stop-teaching-c"><span class="content">Stop Teaching C</span><a class="self-link" href="#stop-teaching-c"></a></h3>
    <ul>
@@ -2073,9 +2160,13 @@ use-cases into classes to show "this has practical value in the real world" shou
    <h2 class="heading settled" id="appendix-c-glossary"><span class="content">Appendix C: Glossary</span><a class="self-link" href="#appendix-c-glossary"></a></h2>
    <ul>
     <li data-md>
-     <p><b>Session</b>: A unit of teaching. In a week-long C++ course, this might refer to hours or days.
+     <p><b>Session</b>: A compilation of sessions. For a week-long C++ course, this would refer to the
+entire course. In a single semester of university, it refers to the full semester. For a
+textbook, a <a class="property" data-link-type="propdesc">session</a> refers to the book’s <a class="property" data-link-type="propdesc">edition</a>.</p>
+    <li data-md>
+     <p><b>Unit</b>: A unit of teaching. In a week-long C++ course, this might refer to hours or days.
 In a single semester of university, it refers to one full week (includes lectures, tutorials,
-and labs). In a textbook, a session is a single chapter.</p>
+and labs). In a textbook, a session is a single chapter. <i>Editor’s note: the term <b>unit</b> was previously known as <b>session</b>. This has now been changed.</i></p>
     <li data-md>
      <p><b>Work item</b>: Please refer to <a data-link-type="biblio" href="#biblio-p1388">[P1388]</a>.</p>
    </ul>
@@ -2228,6 +2319,8 @@ and labs). In a textbook, a session is a single chapter.</p>
    <dd>IMC Financial Markets. <a href="https://www.boost.org/community/imc_summer_of_code_2016.html">IMC Summer of Code 2016</a>. 2016. URL: <a href="https://www.boost.org/community/imc_summer_of_code_2016.html">https://www.boost.org/community/imc_summer_of_code_2016.html</a>
    <dt id="biblio-mentor">[MENTOR]
    <dd>Mentor Graphics. <a href="https://www.mentor.com/">Mentor</a>. URL: <a href="https://www.mentor.com/">https://www.mentor.com/</a>
+   <dt id="biblio-p0798">[P0798]
+   <dd>Simon Brand. <a href="https://wg21.link/p0798">Monadic operations for `std::optional`</a>. URL: <a href="https://wg21.link/p0798">https://wg21.link/p0798</a>
    <dt id="biblio-p1388">[P1388]
    <dd>Christopher Di Bella. <a href="https://wg21.link/p1388">P1388 Work Items in the Context of SG20</a>. URL: <a href="https://wg21.link/p1388">https://wg21.link/p1388</a>
    <dt id="biblio-ppp">[PPP]
