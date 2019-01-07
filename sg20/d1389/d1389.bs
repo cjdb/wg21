@@ -331,38 +331,57 @@ TODO (why?)
 
 ### [tools.debugger] Introduce a debugger early
 
-The ability to step through running code and examine execution state will enable students to troubleshoot issues and correct assumptions they have made about the behavior of language and library features.
+Examples: Visual Studio Debugger, GDB, LLDB
+
+The ability to step through running code and examine execution state will enable students to
+troubleshoot issues and correct assumptions they have made about the behavior of language and
+library features.
 
 ### [tools.package.management] Use a package manager
 
 Examples: [Vcpkg](https://github.com/Microsoft/vcpkg), [Conan](https://conan.io/)
 
-Downloading, installing, and building against dependencies in C++ can be a challenge, especially for beginners. Package managers help alleviate this by providing tested packages along with automatic installation scripts.
+Downloading, installing, and building against dependencies in C++ can be a challenge, especially
+for beginners. Package managers help alleviate this by providing tested packages along with
+automatic installation scripts.
 
 ### [tools.build.system] Use a build system
 
-Example: [CMake](https://cmake.org/), [Meson](https://mesonbuild.com/), [build2](https://build2.org/)
+Example: [CMake](https://cmake.org/), [Meson](https://mesonbuild.com/),
+[build2](https://build2.org/)
 
-Build systems greatly aid building code across a variety of platforms. Without a build system, you will either require:
+Build systems greatly aid building code across a variety of platforms. Without a build system,
+you will either require:
 
 1. A uniform development environment for all students
-2. Build instructions across a variety of supported environments, accounting for dependency installation locations, compiler, toolchain version, etc.
+2. Build instructions across a variety of supported environments, accounting for dependency
+installation locations, compiler, toolchain version, etc.
 
-Neither of these are great solutions: you either need to ensure that all students have the necessary hardware and software to support the canonical environment and provide support for it, or you need to do a considerable amount of work to produce the necessary build instructions. Just use a build system.
+Neither of these are great solutions: you either need to ensure that all students have the
+necessary hardware and software to support the canonical environment and provide support for it,
+or you need to do a considerable amount of work to produce the necessary build instructions. Just
+use a build system.
 
 ### [tools.online.compiler] Introduce online compilers
 
-Examples: [Compiler Explorer](https://godbolt.org/), [Wandbox](https://wandbox.org/), [Coliru](http://coliru.stacked-crooked.com/)
+Examples: [Compiler Explorer](https://godbolt.org/), [Wandbox](https://wandbox.org/),
+[Coliru](http://coliru.stacked-crooked.com/)
 
-Online compilers are invaluable tools for communicating about small snippets of code. Depending on the tool, they let the user compile programs using multiple toolchains, check the output of their code, and share the snippets with others.
+Online compilers are invaluable tools for communicating about small snippets of code. Depending on
+the tool, they let the user compile programs using multiple toolchains, check the output of their
+code, and share the snippets with others.
 
-Compiler Explorer's live updates can be particularly useful when experimenting with new features. The assembly view could overwhelm students however, so care should be taken when introducing this tool.
+Compiler Explorer's live updates can be particularly useful when experimenting with new features.
+The assembly view could overwhelm students however, so care should be taken when introducing this
+tool.
 
 ### [tools.code.formatter] Use a code formatter
 
 Examples: clang-format
 
-Choosing a code formatter and picking a canonical style (it doesn't really matter which one) will avoid some code style arguments and improve uniformity among student's code. The latter will make marking and comparing solutions easier.
+Choosing a code formatter and picking a canonical style (it doesn't really matter which one) will
+avoid some code style arguments and improve uniformity among student's code. The latter will make
+marking and comparing solutions easier.
 
 ### [tools.linter] Use linters
 
