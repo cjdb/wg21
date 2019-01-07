@@ -2,7 +2,7 @@
  <head>
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
   <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
-  <title>D1389R0: Work Item for SG20: Guidelines for Teaching C++ to Beginners</title>
+  <title>D1389R0: Standing Document for SG20: Guidelines for Teaching C++ to Beginners</title>
 <style data-fill-with="stylesheet">/******************************************************************************
  *                   Style sheet for the W3C specifications                   *
  *
@@ -1230,7 +1230,7 @@ Possible extra rowspan handling
   <meta content="Bikeshed version 6dcb46ba8cae3704b42c05bcd8578c92d239786a" name="generator">
   <link href="https://wg21.link/p1389" rel="canonical">
   <link href="https://isocpp.org/favicon.ico" rel="icon">
-  <meta content="3c0eb6769eebb6b4183e907f1a9c7a11a84885db" name="document-revision">
+  <meta content="ead392705e722e841abe96517cd658c9ef051adb" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1439,7 +1439,7 @@ pre .property::before, pre .property::after {
  <body class="h-entry">
   <div class="head">
    <p data-fill-with="logo"></p>
-   <h1 class="p-name no-ref" id="title">D1389R0<br>Work Item for SG20: Guidelines for Teaching C++ to Beginners</h1>
+   <h1 class="p-name no-ref" id="title">D1389R0<br>Standing Document for SG20: Guidelines for Teaching C++ to Beginners</h1>
    <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Proposal, <time class="dt-updated" datetime="2019-01-21">2019-01-21</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
@@ -1461,7 +1461,7 @@ pre .property::before, pre .property::after {
   </div>
   <div class="p-summary" data-fill-with="abstract">
    <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">Abstract</span></h2>
-   <p>D1389 proposes that SG20 creates a work item for guidelines for teaching introductory C++, and a handful of proposed initial guidelines.</p>
+   <p>D1389 proposes that SG20 create a Standing Document for guidelines for teaching introductory C++, and a handful of proposed initial guidelines.</p>
   </div>
   <nav data-fill-with="table-of-contents" id="toc">
    <h2 class="no-num no-toc no-ref" id="contents">Table of Contents</h2>
@@ -1526,13 +1526,14 @@ pre .property::before, pre .property::after {
           <li><a href="#toolsmultiplecompilers-use-two-or-more-competing-compilers"><span class="secno">2.6.1.1</span> <span class="content">[tools.multiple.compilers] Use two or more competing compilers</span></a>
          </ol>
         <li><a href="#toolscompilerwarnings-use-a-high-level-of-warnings-and-enable-warnings-as-error-mode"><span class="secno">2.6.2</span> <span class="content">[tools.compiler.warnings] Use a high level of warnings and enable 'warnings as error' mode</span></a>
-        <li><a href="#toolsdebugger-introduce-a-debugger-early"><span class="secno">2.6.3</span> <span class="content">[tools.debugger] Introduce a debugger early</span></a>
-        <li><a href="#toolspackagemanagement-use-a-package-manager"><span class="secno">2.6.4</span> <span class="content">[tools.package.management] Use a package manager</span></a>
-        <li><a href="#toolsbuildsystem-use-a-build-system"><span class="secno">2.6.5</span> <span class="content">[tools.build.system] Use a build system</span></a>
-        <li><a href="#toolscompilerexplorer-use-compiler-explorer"><span class="secno">2.6.6</span> <span class="content">[tools.compiler.explorer] Use Compiler Explorer</span></a>
-        <li><a href="#toolscodeformatter-use-a-code-formatter"><span class="secno">2.6.7</span> <span class="content">[tools.code.formatter] Use a code formatter</span></a>
-        <li><a href="#toolslinter-use-linters"><span class="secno">2.6.8</span> <span class="content">[tools.linter] Use linters</span></a>
-        <li><a href="#toolsruntimeanalysis-use-run-time-analysers-especially-when-teaching-free-store"><span class="secno">2.6.9</span> <span class="content">[tools.runtime.analysis] Use run-time analysers, especially when teaching free store</span></a>
+        <li><a href="#toolstesting-introduce-a-testing-framework"><span class="secno">2.6.3</span> <span class="content">[tools.testing] Introduce a testing framework</span></a>
+        <li><a href="#toolsdebugger-introduce-a-debugger-early"><span class="secno">2.6.4</span> <span class="content">[tools.debugger] Introduce a debugger early</span></a>
+        <li><a href="#toolspackagemanagement-use-a-package-manager"><span class="secno">2.6.5</span> <span class="content">[tools.package.management] Use a package manager</span></a>
+        <li><a href="#toolsbuildsystem-use-a-build-system"><span class="secno">2.6.6</span> <span class="content">[tools.build.system] Use a build system</span></a>
+        <li><a href="#toolsonlinecompiler-introduce-online-compilers"><span class="secno">2.6.7</span> <span class="content">[tools.online.compiler] Introduce online compilers</span></a>
+        <li><a href="#toolscodeformatter-use-a-code-formatter"><span class="secno">2.6.8</span> <span class="content">[tools.code.formatter] Use a code formatter</span></a>
+        <li><a href="#toolslinter-use-linters"><span class="secno">2.6.9</span> <span class="content">[tools.linter] Use linters</span></a>
+        <li><a href="#toolsruntimeanalysis-use-run-time-analysers-especially-when-teaching-free-store"><span class="secno">2.6.10</span> <span class="content">[tools.runtime.analysis] Use run-time analysers, especially when teaching free store</span></a>
        </ol>
       <li>
        <a href="#appreciation-appreciation-for-c"><span class="secno">2.7</span> <span class="content">[appreciation] Appreciation for C++</span></a>
@@ -1598,7 +1599,7 @@ lightweight abstractions that set C++ apart from other programming languages.</p
    <p>These guidelines are not necessarily meant to be considered in isolation. For example, Dan Saks has
 mentioned that introducing C++ to C programmers requires care in the first features that are
 introduced, and -- in his experience -- that starting with <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>vector</c-></code> as a <i>replacement</i> for
-raw arrays early on is often counter-productive. D1389 does not propose a <i>C++ for C programmers</i> work item, but recommends a later proposal do exactly that. Teachers designing curricula for
+raw arrays early on is often counter-productive. D1389 does not propose a <i>C++ for C programmers</i> Standing Document, but recommends a later proposal do exactly that. Teachers designing curricula for
 introducing C++ to C programmers would then be encouraged to encouraged read <i>both</i> guidelines.</p>
    <h2 class="heading settled" data-level="2" id="guidelines"><span class="secno">2. </span><span class="content">Guidelines</span><a class="self-link" href="#guidelines"></a></h2>
    <p>Each of the following subsections is a proposed guideline.</p>
@@ -1931,7 +1932,7 @@ Style). </i></p>
     <li data-md>
      <p>Most recent MSVC: version 2017 (with updates)</p>
    </ul>
-   <p>TODO (why?)</p>
+   <p>Modern compilers have significantly improved error messages, making it easier for novices to find and correct their errors.</p>
    <h5 class="heading settled" data-level="2.6.1.1" id="toolsmultiplecompilers-use-two-or-more-competing-compilers"><span class="secno">2.6.1.1. </span><span class="content">[tools.multiple.compilers] Use two or more competing compilers</span><a class="self-link" href="#toolsmultiplecompilers-use-two-or-more-competing-compilers"></a></h5>
    <p>TODO (why?)</p>
    <h4 class="heading settled" data-level="2.6.2" id="toolscompilerwarnings-use-a-high-level-of-warnings-and-enable-warnings-as-error-mode"><span class="secno">2.6.2. </span><span class="content">[tools.compiler.warnings] Use a high level of warnings and enable 'warnings as error' mode</span><a class="self-link" href="#toolscompilerwarnings-use-a-high-level-of-warnings-and-enable-warnings-as-error-mode"></a></h4>
@@ -1942,21 +1943,51 @@ Style). </i></p>
      <p>Minimum for MSVC: <code class="highlight"><c- o>/</c-><c- n>W3</c-> <c- o>/</c-><c- n>WX</c-></code></p>
    </ul>
    <p>TODO (why?)</p>
-   <h4 class="heading settled" data-level="2.6.3" id="toolsdebugger-introduce-a-debugger-early"><span class="secno">2.6.3. </span><span class="content">[tools.debugger] Introduce a debugger early</span><a class="self-link" href="#toolsdebugger-introduce-a-debugger-early"></a></h4>
+   <h4 class="heading settled" data-level="2.6.3" id="toolstesting-introduce-a-testing-framework"><span class="secno">2.6.3. </span><span class="content">[tools.testing] Introduce a testing framework</span><a class="self-link" href="#toolstesting-introduce-a-testing-framework"></a></h4>
+   <p>Examples: <a href="https://github.com/catchorg/Catch2">Catch2</a>, <a href="https://github.com/google/googletest">Google Test</a></p>
    <p>TODO (why?)</p>
-   <h4 class="heading settled" data-level="2.6.4" id="toolspackagemanagement-use-a-package-manager"><span class="secno">2.6.4. </span><span class="content">[tools.package.management] Use a package manager</span><a class="self-link" href="#toolspackagemanagement-use-a-package-manager"></a></h4>
-   <p>TODO (why?)</p>
-   <h4 class="heading settled" data-level="2.6.5" id="toolsbuildsystem-use-a-build-system"><span class="secno">2.6.5. </span><span class="content">[tools.build.system] Use a build system</span><a class="self-link" href="#toolsbuildsystem-use-a-build-system"></a></h4>
-   <p>TODO (why?)</p>
-   <h4 class="heading settled" data-level="2.6.6" id="toolscompilerexplorer-use-compiler-explorer"><span class="secno">2.6.6. </span><span class="content">[tools.compiler.explorer] Use Compiler Explorer</span><a class="self-link" href="#toolscompilerexplorer-use-compiler-explorer"></a></h4>
-   <p>TODO (why?)</p>
-   <h4 class="heading settled" data-level="2.6.7" id="toolscodeformatter-use-a-code-formatter"><span class="secno">2.6.7. </span><span class="content">[tools.code.formatter] Use a code formatter</span><a class="self-link" href="#toolscodeformatter-use-a-code-formatter"></a></h4>
+   <h4 class="heading settled" data-level="2.6.4" id="toolsdebugger-introduce-a-debugger-early"><span class="secno">2.6.4. </span><span class="content">[tools.debugger] Introduce a debugger early</span><a class="self-link" href="#toolsdebugger-introduce-a-debugger-early"></a></h4>
+   <p>Examples: Visual Studio Debugger, GDB, LLDB</p>
+   <p>The ability to step through running code and examine execution state will enable students to
+troubleshoot issues and correct assumptions they have made about the behavior of language and
+library features.</p>
+   <h4 class="heading settled" data-level="2.6.5" id="toolspackagemanagement-use-a-package-manager"><span class="secno">2.6.5. </span><span class="content">[tools.package.management] Use a package manager</span><a class="self-link" href="#toolspackagemanagement-use-a-package-manager"></a></h4>
+   <p>Examples: <a href="https://github.com/Microsoft/vcpkg">Vcpkg</a>, <a href="https://conan.io/">Conan</a></p>
+   <p>Downloading, installing, and building against dependencies in C++ can be a challenge, especially
+for beginners. Package managers help alleviate this by providing tested packages along with
+automatic installation scripts.</p>
+   <h4 class="heading settled" data-level="2.6.6" id="toolsbuildsystem-use-a-build-system"><span class="secno">2.6.6. </span><span class="content">[tools.build.system] Use a build system</span><a class="self-link" href="#toolsbuildsystem-use-a-build-system"></a></h4>
+   <p>Example: <a href="https://cmake.org/">CMake</a>, <a href="https://mesonbuild.com/">Meson</a>, <a href="https://build2.org/">build2</a></p>
+   <p>Build systems greatly aid building code across a variety of platforms. Without a build system,
+you will either require:</p>
+   <ol>
+    <li data-md>
+     <p>A uniform development environment for all students</p>
+    <li data-md>
+     <p>Build instructions across a variety of supported environments, accounting for dependency
+installation locations, compiler, toolchain version, etc.</p>
+   </ol>
+   <p>Neither of these are great solutions: you either need to ensure that all students have the
+necessary hardware and software to support the canonical environment and provide support for it,
+or you need to do a considerable amount of work to produce the necessary build instructions. Just
+use a build system.</p>
+   <h4 class="heading settled" data-level="2.6.7" id="toolsonlinecompiler-introduce-online-compilers"><span class="secno">2.6.7. </span><span class="content">[tools.online.compiler] Introduce online compilers</span><a class="self-link" href="#toolsonlinecompiler-introduce-online-compilers"></a></h4>
+   <p>Examples: <a href="https://godbolt.org/">Compiler Explorer</a>, <a href="https://wandbox.org/">Wandbox</a>, <a href="http://coliru.stacked-crooked.com/">Coliru</a></p>
+   <p>Online compilers are invaluable tools for communicating about small snippets of code. Depending on
+the tool, they let the user compile programs using multiple toolchains, check the output of their
+code, and share the snippets with others.</p>
+   <p>Compiler Explorer’s live updates can be particularly useful when experimenting with new features.
+The assembly view could overwhelm students however, so care should be taken when introducing this
+tool.</p>
+   <h4 class="heading settled" data-level="2.6.8" id="toolscodeformatter-use-a-code-formatter"><span class="secno">2.6.8. </span><span class="content">[tools.code.formatter] Use a code formatter</span><a class="self-link" href="#toolscodeformatter-use-a-code-formatter"></a></h4>
    <p>Examples: clang-format</p>
-   <p>TODO (why?)</p>
-   <h4 class="heading settled" data-level="2.6.8" id="toolslinter-use-linters"><span class="secno">2.6.8. </span><span class="content">[tools.linter] Use linters</span><a class="self-link" href="#toolslinter-use-linters"></a></h4>
+   <p>Choosing a code formatter and picking a canonical style (it doesn’t really matter which one) will
+avoid some code style arguments and improve uniformity among student’s code. The latter will make
+marking and comparing solutions easier.</p>
+   <h4 class="heading settled" data-level="2.6.9" id="toolslinter-use-linters"><span class="secno">2.6.9. </span><span class="content">[tools.linter] Use linters</span><a class="self-link" href="#toolslinter-use-linters"></a></h4>
    <p>Example: clang-tidy</p>
    <p>TODO (why?)</p>
-   <h4 class="heading settled" data-level="2.6.9" id="toolsruntimeanalysis-use-run-time-analysers-especially-when-teaching-free-store"><span class="secno">2.6.9. </span><span class="content">[tools.runtime.analysis] Use run-time analysers, especially when teaching free store</span><a class="self-link" href="#toolsruntimeanalysis-use-run-time-analysers-especially-when-teaching-free-store"></a></h4>
+   <h4 class="heading settled" data-level="2.6.10" id="toolsruntimeanalysis-use-run-time-analysers-especially-when-teaching-free-store"><span class="secno">2.6.10. </span><span class="content">[tools.runtime.analysis] Use run-time analysers, especially when teaching free store</span><a class="self-link" href="#toolsruntimeanalysis-use-run-time-analysers-especially-when-teaching-free-store"></a></h4>
    <p>Examples: <code class="highlight"><c- n>AddressSanitizer</c-></code>, <code class="highlight"><c- n>UndefinedBehaviorSanitizer</c-></code></p>
    <p>Notes: WSL does not play nicely with asan, but a Docker image running inside WSL does.</p>
    <p>TODO (why?)</p>
@@ -2094,7 +2125,7 @@ guidelines.</p>
      <p>understand why using a code linter is a 'best practice'</p>
    </ul>
    <h2 class="heading settled" data-level="4" id="acknowledgements"><span class="secno">4. </span><span class="content">Acknowledgements</span><a class="self-link" href="#acknowledgements"></a></h2>
-   <p>I’d like to thank Gordon Brown, ..., Bjarne Stroustrup, and JC van Winkel for reviewing.</p>
+   <p>I’d like to thank Gordon Brown, Bjarne Stroustrup, JC van Winkel, and Michael Wong for reviewing.</p>
    <h2 class="heading settled" id="appendix-a-resources-for-students"><span class="content">Appendix A: Resources for Students</span><a class="self-link" href="#appendix-a-resources-for-students"></a></h2>
    <h3 class="heading settled" id="programming----principles-and-practice-using-c"><span class="content">Programming -- Principles and Practice Using C++</span><a class="self-link" href="#programming----principles-and-practice-using-c"></a></h3>
    <ul>
@@ -2167,8 +2198,6 @@ textbook, a <a class="property" data-link-type="propdesc">session</a> refers to 
      <p><b>Unit</b>: A unit of teaching. In a week-long C++ course, this might refer to hours or days.
 In a single semester of university, it refers to one full week (includes lectures, tutorials,
 and labs). In a textbook, a session is a single chapter. <i>Editor’s note: the term <b>unit</b> was previously known as <b>session</b>. This has now been changed.</i></p>
-    <li data-md>
-     <p><b>Work item</b>: Please refer to <a data-link-type="biblio" href="#biblio-p1388">[P1388]</a>.</p>
    </ul>
   </main>
 <script>
@@ -2321,8 +2350,6 @@ and labs). In a textbook, a session is a single chapter. <i>Editor’s note: the
    <dd>Mentor Graphics. <a href="https://www.mentor.com/">Mentor</a>. URL: <a href="https://www.mentor.com/">https://www.mentor.com/</a>
    <dt id="biblio-p0798">[P0798]
    <dd>Simon Brand. <a href="https://wg21.link/p0798">Monadic operations for `std::optional`</a>. URL: <a href="https://wg21.link/p0798">https://wg21.link/p0798</a>
-   <dt id="biblio-p1388">[P1388]
-   <dd>Christopher Di Bella. <a href="https://wg21.link/p1388">P1388 Work Items in the Context of SG20</a>. URL: <a href="https://wg21.link/p1388">https://wg21.link/p1388</a>
    <dt id="biblio-ppp">[PPP]
    <dd>Bjarne Stroustrup. <a href="http://stroustrup.com/programming.html">Programming -- Principles and Practice Using C++</a>. URL: <a href="http://stroustrup.com/programming.html">http://stroustrup.com/programming.html</a>
    <dt id="biblio-rcar">[RCAR]
