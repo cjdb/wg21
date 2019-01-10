@@ -253,13 +253,13 @@ TODO
 
 TODO (visit after [[P0798]] receives a verdict).
 
-## [prolong] Prolong features until there is a genuine use-case
+## [delay] Delay features until there is a genuine use-case
 
 [basic.types] explicitly recommends avoiding the introduction of most fundamental types early on,
 as there is no use-case. Similarly, raw arrays, pointers, and even references are not considered
 members of [basic.types], as students will not appreciate them.
 
-### [prolong.references] References
+### [delay.references] References
 The author has found multiple resources that introduce pointers or references in the following
 fashion:
 
@@ -284,10 +284,10 @@ The above code offers no context for why references are necessary: only that rea
 can make seem C++ look rather quirky! Instead, it is recommended that students be exposed to
 references in a practical fashion, such as when passing parameters to functions.
 
-### [prolong.pointers] Pointers
+### [delay.pointers] Pointers
 
 Given that pointers solve a similar problem to references in terms of indirection, they share what
-is mentioned in [prolong.references]. While pointers are an important part of C++ programming, their
+is mentioned in [delay.references]. While pointers are an important part of C++ programming, their
 use-cases have been severely diminished thanks to references and abstractions such as `vector` and
 `map`.
 
@@ -295,7 +295,7 @@ References should definitely precede pointers by quite some time. This simplifie
 C++ by eliminating syntax that often isn't necessary. Kate Gregory expands on this idea in
 [[Stop-Teaching-C]].
 
-### [prolong.iterators] Iterators
+### [delay.iterators] Iterators
 
 Iterators are a fundamental part of the standard library, which means that they can't be avoided in
 the context of standard library usage. The suggested guideline is for initial iterator usage:
@@ -321,7 +321,7 @@ two things:
 1. Keeps students away from the quirky syntax of iterators. Default to references.
 2. Gets students into the mindest that an iterator's `operator*` returns a reference.
 
-### [prolong.concept.definitions] Concept definitions
+### [delay.concept.definitions] Concept definitions
 
 Designing a concept is a lot of work, and is arguably an advanced topic; the world's foremost
 experts on the topic have stated that designing effective concepts comes after one has studied the
@@ -330,7 +330,7 @@ that `a == b` and `a != b` are syntactically possible.
 
 This recommendation does not preculude the introduction of <i>using</i> existing concepts.
 
-### [prolong.cpp] C Preprocessor
+### [delay.cpp] C Preprocessor
 
 Excludes `#include`, which is necessary until modules are in C++.
 
