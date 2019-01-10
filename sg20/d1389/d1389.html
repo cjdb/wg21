@@ -1227,10 +1227,10 @@ Possible extra rowspan handling
       text-align: center;
     }
   </style>
-  <meta content="Bikeshed version 6dcb46ba8cae3704b42c05bcd8578c92d239786a" name="generator">
+  <meta content="Bikeshed version 30dbdcf66519991ec52011cac10c49a7b5b449c5" name="generator">
   <link href="https://wg21.link/p1389" rel="canonical">
   <link href="https://isocpp.org/favicon.ico" rel="icon">
-  <meta content="ead392705e722e841abe96517cd658c9ef051adb" name="document-revision">
+  <meta content="1a692ffd9a554e12943c3d27fbacfa8741984e48" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1502,13 +1502,13 @@ pre .property::before, pre .property::after {
         <li><a href="#typesmonadic-types-with-monadic-interfaces"><span class="secno">2.2.3</span> <span class="content">[types.monadic] Types with monadic interfaces</span></a>
        </ol>
       <li>
-       <a href="#prolong-prolong-features-until-there-is-a-genuine-use-case"><span class="secno">2.3</span> <span class="content">[prolong] Prolong features until there is a genuine use-case</span></a>
+       <a href="#delay-delay-features-until-there-is-a-genuine-use-case"><span class="secno">2.3</span> <span class="content">[delay] Delay features until there is a genuine use-case</span></a>
        <ol class="toc">
-        <li><a href="#prolongreferences-references"><span class="secno">2.3.1</span> <span class="content">[prolong.references] References</span></a>
-        <li><a href="#prolongpointers-pointers"><span class="secno">2.3.2</span> <span class="content">[prolong.pointers] Pointers</span></a>
-        <li><a href="#prolongiterators-iterators"><span class="secno">2.3.3</span> <span class="content">[prolong.iterators] Iterators</span></a>
-        <li><a href="#prolongconceptdefinitions-concept-definitions"><span class="secno">2.3.4</span> <span class="content">[prolong.concept.definitions] Concept definitions</span></a>
-        <li><a href="#prolongcpp-c-preprocessor"><span class="secno">2.3.5</span> <span class="content">[prolong.cpp] C Preprocessor</span></a>
+        <li><a href="#delayreferences-references"><span class="secno">2.3.1</span> <span class="content">[delay.references] References</span></a>
+        <li><a href="#delaypointers-pointers"><span class="secno">2.3.2</span> <span class="content">[delay.pointers] Pointers</span></a>
+        <li><a href="#delayiterators-iterators"><span class="secno">2.3.3</span> <span class="content">[delay.iterators] Iterators</span></a>
+        <li><a href="#delayconceptdefinitions-concept-definitions"><span class="secno">2.3.4</span> <span class="content">[delay.concept.definitions] Concept definitions</span></a>
+        <li><a href="#delaycpp-c-preprocessor"><span class="secno">2.3.5</span> <span class="content">[delay.cpp] C Preprocessor</span></a>
        </ol>
       <li>
        <a href="#style-style-practices"><span class="secno">2.4</span> <span class="content">[style] Style practices</span></a>
@@ -1826,11 +1826,11 @@ into a program.</i></p>
    <p>(should <code class="highlight"><c- k>mutable</c-></code> even be a topic for beginners? probably a stage 3 topic?)</p>
    <h4 class="heading settled" data-level="2.2.3" id="typesmonadic-types-with-monadic-interfaces"><span class="secno">2.2.3. </span><span class="content">[types.monadic] Types with monadic interfaces</span><a class="self-link" href="#typesmonadic-types-with-monadic-interfaces"></a></h4>
    <p>TODO (visit after <a data-link-type="biblio" href="#biblio-p0798">[P0798]</a> receives a verdict).</p>
-   <h3 class="heading settled" data-level="2.3" id="prolong-prolong-features-until-there-is-a-genuine-use-case"><span class="secno">2.3. </span><span class="content">[prolong] Prolong features until there is a genuine use-case</span><a class="self-link" href="#prolong-prolong-features-until-there-is-a-genuine-use-case"></a></h3>
+   <h3 class="heading settled" data-level="2.3" id="delay-delay-features-until-there-is-a-genuine-use-case"><span class="secno">2.3. </span><span class="content">[delay] Delay features until there is a genuine use-case</span><a class="self-link" href="#delay-delay-features-until-there-is-a-genuine-use-case"></a></h3>
    <p>[basic.types] explicitly recommends avoiding the introduction of most fundamental types early on,
 as there is no use-case. Similarly, raw arrays, pointers, and even references are not considered
 members of [basic.types], as students will not appreciate them.</p>
-   <h4 class="heading settled" data-level="2.3.1" id="prolongreferences-references"><span class="secno">2.3.1. </span><span class="content">[prolong.references] References</span><a class="self-link" href="#prolongreferences-references"></a></h4>
+   <h4 class="heading settled" data-level="2.3.1" id="delayreferences-references"><span class="secno">2.3.1. </span><span class="content">[delay.references] References</span><a class="self-link" href="#delayreferences-references"></a></h4>
     The author has found multiple resources that introduce pointers or references in the following
 fashion: 
 <pre class="language-cpp highlight"><c- c1>// replicated introduction, not from an actual source</c->
@@ -1850,13 +1850,13 @@ fashion:
    <p>The above code offers no context for why references are necessary: only that reading and modifying <code class="highlight"><c- n>r</c-></code> is synonymous to reading and modifying <code class="highlight"><c- n>i</c-></code>, respectively. Without a genuine use-case, references
 can make seem C++ look rather quirky! Instead, it is recommended that students be exposed to
 references in a practical fashion, such as when passing parameters to functions.</p>
-   <h4 class="heading settled" data-level="2.3.2" id="prolongpointers-pointers"><span class="secno">2.3.2. </span><span class="content">[prolong.pointers] Pointers</span><a class="self-link" href="#prolongpointers-pointers"></a></h4>
+   <h4 class="heading settled" data-level="2.3.2" id="delaypointers-pointers"><span class="secno">2.3.2. </span><span class="content">[delay.pointers] Pointers</span><a class="self-link" href="#delaypointers-pointers"></a></h4>
    <p>Given that pointers solve a similar problem to references in terms of indirection, they share what
-is mentioned in [prolong.references]. While pointers are an important part of C++ programming, their
+is mentioned in [delay.references]. While pointers are an important part of C++ programming, their
 use-cases have been severely diminished thanks to references and abstractions such as <code class="highlight"><c- n>vector</c-></code> and <code class="highlight"><c- n>map</c-></code>.</p>
    <p>References should definitely precede pointers by quite some time. This simplifies the idea of using
 C++ by eliminating syntax that often isn’t necessary. Kate Gregory expands on this idea in <a data-link-type="biblio" href="#biblio-stop-teaching-c">[Stop-Teaching-C]</a>.</p>
-   <h4 class="heading settled" data-level="2.3.3" id="prolongiterators-iterators"><span class="secno">2.3.3. </span><span class="content">[prolong.iterators] Iterators</span><a class="self-link" href="#prolongiterators-iterators"></a></h4>
+   <h4 class="heading settled" data-level="2.3.3" id="delayiterators-iterators"><span class="secno">2.3.3. </span><span class="content">[delay.iterators] Iterators</span><a class="self-link" href="#delayiterators-iterators"></a></h4>
    <p>Iterators are a fundamental part of the standard library, which means that they can’t be avoided in
 the context of standard library usage. The suggested guideline is for initial iterator usage:</p>
 <pre class="language-cpp highlight"><c- c1>// find gets a result                        // result != end(images) asks "did we find an image?"</c->
@@ -1880,13 +1880,13 @@ two things:</p>
     <li data-md>
      <p>Gets students into the mindest that an iterator’s <code class="highlight"><c- k>operator</c-><c- o>*</c-></code> returns a reference.</p>
    </ol>
-   <h4 class="heading settled" data-level="2.3.4" id="prolongconceptdefinitions-concept-definitions"><span class="secno">2.3.4. </span><span class="content">[prolong.concept.definitions] Concept definitions</span><a class="self-link" href="#prolongconceptdefinitions-concept-definitions"></a></h4>
+   <h4 class="heading settled" data-level="2.3.4" id="delayconceptdefinitions-concept-definitions"><span class="secno">2.3.4. </span><span class="content">[delay.concept.definitions] Concept definitions</span><a class="self-link" href="#delayconceptdefinitions-concept-definitions"></a></h4>
    <p>Designing a concept is a lot of work, and is arguably an advanced topic; the world’s foremost
 experts on the topic have stated that designing effective concepts comes after one has studied the
 details of algorithms. Even the definition for <code class="highlight"><c- n>EqualityComparable</c-></code> is much more than just checking
 that <code class="highlight"><c- n>a</c-> <c- o>==</c-> <c- n>b</c-></code> and <code class="highlight"><c- n>a</c-> <c- o>!=</c-> <c- n>b</c-></code> are syntactically possible.</p>
    <p>This recommendation does not preculude the introduction of <i>using</i> existing concepts.</p>
-   <h4 class="heading settled" data-level="2.3.5" id="prolongcpp-c-preprocessor"><span class="secno">2.3.5. </span><span class="content">[prolong.cpp] C Preprocessor</span><a class="self-link" href="#prolongcpp-c-preprocessor"></a></h4>
+   <h4 class="heading settled" data-level="2.3.5" id="delaycpp-c-preprocessor"><span class="secno">2.3.5. </span><span class="content">[delay.cpp] C Preprocessor</span><a class="self-link" href="#delaycpp-c-preprocessor"></a></h4>
    <p>Excludes <code class="highlight"><c- cp>#include</c-></code>, which is necessary until modules are in C++.</p>
    <p>TODO</p>
    <h3 class="heading settled" data-level="2.4" id="style-style-practices"><span class="secno">2.4. </span><span class="content">[style] Style practices</span><a class="self-link" href="#style-style-practices"></a></h3>
