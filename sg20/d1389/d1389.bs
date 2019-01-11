@@ -19,8 +19,8 @@ Date: 2019-01-21
 
 ## Who is a 'beginner'?
 
-The term 'beginner' in D1389 deliberately remains agnostic to programming novices, programmers who
-haven't written C++ at all, and programmers who haven't extensively used C++.
+The term 'beginner' in D1389 targets students who have previously written programs before, but have
+little-to-zero training in writing C++ programs.
 
 ## Why beginner guidelines?
 
