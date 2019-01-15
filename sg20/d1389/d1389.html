@@ -1227,10 +1227,9 @@ Possible extra rowspan handling
       text-align: center;
     }
   </style>
-  <meta content="Bikeshed version 30dbdcf66519991ec52011cac10c49a7b5b449c5" name="generator">
+  <meta content="Bikeshed version 9c6ae748322940994300e90a77c34437364b40a6" name="generator">
   <link href="https://wg21.link/p1389" rel="canonical">
   <link href="https://isocpp.org/favicon.ico" rel="icon">
-  <meta content="3a44f752cd894976baeb0aa365a35532c66af932" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1514,7 +1513,8 @@ pre .property::before, pre .property::after {
        <a href="#style-style-practices"><span class="secno">2.4</span> <span class="content">[style] Style practices</span></a>
        <ol class="toc">
         <li><a href="#styleguide-use-a-style-guide"><span class="secno">2.4.1</span> <span class="content">[style.guide] Use a style guide</span></a>
-        <li><a href="#styleall_caps-avoid-all_caps-names"><span class="secno">2.4.2</span> <span class="content">[style.<code class="highlight"><c- n>ALL_CAPS</c-></code>] Avoid <code class="highlight"><c- n>ALL_CAPS</c-></code> names</span></a>
+        <li><a href="#stylenaming-use-consistent-set-of-naming-conventions-for-identifiers"><span class="secno">2.4.2</span> <span class="content">[style.naming] Use consistent set of naming conventions for identifiers</span></a>
+        <li><a href="#styleall_caps-avoid-all_caps-names"><span class="secno">2.4.3</span> <span class="content">[style.<code class="highlight"><c- n>ALL_CAPS</c-></code>] Avoid <code class="highlight"><c- n>ALL_CAPS</c-></code> names</span></a>
        </ol>
       <li><a href="#projects-projects"><span class="secno">2.5</span> <span class="content">[projects] Projects</span></a>
       <li>
@@ -1900,7 +1900,16 @@ that <code class="highlight"><c- n>a</c-> <c- o>==</c-> <c- n>b</c-></code> and 
      <p>See also: <a href="#toolslinter-use-linters">Use a linter</a></p>
    </ul>
    <p>TODO (why?)</p>
-   <h4 class="heading settled" data-level="2.4.2" id="styleall_caps-avoid-all_caps-names"><span class="secno">2.4.2. </span><span class="content">[style.<code class="highlight"><c- n>ALL_CAPS</c-></code>] Avoid <code class="highlight"><c- n>ALL_CAPS</c-></code> names</span><a class="self-link" href="#styleall_caps-avoid-all_caps-names"></a></h4>
+   <h4 class="heading settled" data-level="2.4.2" id="stylenaming-use-consistent-set-of-naming-conventions-for-identifiers"><span class="secno">2.4.2. </span><span class="content">[style.naming] Use consistent set of naming conventions for identifiers</span><a class="self-link" href="#stylenaming-use-consistent-set-of-naming-conventions-for-identifiers"></a></h4>
+    (e.g., names of variables, types, etc.) 
+   <p>To whatever extent is possible, a consistent set of naming conventions
+for identifiers should be employed.  This practice helps to greatly
+improve the readability of code, amongst other things.  Many popular
+naming conventions exist, and there are likely equally many opinions
+as to which one is best.  Therefore, no attempt is made to advocate
+a particular one here.  For examples of naming conventions that could
+be used, please refer to some of the popular style guides.</p>
+   <h4 class="heading settled" data-level="2.4.3" id="styleall_caps-avoid-all_caps-names"><span class="secno">2.4.3. </span><span class="content">[style.<code class="highlight"><c- n>ALL_CAPS</c-></code>] Avoid <code class="highlight"><c- n>ALL_CAPS</c-></code> names</span><a class="self-link" href="#styleall_caps-avoid-all_caps-names"></a></h4>
    <p>The use of <code class="highlight"><c- n>ALL_CAPS</c-></code> is commonly reserved for macros. Developer tools, such as compilers and IDEs
 are able to quickly detect when a programmer is trying to write to something that is read-only (e.g.
 a constant).</p>
@@ -1945,7 +1954,16 @@ Style). </i></p>
    <p>TODO (why?)</p>
    <h4 class="heading settled" data-level="2.6.3" id="toolstesting-introduce-a-testing-framework"><span class="secno">2.6.3. </span><span class="content">[tools.testing] Introduce a testing framework</span><a class="self-link" href="#toolstesting-introduce-a-testing-framework"></a></h4>
    <p>Examples: <a href="https://github.com/catchorg/Catch2">Catch2</a>, <a href="https://github.com/google/googletest">Google Test</a></p>
-   <p>TODO (why?)</p>
+   <p>Testing code is often viewed as tedious and boring by students, which
+discourages students from investing the time to properly test code.  By
+using a testing framework, some of the monotony of testing can be
+reduced by eliminating the need for students to repeat boilerplate code
+that would be automatically provided by a test framework.   By making
+testing less tedious to perform, students will be more motivated to do
+it well.  Moreover, if a test framework that is popular in industry is
+chosen for teaching purposes, students will be further motivated by the
+knowledge that they are learning a useful tool in addition to developing
+their testing skills.</p>
    <h4 class="heading settled" data-level="2.6.4" id="toolsdebugger-introduce-a-debugger-early"><span class="secno">2.6.4. </span><span class="content">[tools.debugger] Introduce a debugger early</span><a class="self-link" href="#toolsdebugger-introduce-a-debugger-early"></a></h4>
    <p>Examples: Visual Studio Debugger, GDB, LLDB</p>
    <p>The ability to step through running code and examine execution state will enable students to
