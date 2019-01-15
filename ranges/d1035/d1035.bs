@@ -1,7 +1,7 @@
 <pre class='metadata'>
 Title: Input range adaptors
 Shortname: D1035
-Level: 3
+Level: 4
 Status: D
 Group: wg21
 Editor: Christopher Di Bella, cjdb.ns@gmail.com
@@ -1216,22 +1216,52 @@ P1035 introduces shorthands for `iter_foo_t<iterator_t<R>>` as `range_foo_t<R>`,
 been taken from range-v3.
 
 ```cpp
-template<Range R>
+template<class R>
 using range_difference_t = iter_difference_t<iterator_t<R>>;
 
-template<InputRange R>
+template<class R>
 using range_value_t = iter_value_t<iterator_t<R>>;
 
-template<InputRange R>
+template<class R>
 using range_reference_t = iter_reference_t<iterator_t<R>>;
 
-template<InputRange R>
+template<class R>
 using range_rvalue_reference_t = iter_rvalue_reference_t<iterator_t<R>>;
 ```
 
 These have an enormous amount of usage in range-v3, and will ensure consistency between generic code
 that uses ranges and generic code that uses iterators (which are essential for underpinning all
 range abstractions in C++).
+
+### Amendment to the associated iterator types
+
+The previous revision of P1035 imposed explicit `Range` and `InputRange` requirements on the above
+associated types. While reviewing a Pull Request to add these to cmcstl2, Casey noted that requiring
+`Range` and `InputRange` on the above was not the best approach. The rationale -- taken from a Slack
+converation -- is:
+
+> Since the "Better Safer Range Access CPOs" work was merged, the definition of `Range` no longer
+> depends on `iterator_t` and `sentinel_t`; they could be constrained to require `Range`. If that
+> were the case, the `range_foo_t = foo<iterator_t<X>>` aliases wouldn't need to be so constrained,
+> because they would already be ill-formed when passed a non-`Range`.
+>
+> We're big on pushing requirements into the "leaves" of the design to put errors closer to the user
+> and as early as possible, seems like a reasonable change to me.
+>
+> We couldn't do it in the TS era, because `Range` depended on `iterator_t` and `sentinel_t` - but
+> that's no longer the case.
+
+P1035 proposes that `iterator_t` and `sentinel_t` instead require `Range`. That is,
+
+```diff
+- template<class T>
++ template<Range T>
+    using iterator_t = decltype(ranges::begin(declval<T&>()));
+
+- template<class T>
++ template<Range T>
+    using sentinel_t = decltype(ranges::end(declval<T&>()));
+```
 
 ## `take_while_view`
 
