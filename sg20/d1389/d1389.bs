@@ -346,6 +346,17 @@ TODO
 
 TODO (why?)
 
+### [style.naming] Use consistent set of naming conventions for identifiers
+(e.g., names of variables, types, etc.)
+
+To whatever extent is possible, a consistent set of naming conventions
+for identifiers should be employed.  This practice helps to greatly
+improve the readability of code, amongst other things.  Many popular
+naming conventions exist, and there are likely equally many opinions
+as to which one is best.  Therefore, no attempt is made to advocate
+a particular one here.  For examples of naming conventions that could
+be used, please refer to some of the popular style guides.
+
 ### [style.`ALL_CAPS`] Avoid `ALL_CAPS` names
 
 The use of `ALL_CAPS` is commonly reserved for macros. Developer tools, such as compilers and IDEs
@@ -396,7 +407,16 @@ TODO (why?)
 
 Examples: [Catch2](https://github.com/catchorg/Catch2), [Google Test](https://github.com/google/googletest)
 
-TODO (why?)
+Testing code is often viewed as tedious and boring by students, which
+discourages students from investing the time to properly test code.  By
+using a testing framework, some of the monotony of testing can be
+reduced by eliminating the need for students to repeat boilerplate code
+that would be automatically provided by a test framework.   By making
+testing less tedious to perform, students will be more motivated to do
+it well.  Moreover, if a test framework that is popular in industry is
+chosen for teaching purposes, students will be further motivated by the
+knowledge that they are learning a useful tool in addition to developing
+their testing skills.
 
 ### [tools.debugger] Introduce a debugger early
 
