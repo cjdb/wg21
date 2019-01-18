@@ -1931,27 +1931,53 @@ Style). </i></p>
    <h3 class="heading settled" data-level="2.5" id="projects-projects"><span class="secno">2.5. </span><span class="content">[projects] Projects</span><a class="self-link" href="#projects-projects"></a></h3>
    <p>TODO (what?, why?, how?, where?, when?, how many?)</p>
    <h3 class="heading settled" data-level="2.6" id="tools-tools"><span class="secno">2.6. </span><span class="content">[tools] Tools</span><a class="self-link" href="#tools-tools"></a></h3>
+   <p>Students should be introduced to a variety of basic tools for code development
+relatively early in the learning process (not later as an afterthought).
+The effective use of tools is important because this can make many tasks
+much easier, from formatting source code to testing and debugging.
+Not introducing at least some basic tools to the student will make their
+programming experience unnecessarily difficult and discourage the
+student from learning.</p>
    <h4 class="heading settled" data-level="2.6.1" id="toolscompilers-use-an-up-to-date-compiler"><span class="secno">2.6.1. </span><span class="content">[tools.compilers] Use an up-to-date compiler</span><a class="self-link" href="#toolscompilers-use-an-up-to-date-compiler"></a></h4>
-   <p>... even if you are not teaching the latest C++</p>
+   <p>The C++ language and standard library have been evolving rapidly in
+recent years.  In order to ensure that newer language and library
+features are available, an up-to-date compiler is essential.
+Even if all of the latest language/library features are not
+needed for a course, using an up-to-date compiler is important for
+another reason.
+In particular, modern compilers have significantly improved error messages,
+making it easier for novices to find and correct their errors.</p>
+   <p>At the time of this writing, the most recent versions of several
+popular compilers are as follows:</p>
    <ul>
     <li data-md>
-     <p>Most recent GCC: version 8</p>
+     <p>GCC: version 8</p>
     <li data-md>
-     <p>Most recent Clang: version 7</p>
+     <p>Clang: version 7</p>
     <li data-md>
-     <p>Most recent MSVC: version 2017 (with updates)</p>
+     <p>MSVC: version 2017 (with updates)</p>
    </ul>
-   <p>Modern compilers have significantly improved error messages, making it easier for novices to find and correct their errors.</p>
    <h5 class="heading settled" data-level="2.6.1.1" id="toolsmultiplecompilers-use-two-or-more-competing-compilers"><span class="secno">2.6.1.1. </span><span class="content">[tools.multiple.compilers] Use two or more competing compilers</span><a class="self-link" href="#toolsmultiplecompilers-use-two-or-more-competing-compilers"></a></h5>
-   <p>TODO (why?)</p>
+   <p>No compiler is perfect.  Some provide better diagnostics for certain
+types of problems than others.  Giving the student the ability to
+use more than one compiler can be helpful when the error message from
+one compiler is not as enlightening as one would like.
+Also, some tools may only be available for a particular compiler.
+Therefore, in order to best utilize various tools, it is helpful for
+the student to be comfortable using more than one compiler.</p>
    <h4 class="heading settled" data-level="2.6.2" id="toolscompilerwarnings-use-a-high-level-of-warnings-and-enable-warnings-as-error-mode"><span class="secno">2.6.2. </span><span class="content">[tools.compiler.warnings] Use a high level of warnings and enable 'warnings as error' mode</span><a class="self-link" href="#toolscompilerwarnings-use-a-high-level-of-warnings-and-enable-warnings-as-error-mode"></a></h4>
+   <p>Students should be taught to understand that the compiler is their friend.
+It can catch many problems in their code.
+Compiler warnings are one way in which the compiler can help the student
+to find problems in their code (such as a function with a missing
+return statement).</p>
+   <p>For example, one might use the following compiler flags:</p>
    <ul>
     <li data-md>
      <p>Minimum for GCC and Clang: <code class="highlight"><c- o>-</c-><c- n>Wall</c-> <c- o>-</c-><c- n>Wextra</c-> <c- o>-</c-><c- n>pedantic</c-> <c- o>-</c-><c- n>Werror</c-></code></p>
     <li data-md>
      <p>Minimum for MSVC: <code class="highlight"><c- o>/</c-><c- n>W3</c-> <c- o>/</c-><c- n>WX</c-></code></p>
    </ul>
-   <p>TODO (why?)</p>
    <h4 class="heading settled" data-level="2.6.3" id="toolstesting-introduce-a-testing-framework"><span class="secno">2.6.3. </span><span class="content">[tools.testing] Introduce a testing framework</span><a class="self-link" href="#toolstesting-introduce-a-testing-framework"></a></h4>
    <p>Examples: <a href="https://github.com/catchorg/Catch2">Catch2</a>, <a href="https://github.com/google/googletest">Google Test</a></p>
    <p>Testing code is often viewed as tedious and boring by students, which
@@ -1990,25 +2016,44 @@ necessary hardware and software to support the canonical environment and provide
 or you need to do a considerable amount of work to produce the necessary build instructions. Just
 use a build system.</p>
    <h4 class="heading settled" data-level="2.6.7" id="toolsonlinecompiler-introduce-online-compilers"><span class="secno">2.6.7. </span><span class="content">[tools.online.compiler] Introduce online compilers</span><a class="self-link" href="#toolsonlinecompiler-introduce-online-compilers"></a></h4>
-   <p>Examples: <a href="https://godbolt.org/">Compiler Explorer</a>, <a href="https://wandbox.org/">Wandbox</a>, <a href="http://coliru.stacked-crooked.com/">Coliru</a></p>
+   <p>Examples: <a href="https://godbolt.org/">Compiler Explorer</a>, <a href="https://wandbox.org/">Wandbox</a>, <a href="http://coliru.stacked-crooked.com/">Coliru</a>, <a href="https://cppinsights.io/">C++ Insights</a></p>
    <p>Online compilers are invaluable tools for communicating about small snippets of code. Depending on
 the tool, they let the user compile programs using multiple toolchains, check the output of their
 code, and share the snippets with others.</p>
    <p>Compiler Explorer’s live updates can be particularly useful when experimenting with new features.
 The assembly view could overwhelm students however, so care should be taken when introducing this
 tool.</p>
+   <p>C++ Insights is a source-code transformation tool that can be
+particularly useful for helping the student to understand how the
+compiler views various types of code constructs in the language.
+For example, source code containing a lambda expression can be transformed
+by the tool into new (equivalent) source code that shows the closure type
+generated by the lambda expression.
+Many other code constructs are also handled by the tool
+(such as range-based for loops and structured bindings).</p>
    <h4 class="heading settled" data-level="2.6.8" id="toolscodeformatter-use-a-code-formatter"><span class="secno">2.6.8. </span><span class="content">[tools.code.formatter] Use a code formatter</span><a class="self-link" href="#toolscodeformatter-use-a-code-formatter"></a></h4>
-   <p>Examples: clang-format</p>
+   <p>Examples: <a href="https://clang.llvm.org/docs/ClangFormat.html">Clang Format</a></p>
    <p>Choosing a code formatter and picking a canonical style (it doesn’t really matter which one) will
 avoid some code style arguments and improve uniformity among student’s code. The latter will make
 marking and comparing solutions easier.</p>
    <h4 class="heading settled" data-level="2.6.9" id="toolslinter-use-linters"><span class="secno">2.6.9. </span><span class="content">[tools.linter] Use linters</span><a class="self-link" href="#toolslinter-use-linters"></a></h4>
-   <p>Example: clang-tidy</p>
-   <p>TODO (why?)</p>
+   <p>Example: <a href="http://clang.llvm.org/extra/clang-tidy/">Clang Tidy</a></p>
+   <p>Static analysis tools are extremely useful for finding certain types of
+bugs or other problems in code.
+Students should be introduced to at least some basic static analysis tools
+(such as linters, like Clang Tidy)
+in order to instill the basic principle of finding bugs early
+(i.e., at compile time).</p>
    <h4 class="heading settled" data-level="2.6.10" id="toolsruntimeanalysis-use-run-time-analysers-especially-when-teaching-free-store"><span class="secno">2.6.10. </span><span class="content">[tools.runtime.analysis] Use run-time analysers, especially when teaching free store</span><a class="self-link" href="#toolsruntimeanalysis-use-run-time-analysers-especially-when-teaching-free-store"></a></h4>
-   <p>Examples: <code class="highlight"><c- n>AddressSanitizer</c-></code>, <code class="highlight"><c- n>UndefinedBehaviorSanitizer</c-></code></p>
-   <p>Notes: WSL does not play nicely with asan, but a Docker image running inside WSL does.</p>
-   <p>TODO (why?)</p>
+   <p>Examples: <a href="https://github.com/google/sanitizers/wiki/AddressSanitizer">Address Sanitizer (ASan)</a>, <a href="https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html">Undefined Behavior Sanitizer (UBSan)</a></p>
+   <p>Dynamic analysis tools can greatly improve the rigor with which code can be
+tested and also help to isolate bugs more quickly.
+Student should be introduced to basic dynamic analysis tools (such as
+ASan and UBSan) as such tools will help the student to more easily
+find problems in their code and also perhaps teach them that code
+that appears to run correctly can still have serious bugs that can be
+caught by such tools.</p>
+   <p>Notes: WSL does not play nicely with ASan, but a Docker image running inside WSL does.</p>
    <h3 class="heading settled" data-level="2.7" id="appreciation-appreciation-for-c"><span class="secno">2.7. </span><span class="content">[appreciation] Appreciation for C++</span><a class="self-link" href="#appreciation-appreciation-for-c"></a></h3>
    <h4 class="heading settled" data-level="2.7.1" id="appreciationhistory-history"><span class="secno">2.7.1. </span><span class="content">[appreciation.history] History</span><a class="self-link" href="#appreciationhistory-history"></a></h4>
    <p>Do not introduce historical aspects of C++ in the forefront of C++ education. This includes:</p>
