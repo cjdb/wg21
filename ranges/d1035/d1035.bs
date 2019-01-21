@@ -1,8 +1,8 @@
 <pre class='metadata'>
 Title: Input range adaptors
-Shortname: D1035
+Shortname: P1035
 Level: 4
-Status: D
+Status: P
 Group: wg21
 Editor: Christopher Di Bella, cjdb.ns@gmail.com
 Editor: Casey Carter, casey@carter.com
@@ -224,9 +224,15 @@ The following polls were taken by LEWG during the San Diego meeting.
    </tr>
 </table>
 
+## From R3 to R4
+
+* Proposes that `iterator_t` and `sentinel_t` require `Range` in their interface.
+* Adjusts associated types for ranges so that they don't explicitly require `Range` (this is
+    deferred to `iterator_t`).
+
 ## From R2 to R3
 
-* Added the above polls.
+* Adds polls from San Diego meeting.
 * Removed `range_size_t` and `range_common_iterator_t` from the associated types.
 * Added justification for why `is_object_v` is necessary for `take_while_view`.
 * Replaced contract-specified pre-conditions with text-specified pre-conditions.
@@ -1812,33 +1818,193 @@ currently no easy way to do that. It can be approximated using `ranges::view::tr
 frequently such operation is needed we think their addition would make manipulation of associative
 containers easier by more clearly expressing the intent.
 
+<table>
+   <tr>
+      <th>Current</th>
+      <th>Proposed</th>
+   </tr>
+   <tr>
+   <td>
+   <xmp>
+   for(auto && name : map | view::transform(&std::pair<const int,int>::first)) {
+        std::format("Hello {}", name);
+   }
+   </xmp>
+   </td>
+   <td>
+   <xmp>
+    for(auto && name :  map | view::keys) {
+        std::format("Hello {}", name);
+    }
+   </xmp>
+   </tr>
+</table>
+
 These views have been part of ranges-v3 and we also have implemented them in cmcstl2. A lot of
 languages and frameworks (notably JS, Python, Qt, Java, [[Boost.Range]]) offer methods to extract
 the keys or values of an associative container, often through `.keys()` and `.values()` operations,
 respectively.
 
-### Implementation
+<xmp>
+std::vector<std::tuple<int, int, int>> vector_of_tuple = {
+    {0,  1,  2},
+    {3,  4,  5},
+    {6,  7,  8},
+    {9, 10, 11}
+};
+
+lst = view::elements<2>(vector_of_tuple);
+//lst == {2, 5, 8, 11}
+</xmp>
+
+* `keys_view` and the corresponding adaptor `view::keys` iterate over the first elements of a
+    sequence of tuple-like objects of size 2 (tuple of size other than two cannot be considered as
+    representing a key-value pair).
+
+It can be defined as:
+
+<xmp>
+template <InputRange R>
+requires std::tuple_size_v<iter_value_t<iterator_t<R>>> == 2
+using keys_view = elements_view<R, 0>;
+</xmp>
+
+* `values_view` and the corresponding adaptor `view::values` iterate over the second elements of a
+    sequence of tuple-like objects of size 2 (tuple of size other than two cannot be considered as
+    representing a key-value pair).
+
+It can be defined as:
+
+<xmp>
+template <InputRange R>
+requires std::tuple_size_v<iter_value_t<iterator_t<R>>> == 2
+using values_view = elements_view<R, 1>;
+</xmp>
+
+And used as:
+
+<xmp>
+auto total_zeroes = ranges::count(map | ranges::view::values, 0);
+</xmp>
+
+### Interface
 
 Given an exposition-only tuple extractor (`__get_fn`), `keys` and `values` need only be range
 adaptor objects implemented in terms of `view::transform`, rather than range adaptors.
 
 <xmp>
-namespace view {
-   template<int X>
-   requires (X == 0) || (X == 1)
-   struct __get_fn {
-      template<class P>
-      requires pair-like<P>
-      constexpr decltype(auto) operator()(P&& p) const
-      {
-         using T = decltype(std::get<X>(std::forward<P>(p)));
-         return std::get<X>(std::forward<P>(p));
-      }
+namespace ranges {
+   template<InputRange R, size_t N>
+   requries View<R> && N < tuple_size_v<range_value_t<R>>
+   class elements_view : public view_interface<elements_view<R, N>> {
+   private:
+      template<bool Const> struct __iterator; // exposition-only
+      template<bool Const> struct __sentinel; // exposition-only
+      R base_;                                // exposition-only
+   public:
+      elements_view() = default;
+
+      constexpr explicit elements_view(R base);
+
+      constexpr R base() const noexcept;
+
+      constexpr auto begin()
+        requires (!simple-view<const R>);
+
+      constexpr auto begin() const
+        requires simple-view<const R>;
+
+      constexpr auto end()
+        requires (!simple-view<const R>);
+
+      constexpr auto end() const
+        requires simple-view<const R>;
+
+      constexpr auto size() const
+        requires SizedRange<R> && (!simple-view<const R>);
+
+      constexpr auto size() const
+        requires SizedRange<const R> && simple-view<const R>;
    };
 
-   inline constexpr auto keys = view::transform(__get_fn<0>{});
-   inline constexpr auto values = view::transform(__get_fn<1>{});
-} // namespace view
+   template<class R>
+   using keys_view = elements_view<all_view<R>, 0>;
+
+   template<class R>
+   using values_view = elements_view<all_view<R>, 1>;
+</xmp>
+
+### `elements_view` constructor
+
+<xmp>
+constexpr explicit elements_view(R base);
+</xmp>
+
+1. <i>Effects</i>: Initialises `base_` with `base`.
+
+### `elements_view` conversion
+
+<xmp>
+constexpr R base() const noexcept;
+</xmp>
+
+2. <i>Effects</i>: Equivalent to `return base_;`.
+
+### `elements_view` range begin
+
+<xmp>
+constexpr auto begin()
+  requires (!simple-view<const R>);
+
+constexpr auto begin() const
+  requires simple-view<const R>;
+</xmp>
+
+3. <i>Effects</i>: Equivalent to `return __iterator<is_const_v<decltype(*this)>>(*this, begin(base_));`.
+
+### `elements_view` range end
+
+<xmp>
+constexpr auto end()
+  requires (!simple-view<const R>);
+
+constexpr auto end() const
+  requires simple-view<const R>;
+</xmp>
+
+4. <i>Effects</i>: Equivalent to `return __iterator<is_const_v<decltype(*this)>>(*this, end(base_));`.
+
+### `elements_view` range size
+
+<xmp>
+constexpr auto size() const
+  requires SizedRange<R> && (!simple-view<const R>);
+
+constexpr auto size() const
+  requires SizedRange<const R> && simple-view<const R>;
+</xmp>
+
+5. <i>Effects</i>: Equivalent to `return size(base_);`.
+
+## `elements_view` range adaptor objects
+
+<xmp>
+   namespace view {
+      template<int X>
+      requires (X == 0) || (X == 1)
+      struct __get_fn {
+         template<class P>
+         requires pair-like<P>
+         constexpr decltype(auto) operator()(P&& p) const
+         {
+            using T = decltype(std::get<X>(std::forward<P>(p)));
+            return std::get<X>(std::forward<P>(p));
+         }
+      };
+
+      inline constexpr auto keys = view::transform(__get_fn<0>{});
+      inline constexpr auto values = view::transform(__get_fn<1>{});
+   } // namespace view
 </xmp>
 
 
