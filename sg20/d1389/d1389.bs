@@ -193,7 +193,7 @@ The table below recommends these as the primary types for beginners.
    </tr>
 </table>
 
-The distinction between pre-C++20 and C++20 is simply the acknowldgement of UTF-8. This is not to
+The distinction between pre-C++20 and C++20 is simply the acknowledgement of UTF-8. This is not to
 suggest that students should be introduced to the details of UTF-8 any earlier, but rather to get
 the idea of UTF-8 support on their radar, so that when they need to care about locales, they won't
 need to shift from thinking about why `char` is insufficient in the current programming world: they
@@ -320,7 +320,7 @@ There has been a comment on why `display(*result)` is not directly applied. The 
 two things:
 
 1. Keeps students away from the quirky syntax of iterators. Default to references.
-2. Gets students into the mindest that an iterator's `operator*` returns a reference.
+2. Gets students into the mindset that an iterator's `operator*` returns a reference.
 
 ### [delay.concept.definitions] Concept definitions
 
@@ -329,7 +329,7 @@ experts on the topic have stated that designing effective concepts comes after o
 details of algorithms. Even the definition for `EqualityComparable` is much more than just checking
 that `a == b` and `a != b` are syntactically possible.
 
-This recommendation does not preculude the introduction of <i>using</i> existing concepts.
+This recommendation does not preclude the introduction of <i>using</i> existing concepts.
 
 ### [delay.cpp] C Preprocessor
 
