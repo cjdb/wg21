@@ -333,9 +333,44 @@ This recommendation does not preculude the introduction of <i>using</i> existing
 
 ### [delay.cpp] C Preprocessor
 
-Excludes `#include`, which is necessary until modules are in C++.
+Most of the traditional usages of the C Preprocessor have better and safer C++ replacements.
+For example:
+```cpp
+// compile-time constant
+#define BUFFER_SIZE 256
+// better as:
+auto constexpr buffer_size = 256;
 
-TODO
+// named constants
+#define RED   0xFF0000
+#define GREEN 0x00FF00
+#define BLUE  0x0000FF
+// better as:
+enum class Color { red = 0xFF0000, green = 0x00FF00, blue = 0x0000FF };
+
+// inline function
+#define SUCCEEDED(res) (res == 0)
+// better as:
+inline bool succeeded(int res) { return res == 0; }
+
+// generic function
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+// better as:
+template <typename T>
+T const& min(T const& a, T const& b) {
+   return a < b ? a : b;
+}
+```
+
+All these macros have [many possible pitfalls](https://gcc.gnu.org/onlinedocs/cpp/Macro-Pitfalls.html#Macro-Pitfalls),
+they hard to get right and they don't obey scope and type rules.  The C++ replacements are easier to
+get right and fit better into the general picture.
+
+The only preprocessor usages that are necessary right at the beginning are:
+* `#include` for textual inclusion of header files (at least until modules become the main tool for
+    consuming external code)
+* `#ifndef` for creating "include guards" to prevent multiple inclusion (or use `#pragma once` instead,
+    which is simpler to teach and available in most mainstream compilers) 
 
 ## [style] Style practices
 
