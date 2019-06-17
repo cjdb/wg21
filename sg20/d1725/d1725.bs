@@ -1,12 +1,20 @@
-# Modular Topic Design
+<pre class='metadata'>
+Title: Modular Topic Design
+Shortname: D1725
+Level: 0
+Status: D
+Group: wg21
+Editor: Christopher Di Bella, cjdb.ns@gmail.com
+URL: https://wg21.link/p1725
+Abstract: SG20 advised that [[P1389R0]] should move away from a linear stage-based model into a more modular topic-based model. This proposal aims to start the discussion for evaluating the the class of modules that are suitable for curriculum guidelines.
+Audience: SG20
+Markup Shorthands: markdown yes
+Default Highlight: CPP
+Line Numbers: no
+Date: 2019-06-17
+</pre>
 
-## Abstract
-
-SG20 advised that [P1389R0] should move away from a linear stage-based model into a more modular
-topic-based model. This proposal aims to start the discussion for evaluating the the class of
-modules that are suitable for curriculum guidelines.
-
-## Motivation
+# Motivation
 
 It was noted in the SG20 Kona face-to-face that learning is an iterative process, requring
 malleability, and that the stages outlined in P1389 were too rigid and linear; this might be too
@@ -34,7 +42,7 @@ Documents that SG20 outputs, so that they are significantly less prescriptive, a
 advisory role outlined in the SG20 charter, as opposed to accidentally becoming a prescriptive
 curriculum.
 
-## Design goals
+# Design goals
 
 It should be noted that while P1725 suggests a handful of modules and topics that fall within those
 modules, it is by no means an exhaustive list of either. Furthermore, P1725R0 does not make any
@@ -48,6 +56,10 @@ student should have developed certain knowledge, understanding, and skills about
 These are assessable through course outcomes, which advise that a student should be able to do
 something related with that knowledge, or related to that skill. For example, Table 1 outlines a few
 objectives and outcomes from a hypothetical introductory C++ course.
+
+<b>Note: Table 1 is an example set of objectives and outcomes for a particular hypothetical course
+and is deliberately incomplete: P1725 is <i>not</i> proposing the contents of Table 1 be added to
+any document published by SG20.</b>
 
 <table>
   <tr>
@@ -114,10 +126,7 @@ objectives and outcomes from a hypothetical introductory C++ course.
   </tr>
 </table>
 
-**Table 1 is an attempt to communicate the ideas behind objectives and outcomes, are are strictly
-_not_ to be included as a part of P1725's output.**
-
-## A non-exhausive list of modules
+# A non-exhausive list of modules
 
 Table 2 outlines a non-exhaustive list of modules and their related topics. The modules are not
 listed in a meaningful order; instead, they are listed so that the table is evenly formatted.
@@ -172,6 +181,7 @@ listed in a meaningful order; instead, they are listed so that the table is even
 				<li>pointers</li>
 				<li>references</li>
 				<li>references-to-<code>const</code></li>
+				<li>reference semantics</li>
 				<li>resources</li>
 				<li>rule-of-five</li>
 				<li>rule-of-zero</li>
@@ -180,6 +190,7 @@ listed in a meaningful order; instead, they are listed so that the table is even
 				<li>special member functions</li>
 				<li>types</li>
 				<li>values</li>
+				<li>value semantics</li>
 			</ul>
 		</td>
 		<td>
@@ -212,7 +223,7 @@ listed in a meaningful order; instead, they are listed so that the table is even
 				<li>friends</li>
 				<li>interface inhertiance</li>
 				<li>member functions</li>
-				<li><code>optional</code>s and <code>variant</code>s as sum types</li>
+				<li><code>optional</code> and <code>variant</code> as sum types</li>
 				<li>rule-of-five</li>
 				<li>rule-of-zero</li>
 				<li>special member functions</li>
@@ -281,21 +292,38 @@ listed in a meaningful order; instead, they are listed so that the table is even
 			<br />
 			No topic suggestions at present.
 		</td>
+		<td>
+			<b>Undefined behaviour</b>
+			<br />
+			No topic suggestions at present.
+		</td>
 	</tr>
 </table>
 
 An astute reader should notice that there are a few topics that are mentioned in multiple modules.
-This highlights that the above modules could perhaps be further refined _or_ that certain topics
-cannot be taught in isolation. Given that features of C++ are designed to work with one another,
-the author believes that the latter case is more likely. The reader should also note that both
-'types' and 'user-defined types' have been listed as modules _and_ topics within other modules.
+This highlights that the above modules could perhaps be further refined <i>or</i> that certain
+topics cannot be taught in isolation. Given that features of C++ are designed to work with one
+another, the author believes that the latter case is more likely. The reader should also note that
+both 'types' and 'user-defined types' have been listed as modules <i>and</i> topics within other
+modules.
 
 The author would like to propose that SG20 adopt the module/topic model -- even if it is in a
 different form to what is outlined above -- and begin discussing the kinds of modules desired, the
 topics underneath each module, the objectives for each module, and the relevant module outcomes
 associated with each objective.
 
-## Acknowledgements
+# Acknowledgements
+
+The author would like to thank JC van Winkel for his direct feedback on this proposal, as well as
+the members of SG20 who provided feedback on P1389R0's structure.
 
 
-[P1389]: https://wg21.link/p1389r0
+<pre class=biblio>
+{
+"P1389R0": {
+   "title": "Standing Document for SG20: Guidelines for Teaching C++ to Beginners",
+   "authors": "Christopher Di Bella, Simon Brand, Michael Adams",
+   "href": "https://wg21.link/p1389r0"
+}
+}
+</pre>
