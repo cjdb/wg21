@@ -1,0 +1,1424 @@
+<pre class='metadata'>
+Title: Concepts for the Numeric Algorithms
+Shortname: D1034
+Level: 0
+Status: D
+Group: wg21
+Editor: Christopher Di Bella, cjdb.ns@gmail.com
+URL: https://wg21.link/p1034
+Abstract: D1034 proposes to introduce the numeric algorithms to std::ranges.
+Audience: LEWG, SG1, SG6, SG8, SG9, SG18
+Markup Shorthands: markdown yes
+Default Highlight: CPP
+Line Numbers: no
+Date: 2018-10-08
+</pre>
+
+# Introduction
+
+## Motivation
+
+> Every time someone asks why we didn’t cover `<numeric>` and `<memory>` algorithms: We thought 187
+> pages of TS was enough.
+>
+> —Casey Carter
+
+[[N3351]] served as the basis for the Ranges TS, which was merged into the C++20 WP. N3351 focused
+on defining concepts for the standard library, which is achieved by looking at the use-cases that
+concepts are designed for: generic algorithms. Specifically, N3351 looked at pinning down the
+concepts relevant to the algorithms found in `<algorithm>` after C++11. All known bodies of work
+from [[N4128]] through to [[P0896]] and [[P0898]] —with the exception of [[P1033]]— have continued
+to focus on studying and refining the contents of `<algorithm>`. P1033 takes the extremely
+low-hanging fruit and adds the uninitialised-memory algorithms from `<memory>` to the mix. To the
+author's best knowledge, all that's left to be added are possibly a few algorithms introduced in
+C++17 and C++20, and all of the algorithms in `<numeric>`.
+
+The numeric algorithms weren't abandoned or forgotten: given the limited resources, there simply
+wasn't enough time to study all of the algorithms in `<algorithm>` and `<numeric>`, and also
+introduce the basis for range adaptors in C++20. Now that we're moving into the C++23 era, we should
+start considering the numeric algorithms in the same light as N3351 considered the `<algorithm>`
+algorithms.
+
+A complete design is not as simple as taking the concepts introduced in P0896, slapping them on the
+numeric algorithms, and calling it a day. These algorithms have different requirements to those in
+`<algorithm>`, and P1034 takes aim at what those might look like. P1034R0 chooses to focus on only
+those algorithms introduced in C++98 and `reduce`; the remaining C++17 numeric algorithms are left
+to P1034R1.
+
+## Design Ideals
+
+The following section has been lifted almost completely verbatim from N3351. This serves as a
+reminder that the design ideals have not really changed since N3351's publication in 2012.
+
+> 1. The concepts for the STL must be mathematically and logically sound. By this, we mean to
+>     emphasise the fact that we should be able to reason about properties of programs (e.g.
+>     correctness) with respect to the semantics of the language and the types used in those
+>     programs.
+> 2. The concepts used should express general ideas in the application domain (hence the name
+>     'concepts') rather than mere programming language artifacts. Thinking about concepts as a yet
+>     another 'contract' language can lead to partially formed ideas. Contracts force programmers to
+>     think about requirements on individual functions or interfaces, whereas concepts should
+>     represent fully formed abstractions.
+> 3. The concepts should specify both syntactic and semantic requirements ("concepts are allabout
+>     semantics" —Alex Stepanov). A concept without semantics only partially specifies an interface
+>     and cannot be reasoned about; the absence of semantics is the opposite ofsoundness ("it is
+>     insanity" —Alex Stepanov).
+> 4. Symbols and identifiers should be associated with their conventional meanings. Overloads should
+>     have well defined semantics and not change the usual meaning of the symbol or name.
+> 5. The concepts as used to specify algorithms should be terse and readable. An algorithm's
+>     requirements must not restate the syntax of its implementation.
+> 6. The number of concepts used should be low, in order to make them easier to understand and
+>     remember.
+> 7. An algorithm's requirements must not inhibit the use of very common code patterns in its
+>     implementation.
+> 8. An algorithm should not contain requirements for syntax that it does not use, thereby
+>     unnecessarily limiting its generality.
+> 9. The STL with concepts should be compatible with C++20 except where that compatibility would
+>     imply a serious violation of one of the first two aims.
+
+The only non-editorial change made to this list of ideals is #9, which has been updated to reflect
+the current decade.
+
+> Every generic library design must choose the style in which it describes template requirements.
+> The ways in which requirements are specified has a direct impact on the design of the concepts
+> used to express them, and (as always) there are direct consequences of that choice. For example,
+> we could choose to state template requirements in terms of the exact syntax requirements of the
+> template. This leads to concept designs that have large numbers of small yntactic predicates (e.g.
+> `HasPlus`, `HasComma`, etc.). The benefit of this style of constraint is that templates are more
+> broadly adaptable: there are potentially more conforming types with which the template will
+> interoperate. On the downside, exact requirements tend to be more verbose, decreasing the
+> likelihood that the intended abstraction will be adequately communicated to the library’s users.
+> The C++0x design is, in many aspects, a product of this style.
+>
+> On the other end of the spectrum, we could choose to express requirements in terms of the required
+> abstraction instead of the required syntax. This approach can lead to (far) fewer concepts in the
+> library design because related syntactic requirements are grouped to create coherent, meaningful
+> abstractions. Requirements can also be expressed more tersely, needing fewer concepts to express a
+> set of requirements that describe how types are used in an algorithm. The use of abstract concepts
+> also allows an algorithm to have more conforming implementations, giving a library author an
+> opportunity to modify (i.e. maintain) a template’s implementation without impacting its
+> requirements. The obvious downside to this style is that it over-constrains templates; there may
+> be types that conform to a minimal set of operations used by a template, but not the full set of
+> operations required by the concept. The concepts presented in <em>Elements of Programming</em>
+> approach this end of the spectrum.
+
+Similarly to N3351, P1034 aims to hold itself in-between these two extremes, but readers familiar
+with the designs in EoP will probably notice a bias toward abstract concepts.
+
+## Organisation
+
+Similarly to N3351, P1034 is broken into a section for declaring algorithms with concept
+requirements, and a section for defining concepts.
+
+## Assumed knowledge
+
+The following sections assume familiarity with the concepts library ([concepts]), the iterator
+concepts ([iterator.concepts]), the indirect callable requirements ([indirectcallable]), the common
+algorithm requirements ([alg.req]), the range requirements ([range.req]), and the way in which
+algorithms are specified in namespace `std::ranges` ([algorithms]).
+
+Readers should consult [[concept-design]] prior to reading the remainder of P1034. Readers are also
+encouraged to consult [[EoP]] and N3351 as necessary.
+
+## Acknowledgements
+
+It should be no surprise -- at this point -- that the author has lifted large parts of §1 from N3351
+verbatim. The author would like to thank those who worked on N3351 for starting this work, and for
+outlining a clear vision that would carry on for almost a decade.
+
+# Algorithms
+
+> We start with algorithms because it is algorithms we want to specify cleanly, precisely,
+> completely, and readably. If we can specify algorithms well, our concepts and the language
+> mechanisms we use to specify the concepts are adequate. If not, no amount of sophistication in
+> language mechanisms will help us.
+>
+> —N3351, §2
+
+> Generic Programming pro tip: Although Concepts are constraints on types, you don't find them by
+> looking at the types in your system. You find them by studying the algorithms.
+>
+> —Eric Niebler
+
+## Sequenced numeric algorithms
+
+The 'sequenced numeric algorithms' are the algorithms found in `<numeric>` introduced in C++98. This
+family of algorithms performs computations in a sequential manner, from left-to-right, or from the
+first element in the sequence to the last. For some binary operation `bop`, and two expressions `x`
+and `y`, the expression `bop(x, y)` need only be equality-preserving ([concepts.equality]); the
+expression `bop(x, y)` doesn't need to be _associative_, nor does it need to be _commutative_. That
+is, `bop(x, bop(y, z))` is not required to return the same result as `bop(bop(x, y), z)`, and
+`bop(x, y)` does not need to return the same result as `bop(y, x)`.
+
+For example, subtraction is not an associative operation: `1 - (2 - 3) == 2` and
+`(1 - 2) - 3 == -4`. Subtraction is also not a commutative operation: `1 - 2 == -1` and
+`2 - 1 == 1`.
+
+### Accumulate
+
+`accumulate` is an algorithm that performs a fold operation, or in other words, takes a sequence of
+values and reduces them into a single value according to some operation. This is a generalisation of
+a summation.
+
+The algorithm —modelled after what's currently in the International Standard— has a fairly
+straightforward declaration:
+
+```cpp
+template<input_iterator I, sentinel_for<I>, movable T, class Proj = identity,
+         indirect_magma<const T*, projected<I, Proj>, T*> BOp = ranges::plus>
+constexpr accumulate_result<I, T>
+  accumulate(I first, S last, T init, BOp bop = {}, Proj proj = {});
+
+template<input_range R, movable T, class Proj = identity,
+         indirect_magma<const T*, projected<iterator_t<R>, Proj>, T*> BOp = ranges::plus>
+constexpr accumulate_result<safe_iterator_t<R>, T>
+  accumulate(R&& r, T init, BOp bop = {}, Proj proj = {});
+```
+
+A `magma` is a binary operation `bop` over a set of elements `S`, where the result of `bop(x, y)` is
+also in the set, or alternatively, `bop` is closed under `S`. Because different types may represent
+the same set of elements (e.g. all of `int`, `long long`, and `double` *can* be used to represent
+a subset of integers), `BOp` does not need to be a homogeneous binary operation. For equational
+reasoning purposes, the types are expected to have a common type, and so `bop(0, vector{0})` does
+not model a `magma`. Similarly, `bop(x, y)`, where `x` and `y` are possibly different types is
+expected to share a type common to both `x` and `y`. The type of `bop(x, y)` must be the same as the
+type of `bop(y, x)`. A `magma` also requires `BOp` to model `regular_invocable`. Finally, a magma is
+only concerned with closure: they do not impose any requirements on associativity, nor on
+commutativity, so although the types of `bop(x, y)` and `bop(y, x)` need to match, there is no
+requirement for their values to match.
+
+It might also be nice to use `accumulate` without an initial value, similarly to `std::reduce`. It
+would certainly be convenient to use `accumulate(r)` or `accumulate(r, ranges::product{})`, where
+`r` is an arbitrary range, and `ranges::product` is a modernisation of `std::multiplies`. The former
+is fairly trivial to do: we can default `init = T{}` and call it a day, just as `std::reduce` has,
+but the author feels that this is lacking. An *ideal* `init`-less `accumulate` should permit the
+caller to specify a range, optionally an operation, and optionally a projection. This requires more
+care, because `accumulate(r, product{})` when `init = T{}` would always produce a single result:
+`0`. The reasons for why this is not desirable should be obvious.
+
+By instead choosing an appropriate *identity element*, `accumulate(r, bop, proj)` becomes a viable
+candidate to add to our overload set. An identity element `id` is an element in a set where
+`bop(x, id)` is equivalent to `x`, or `bop(id, x)` is equivalent to `x`. `bop(x, id)` is called a
+*right-identity*, because `id` is on the right-hand-side of `x`, and `bop(id, x)` is called a
+*left-identity*. When `id` is both a left-identity and a right-identity, we call it a
+*two-sided identity* (mathematicians should note that `std::identity` is a function object, so a
+new name needed to be chosen). With an interface that requires a two-sided identity, we can now
+declare our additions to the `accumulate` overload set.
+
+```cpp
+template<input_iterator I, sentinel_for<I> S, class Proj = identity,
+         indirect_monoid<projected<I, Proj>, projected<I, Proj>,
+                         iter_value_t<projected<I, Proj>>*> BOp = ranges::plus>
+requires movable<iter_value_t<projected<I, Proj>>>
+constexpr accumulate_result<I, iter_value_t<projected<I, Proj>>>
+  accumulate(I first, S last, BOp bop = {}, Proj proj = {});
+
+template<input_range R, class Proj = identity,
+         indirect_monoid<projected<iterator_t<R>, Proj>,
+                         projected<iterator_t<R>, Proj>,
+                         iter_value_t<projected<iterator_t<R>, Proj>>* = ranges::plus>
+requires movable<iter_value_t<projected<iterator_t<R>, Proj>>>
+constexpr accumulate_result<safe_iterator_t<R>, iter_value_t<projected<iterator_t<R>, Proj>>>
+  accumulate(R&& r, BOp bop = {}, Proj proj = {});
+```
+
+A `monoid` is a twice-removed refinement over `magma`: it requires `BOp` be an associative operation
+(this is the sole additional requirement of a `semigroup`), and it requires that `BOp` have a
+two-sided identity (this is the sole additional requirement of a `monoid`). How this is achieved is
+covered later, but it is a good idea to note now that the notion of identities are defined using a
+new set of traits (numeric traits). This overload subset designates the return type to be the same
+as the iterator's value type, so the requirement for `T` to be `movable` must be moved
+appropriately.
+
+### Partial sum
+
+A `partial_sum` is an 'along-the-way' reduction. That is, it writes out all the values that
+`accumulate` would produce, not unlike to 'showing its work for each iteration'.
+
+```cpp
+template<input_iterator I, sentinel_for<I> S1, weakly_incrementalbe O, sentinel_for<O> S2,
+         class Proj = identity,
+         indirect_magma<projected<I, Proj>, projected<I, Proj>, O> BOp = ranges::plus>
+requires indirectly_copyable_storable<I, O>
+constexpr partial_sum_result<I, O>
+  partial_sum(I first, S1 last, O result, S2 result_last, BOp bop = {}, Proj proj = {});
+
+template<input_range R, range O, class Proj = identity,
+         indirect_magma<projected<iterator_t<R>, Proj>,
+                       projected<iterator_t<R>, Proj>,
+                       iterator_t<O>> BOp = ranges::plus>
+requires indirectly_copyable_storable<iterator_t<I>, iterator_t<O>>
+constexpr partial_sum_result<safe_iterator_t<R>, safe_iterator_t<O>>
+  partial_sum(R&& r, O&& result, BOp bop = {}, Proj proj = {});
+```
+
+Unlike `accumulate`, `partial_sum` doesn't require an initial value, instead designating the initial
+value be `first`. `partial_sum` requires a `magma` for the same reasons as `accumulate`. The output
+of `partial_sum`'s value-type must be copyable and movable through a cache.
+
+*[Note to reviewers: the above paragrpah is poorly worded. Input on how to rephrase appreciated.]*
+
+The author suspects that the output for `partial_sum` might be better off modelling `OutputIterator`
+and `OutputRange`. Both overloads have been changed to take two ranges as parameters instead of
+range-and-a-half parameters to minimise the likelihood of writing to an output range that is smaller
+than the input range.
+
+### Adjacent difference
+
+`adjacent_difference` computes the result of `bop(x, y)`, where `bop` is a binary operation, and `x`
+and `y` are adjacent elements in a sequence. Its output is a sequence of pair-wise reductions of its
+input. Given its name, the default operation for `adjacent_difference` is the difference of two
+adjacent elements instead of the previously used sum operation.
+
+```cpp
+template<input_iterator I, sentinel_for<I> S1, weakly_incrementalbe O, sentinel_for<O> S2,
+         class Proj = identity,
+         indirect_magma<projected<I, Proj>, projected<I, Proj>, O> BOp = ranges::minus>
+requires requires indirectly_copyable_storable<I, O>
+constexpr adjacent_difference_result<I, O>
+  adjacent_difference(I first, S1 last, O result, S2 result_last, BOp bop = {}, Proj proj = {});
+
+template<input_range R, range O, class Proj = identity,
+         indirect_magma<projected<iterator_t<R>, Proj>,
+                        projected<iterator_t<R>, Proj>,
+                        iterator_t<O>> BOp = ranges::minus>
+requires indirectly_copyable_storable<iterator_t<I>, iterator_t<O>>
+constexpr adjacent_difference_result<safe_iterator_t<R>, safe_iterator_t<O>>
+  adjacent_difference(R&& r, O&& result, BOp bop = {}, Proj proj = {});
+```
+
+The rationale for this algorithm's requirements are the same as the rationale used for
+`partial_sum`.
+
+### Inner product
+
+`inner_product` is the generalisation of an algebraic inner product.
+
+```cpp
+template<input_iterator I1, sentinel_for<I1> S1, input_iterator I2, sentinel_for<I2> S2,
+         movable T, class Proj1 = identity, class Proj2 = identity,
+         class BOp1 = ranges::plus, class BOp2 = product>
+requires indirect_weak_magmaring<BOp1, BOp2, const T*,
+                                 projected<I1, Proj1>, projected<I2, Proj2>, T*>
+constexpr inner_product_result<I1, I2, T>
+ inner_product(I1 first1, S1 last1, I2 first2, S2 last2, T init,
+               BOp1 bop1 = {}, BOp2 bop2 = {}, Proj1 proj1 = {}, Proj2 proj2 = {});
+
+template<input_range R1, input_range R2, class BOp1 = ranges::plus, class BOp2 = product,
+         movable T, class Proj1 = identity, class Proj2 = identity>
+requires indirect_weak_magmaring<BOp1, BOp2, const T*,
+                                 projected<iterator_t<R1>, Proj1>,
+                                 projected<iterator_t<R2>, Proj2>, T*>
+constexpr inner_product_result<safe_iterator_t<R1>, safe_iterator_t<R2>, T>
+  inner_product(R1&& r1, R2&& r2, T init, BOp1 bop1 = {}, BOp2 bop2 = {},
+                Proj1 proj1 = {}, Proj2 proj2 = {})
+```
+
+Mathematicians note that weak-magmaring is a generalisation of a near-semiring, named by the author,
+to fit the requirements. The author asked around on [[StackExchange]] before naming this algebraic
+structure, but it seems that the structure is too general to be of interest outside of this
+use-case. The choice for naming stems from that fact that a near-semiring weakens (S, ·) from a
+monoid to a semigroup, and a weak-magmaring weakens (S, ·) from a semiring to a magma. A more
+appropriate name might exist: near-semirings still require (S, +) to model a monoid, but a
+near-magma weakens this requirement to a magma as well.
+
+A `weak_magmaring` is an extreme generalisation of the well-known semiring algebraic structure that
+establishes a relationship between two `magma`s. Specifically, it describes that a magma `BOp2` is
+distributive over `BOp1`. Given three objects of possibly distinct —but related— types, `x`, `y`,
+and `z`, the expression `bop2(x, bop1(y, z))` is equivalent to `bop1(bop2(x, y), bop2(x, z))`. For
+example, `x * (y + z) == (x * y) + (x * z)`, since multiplication is distributive over addition.
+
+Care has been taken to ensure that `inner_product` is not over-constraining, and that only types
+that directly interact are required to have a common type. This means the following code doesn't
+meet the requirements for `inner_product`.
+
+```cpp
+auto words_to_ints = [](string_view const word) -> int {
+   // ...
+};
+auto const data1 = vector{"one"s, "two"s, "three"s, "four"s, "five"s};
+auto const data2 = vector{"six"s, "seven"s, "eigth"s, "nine"s, "ten"s};
+return inner_product(data1, data2, 0, ranges::plus{}, words_to_ints);
+// error: words_to_ints doesn't model magma<string, string>, since
+//        common<invoke_result_t<words_to_ints, string, string>, int> is false.
+```
+
+*Editor's note: The author is unsure if this is over-constraining.*
+
+Similarly to `accumulate`, by refining our requirements, it's possible to eliminate the need for an
+initial value, thereby making this possible:
+
+```cpp
+auto slice = [](auto const drop, auto const take){ return view::drop(drop) | view::take(take); };
+return inner_product(ints | slice(100, 10), ints | slice(10, 10));
+```
+
+```cpp
+template<input_iterator I1, sentinel_for<I1> S1, input_iterator I2, sentinel_for<I2> S2,
+         class BOp1 = ranges::plus, class BOp2 = product,
+         class Proj1 = identity, class Proj2 = identity>
+requires indirect_near_semiring<BOp1, BOp2,
+                                const iter_value_t<projected<I1, Proj1>>*,
+                                projected<I1, Proj1>,
+                                projected<I2, Proj2>,
+                                iter_value_t<projected<I1, Proj1>>*>
+constexpr inner_product_result<I1, I2, iter_value_t<projected<I1, Proj1>>>
+inner_product(I1 first1, S1 last1, I2 first2, S2 last2, BOp1 bop1 = {}, BOp2 bop2 = {},
+              Proj1 proj1 = {}, Proj2 proj2 = {});
+
+template<input_range R1, input_range R2, class Proj1 = identity, class Proj2 = identity,
+         class BOp1 = ranges::plus, class BOp2 = product>
+requires indirect_near_semiring<BOp1, BOp2,
+                                const iter_value_t<projected<iterator_t<R1>, Proj1>>*,
+                                projected<iterator_t<R1>, Proj1>,
+                                projected<iterator_t<R2>, Proj2>,
+                                iter_value_t<projected<iterator_t<R1>, Proj1>>*>
+constexpr inner_product_result<safe_iterator_t<R1>, safe_iterator_t<R2>,
+                               iter_value_t<projected<iterator_t<R1>, Proj1>>>
+inner_product(R1&& r1, R2&& r2, BOp1 bop1 = {}, BOp2 bop2 = {},
+              Proj1 proj1 = {}, Proj2 proj2 = {});
+```
+
+`near_semiring` is a refinement of `weak_magmaring`, and naturally arises from studying functions on
+monoids. A near-semigroup requires that `BOp1` model a monoid, and that `BOp2` model a semigroup. As
+a near-semiring refines a weak-magmaring, it subsumes the distributive property. It also introduces
+the notion of an *annhiliating element*. In mathematics, an annihilating element is a special
+element in a set for certain operations, such that when applied with any other element in the set,
+the result of the operation is the annihliating element. It is the complete opposite of an identity
+element. For example, scalar multiplication's annihilating element is `0`: `0 * x == 0` and
+`x * 0 == 0`. Semigroup theory refers to annihilating elements as the *zero element*, as there is
+only one notion of zero.
+
+<em>
+[Note to reviewers: while a zero element is not strictly a necessity for <code>inner_product</code>,
+it appears to be a fundamental property of a near-semiring, and so it has been included in the set
+of requirements for a <code>near_semiring</code>.]
+</em>
+
+### Iota
+
+<em>
+[Note to reviewers: As the C++20 WP contains `iota_view`, it is unclear to the author whether or not
+there is a place for an algorithm `iota`. This subsection will be filled out, either in favour or
+against, after receiving guidance.]
+</em>
+
+## Unsequenced numeric algorithms
+
+The 'unsequenced numeric algorithms' are the `<numeric>` algorithms introduced in C++17. These are a
+further generalisation of the sequenced numeric algorithms, and may perform computations
+out-of-order. As such, in order to guarantee equality-preservation, these algorithms will require
+their operations be both associative and commutative.
+
+There have been noticable performance differences between the sequenced algorithms and their
+unsequenced counterparts, as shown in [[#appendix-a-performance-results]].
+
+### Reduce
+
+`reduce` is the unsequenced counterpart to `accumulate`. Its declaration is fairly similar to that
+of `accumulate`, except for the refinements introduced by this section.
+
+```cpp
+template<input_iterator I, sentinel_for<I>, movable T, class Proj = identity,
+         indirect_commutative_semigroup<const T*, projected<I, Proj>, T*> BOp = ranges::plus>
+constexpr reduce_result<I, T>
+  reduce(I first, S last, T init, BOp bop = {}, Proj proj = {});
+
+template<input_range R, movable T, class Proj = identity,
+         indirect_commutative_semigroup<const T*,
+                                        projected<iterator_t<R>, Proj>, T*> BOp = ranges::plus>
+constexpr reduce_result<safe_iterator_t<R>, T>
+  reduce(R&& r, T init, BOp bop = {}, Proj proj = {});
+
+template<input_iterator I, sentinel_for<I> S, class Proj = identity,
+         indirect_commutative_monoid<projected<I, Proj>, projected<I, Proj>,
+                                     iter_value_t<projected<I, Proj>>*> BOp = ranges::plus>
+requires movable<iter_value_t<projected<I, Proj>>>
+constexpr reduce_result<I, iter_value_t<projected<I, Proj>>>
+  reduce(I first, S last, BOp bop = {}, Proj proj = {});
+
+template<input_range R, class Proj = identity,
+         indirect_commutative_monoid<projected<iterator_t<R>, Proj>,
+                                     projected<iterator_t<R>, Proj>,
+                                     iter_value_t<projected<iterator_t<R>, Proj>>* = ranges::plus>
+requires movable<iter_value_t<projected<iterator_t<R>, Proj>>>
+constexpr reduce_result<safe_iterator_t<R>, iter_value_t<projected<iterator_t<R>, Proj>>>
+  reduce(R&& r, BOp bop = {}, Proj proj = {});
+```
+
+`commutative_semigroup` and `commutative_monoid` respectively refine `semigroup` and `monoid` so
+that `BOp` is a commutative operation. This is achieved by introducing a `commutative_invocable`
+concept, which requires that for two distinct values `x` and `y`, `bop(x, y)` is has same result as
+`bop(y, x)`.
+
+# Algorithm support
+
+> Generic Programming pro tip #2: The "basis operations" of a well-designed concept or concept
+> hierarchy is the minimal set of operations that are both sufficient and necessary for efficiently
+> implementing all algorithms of interest within a particular domain.
+>
+> —Eric Niebler
+
+## Numeric traits
+
+The author is aware that traits may not be the best solution to this problem, and is open to other
+designs that will tidy up this section of the proposal. Both [[#identity]] and [[#zero]] permit
+users to specialise certain parts of their respective designs, but aim to lock down as much as
+possible, to ensure that users don't shoot themselves (or their respective users) in the foot.
+
+To that end, this section doesn't even attempt wording, until strong direction is provided.
+
+### Identity
+
+#### Left identity
+
+`left_identity` is a type that represents the notion of a *left-identity*, as introduced in
+[[#accumulate]].
+
+```cpp
+namespace std {
+  template<class BOp, class T, class U = T>
+  requires magma<BOp, T, U>
+  struct left_identity {};
+
+  template<class BOp, class T, class U>
+  requires magma<BOp, T, U>
+  struct left_identity<BOp&, T, U> : left_identity<remove_cvref_t<BOp>, T, U> {};
+
+  template<class BOp, class T, class U>
+  requires magma<BOp, T, U>
+  struct left_identity<BOp&&, T, U> : left_identity<remove_cvref_t<BOp>, T, U> {};
+
+  template<class BOp, class T, class U = T>
+  using left_identity_t = decltype(std::declval<left_identity<BOp, T, U>>().value());
+} // namespace std
+```
+
+Specialisation of `left_identity`'s first parameter is permitted, but specialising the latter two
+parameters is ill-formed, no diagnostic required. All specialisations must take the form:
+
+```cpp
+struct binary_op {
+  int operator()(int, int) const;
+};
+
+namespace std {
+  template<class T, class U>
+  requires magma<binary_op, T, U>
+  struct left_identity<binary_op, T, U> {
+    constexpr explicit left_identity(const binary_op&, const T&, const U&) {}
+    constexpr common_type_t<T, U> value() const { /* unspecified */ }
+  };
+} // namespace std
+```
+
+#### Right identity
+
+`right_identity` is a type that represents the notion of a *right-identity*, as introduced in
+[[#accumulate]].
+
+```cpp
+namespace std {
+  template<class BOp, class T, class U = T>
+  requires magma<BOp, T, U>
+  struct right_identity {};
+
+  template<class BOp, class T, class U>
+  requires magma<BOp, T, U>
+  struct right_identity<BOp&, T, U> : right_identity<remove_cvref_t<BOp>, T, U> {};
+
+  template<class BOp, class T, class U>
+  requires magma<BOp, T, U>
+  struct right_identity<BOp&&, T, U> : right_identity<remove_cvref_t<BOp>, T, U> {};
+
+  template<class BOp, class T, class U = T>
+  using right_identity_t = decltype(std::declval<right_identity<BOp, T, U>>().value());
+} // namespace std
+```
+
+Specialisation of `right_identity`'s first parameter is permitted, but specialising the latter two
+parameters is ill-formed, no diagnostic required. All specialisations must take the form:
+
+```cpp
+namespace std {
+  template<class T, class U>
+  requires magma<binary_op, T, U>
+  struct right_identity<binary_op, T, U> {
+    constexpr explicit right_identity(const binary_op&, const T&, const U&) {}
+    constexpr common_type_t<T, U> value() const { /* unspecified */ }
+  };
+} // namespace std
+```
+
+### Two-sided identity
+
+`two_sided_identity` is a type that represents the notion of a *two-sided identity*, as introduced
+in [[#accumulate]]. Unlike `left_identity` and `right_identity`, `two_sided_identity` may not be
+specialised at all, even by the standard library.
+
+```cpp
+namespace std {
+  template<class BOp, class T, class U = T>
+  concept has-two-sided-identity = // exposition-only
+    requires(BOp bop, const T& t, const U& u) {
+      typename left_identity_t<BOp, T, U>;
+      typename right_identity_t<BOp, T, U>;
+      typename left_identity_t<BOp, U, T>;
+      typename right_identity_t<BOp, U, T>;
+
+      requires common<left_identity_t<BOp, T, U>, left_identity_t<BOp, U, T>>;
+      requires common<right_identity_t<BOp, T, U>, right_identity_t<BOp, U, T>>;
+      requires common<left_identity_t<BOp, T, U>, right_identity_t<BOp, T, U>>;
+
+      // axiom {
+      //   auto left = left_identity<T, U, BOp>{};
+      //   auto right = right_identity<T, U, BOp>{};
+      //   [[assert: left(bop, t, u) == left(bop, u, t)]];
+      //   [[assert: right(bop, t, u) == right(bop, u, t)]];
+      //   [[assert: left(bop, t, u) == right(bop, u, t)]];
+      //
+      //   if (t != left(bop, t, u) and u != right(bop, t, u)) {
+      //     [[assert: t == invoke(bop, t, right(bop, t, u))]];
+      //     [[assert: u == invoke(bop, left(bop, t, u), u))]];
+      //   }
+      // };
+    };
+```
+
+<em>
+Editor's note: The `axiom` block indicates semantic requirements with declarations. The assertions
+are used to indicate independent semantic requirements.
+</em>
+
+```cpp
+  template<class BOp, class T, class U = T>
+  requires has-two-sided-identity<BOp, T, U>
+  struct two_sided_identity
+  : private left_identity<BOp, T, U>
+  , private right_identity<BOp, T, U> {
+    constexpr explicit two_sided_identity(const BOp& bop, const T& t, const U& u)
+    [[expects: static_cast<left_identity<BOp, T, U>&>(*this).value()
+            == static_cast<right_identity<BOp, T, U>&>(*this).value()]]
+    : left_identity<BOp, T, U>{bop, t, u}
+    , right_identity<BOp, T, U>{bop, t, u}
+    {}
+
+    constexpr auto value() const {
+      return static_cast<std::common_type_t<T, U>>(
+        static_cast<const left_identity<BOp, T, U>&>(*this).value()
+      );
+    }
+  };
+
+  template<class BOp, class T, class U>
+  struct two_sided_identity<BOp&, T, U> : two_sided_identity<remove_cvref_t<BOp>, T, U> {};
+
+  template<class BOp, class T, class U>
+  struct two_sided_identity<BOp&&, T, U> : two_sided_identity<remove_cvref_t<BOp>, T, U> {};
+
+  template<class BOp, class T, class U = T>
+  using two_sided_identity_t = decltype(std::declval<two_sided_identity<BOp, T, U>>().value());
+} // namespace std
+```
+
+<em>
+Editor's note: '`two_sided_identity`' could be renamed as '`complete_identity`', since it is an
+identity element with all the necessary parts to permit a `monoid`.
+</em>
+
+### Zero
+
+<em>
+Editor's note: '`*_zero`' could also be spelt '`*_absorbtion`' or '`*_ahnnialation`'. The author
+chose to follow group theory literature and refer to ahnnialating elements as a zero. As tempting as
+it is to follow through with both numeric traits' renamings, the author strongly discourages the
+urge to do so: 'complete ahnnialation' is the responsibility of destructors, not ahnnialating
+elements.
+</em>
+
+#### Left zero
+
+```cpp
+namespace std {
+  template<class BOp, class T, class U = T>
+  requires magma<BOp, T, U>
+  struct left_zero {};
+
+  template<class BOp, class T, class U>
+  requires magma<BOp, T, U>
+  struct left_zero<BOp&, T, U> : left_zero<remove_cvref_t<BOp>, T, U> {};
+
+  template<class BOp, class T, class U>
+  requires magma<BOp, T, U>
+  struct left_zero<BOp&&, T, U> : left_zero<remove_cvref_t<BOp>, T, U> {};
+
+  template<class BOp, class T, class U = T>
+  using left_zero_t = decltype(std::declval<left_zero<BOp, T, U>>().value());
+} // namespace std
+```
+
+Specialisation of `left_zero`'s first parameter is permitted, but specialising the latter two
+parameters is ill-formed, no diagnostic required. All specialisations must take the form:
+
+```cpp
+struct intersect {
+  template<class T>
+  set<T> operator()(set<T> const&, set<T> const&) const;
+};
+
+namespace std {
+  template<class T, class U>
+  requires magma<intersect, T, U>
+  struct left_zero<intersect, T, U> {
+    constexpr explicit left_zero(const intersect&, const T&, const U&) {}
+    constexpr common_type_t<T, U> value() const { /* unspecified */ }
+  };
+} // namespace std
+```
+
+If both `left_identity` and `left_zero` have been specialised for a binary operation, then the
+results returned by their respective `value` member functions mustn't be equal: this contradicts the
+definition of an identity element and an annihliating element.
+
+#### Right zero
+
+```cpp
+namespace std {
+  template<class BOp, class T, class U = T>
+  requires magma<BOp, T, U>
+  struct right_zero {};
+
+  template<class BOp, class T, class U>
+  requires magma<BOp, T, U>
+  struct right_zero<BOp&, T, U> : right_zero<remove_cvref_t<BOp>, T, U> {};
+
+  template<class BOp, class T, class U>
+  requires magma<BOp, T, U>
+  struct right_zero<BOp&&, T, U> : right_zero<remove_cvref_t<BOp>, T, U> {};
+
+  template<class BOp, class T, class U = T>
+  using right_zero_t = decltype(std::declval<right_zero<BOp, T, U>>().value());
+} // namespace std
+```
+
+Specialisation of `right_zero`'s first parameter is permitted, but specialising the latter two
+parameters is ill-formed, no diagnostic required. All specialisations must take the form:
+
+```cpp
+namespace std {
+  template<class T, class U>
+  requires magma<intersect, T, U>
+  struct right_zero<intersect, T, U> {
+    constexpr explicit right_zero(const intersect&, const T&, const U&) {}
+    constexpr common_type_t<T, U> value() const { /* unspecified */ }
+  };
+} // namespace std
+```
+
+If both `right_identity` and `right_zero` have been specialised for a binary operation, then the
+results returned by their respective `value` member functions mustn't be equal: this contradicts the
+definition of an identity element and an annihliating element.
+
+#### Two-sided zero
+
+`two_sided_zero` is a type that represents the notion of a *two-sided identity*, as introduced
+in [[#inner-product]]. Unlike `left_zero` and `right_zero`, `two_sided_identity` may not be
+specialised at all, even by the standard library.
+
+```cpp
+namespace std {
+  template<class BOp, class T, class U = T>
+  concept has-two-sided-zero = // exposition-only
+    requires(BOp bop, const T& t, const U& u) {
+      typename left_zero_t<BOp, T, U>;
+      typename right_zero_t<BOp, T, U>;
+      typename left_zero_t<BOp, U, T>;
+      typename right_zero_t<BOp, U, T>;
+
+      requires Common<left_zero_t<BOp, T, U>, left_zero_t<BOp, U, T>>;
+      requires Common<right_zero_t<BOp, T, U>, right_zero_t<BOp, U, T>>;
+      requires Common<left_zero_t<BOp, T, U>, right_zero_t<BOp, T, U>>;
+      // axiom {
+      //    auto left = left_zero<T, U, BOp>{};
+      //    auto right = right_zero<T, U, BOp>{};
+      //    [[assert: left(bop, t, u) == left(bop, u, t)]];
+      //    [[assert: right(bop, t, u) == right(bop, u, t)]];
+      //    [[assert: left(bop, t, u) == right(bop, u, t)]];
+      //
+      //    if (t != left(bop, t, u) and u != right(bop, t, u)) {
+      //      [[assert: t == invoke(bop, t, right(bop, t, u))]];
+      //      [[assert: u == invoke(bop, left(bop, t, u), u))]];
+      //    }
+      // };
+    };
+
+  template<class BOp, class T, class U = T>
+  requires has-two-sided-zero<BOp, T, U>
+  struct two_sided_zero
+  : private left_zero<BOp, T, U>
+  , private right_zero<BOp, T, U> {
+    constexpr explicit two_sided_zero(const BOp& bop, const T& t, const U& u)
+    [[expects: static_cast<left_zero<BOp, T, U>&>(*this).value()
+            == static_cast<right_zero<BOp, T, U>&>(*this).value()]]
+    : left_zero<BOp, T, U>{bop, t, u}
+    , right_zero<BOp, T, U>{bop, t, u}
+    {}
+
+    constexpr auto value() const {
+    return static_cast<std::common_type_t<T, U>>(
+      static_cast<const left_zero<BOp, T, U>&>(*this).value()
+    );
+    }
+  };
+
+  template<class BOp, class T, class U>
+  struct two_sided_zero<BOp&, T, U> : two_sided_zero<remove_cvref_t<BOp>, T, U> {};
+
+  template<class BOp, class T, class U>
+  struct two_sided_zero<BOp&&, T, U> : two_sided_zero<remove_cvref_t<BOp>, T, U> {};
+
+  template<class BOp, class T, class U = T>
+  using two_sided_zero_t = decltype(std::declval<two_sided_zero<BOp, T, U>>().value());
+} // namespace std
+```
+
+## Concepts
+
+### Commutative invocable
+
+```cpp
+template<class BOp, class T, class U>
+concept commutative_invocable = regular_invocable<BOp, T, U> && regular_invocable<BOp, U, T> &&
+  common<T, U>;
+```
+
+1. Let `bop` be an object of type `BOp`, `t` be an object of type `T`, and `u` be an object of type
+    `U`, where `common_type_t<T, U>{t} != common_type_t<T, U>{u}`.
+2. The result of `invoke(bop, t, u)` is expression-equivalent to `invoke(bop, u, t)`.
+
+## Algebraic concepts
+
+### Magma
+
+A *magma* is is a set S associated with a binary operation •, such that S is *closed under* •.
+(ℤ, +) is an example of a magma, since we can add any two integers and find that the result is also
+an element in the set of integers. (ℤ, /) is not a magma, since the result of `2 / 3` is not an
+integer.
+
+```cpp
+template<class BOp, class T, class U>
+concept magma =
+  common<T, U> &&
+  regular_invocable<BOp, T, T> &&
+  regular_invocable<BOp, U, U> &&
+  regular_invocable<BOp, T, U> &&
+  regular_invocable<BOp, U, T> &&
+  common<invoke_result_t<BOp&, T, U>, T> &&
+  common<invoke_result_t<BOp&, T, U>, U> &&
+  same<invoke_result_t<BOp&, T, U>, invoke_result_t<BOp&, U, T>>;
+```
+
+1. Let `bop` be an object of type `BOp`, `t` be an object of type `T`, and `u` be an object of type
+    `U`.
+2. The expression `invoke(bop, t, u)` must return a result that is representable by
+    `common_type_t<T, U>`.
+3. [*Note:* The result of `invoke(bop, t, u)` needn't be the same as `invoke(bop, u, t)`.
+    -- *end note*]
+
+### Semigroup
+
+A *semigroup* (S, •) refines the notion of a magma by requiring • to be an *associative() binary
+operation. (ℝ, +) is an example of a semigroup, since (1.2 + 2.3) + π = 1.2 + (2.3 + π). (ℝ, -) is
+not a semigroup, since (1.2 - 2.3) - π ≠ 1.2 - (2.3 - π).
+
+```cpp
+template<class BOp, class T, class U>
+concept semigroup = magma<BOp, T, U>;
+```
+
+1. Let `bop` be an object of type `BOp`, `t` be an object of type `T`, and `u` be an object of type
+    `U`.
+2. The expression `invoke(bop, t, invoke(bop, t, u))` is expression-equivalent to
+    `invoke(bop, invoke(bop, t, u), u)`.
+3. [*Note:* The difference between `magma` and `semigroup` is purely semantic. -- *end note*]
+
+### Monoid
+
+A *monoid* (S, •) refines the notion of a semigroup by requiring • to have a <em>two-sided identity
+element</em>.
+
+```cpp
+template<class BOp, class T, class U>
+concept monoid = semigroup<BOp, T, U> && requires {
+  typename two_sided_identity_t<BOp, remove_cvref_t<T>, remove_cvref_t<U>>;
+};
+```
+
+### Weak weak-magmaring
+
+A *weak weak-magmaring* (S, +, ⋅) is a generalisation of the notion of a near-semiring, where:
+
+* (S, +) is a magma
+* (S, ⋅) is a magma
+* ⋅ is *distributive over* +
+    * a ⋅ (b + c) = (a ⋅ b) + (a ⋅ c)
+    * (a + b) ⋅ c = (a ⋅ c) + (b ⋅ c)
+
+Note that + does not refer to canonical addition, and ⋅ does not refer to canonical multiplication.
+
+```cpp
+template<class BOp1, class BOp2, class T, class U, class V>
+concept weak_weak_magmaring = magma<BOp2, U, V> && magma<BOp1, T, invoke_result_t<BOp2&, U, V>>;
+```
+
+1. Let `bop1` be an object of type `BOp1`, `bop2` be an object of type `BOp2`, `t` be an object of
+    type `T`, `u` be an object of type `U`, and `v` be an object of type `V`.
+2. `invoke(bop2, invoke(bop1, t, u), v)` is expression-equivalent to
+    `invoke(bop1, invoke(bop2, t, v), invoke(bop2, u, v))`.
+3. [*Note:* That is, `bop2` is distributive over `bop1`. -- *end note*]
+
+### Near-semiring
+
+A *near semiring* (S, +, ⋅) refines the notion of a weak weak-magmaring, by refining the
+substructures and introducing the notion of a *two-sided zero element*.
+
+* (S, +) is a monoid
+* (S, ⋅) is a semigroup
+* 0 ⋅ a = 0 for all a in S.
+
+```cpp
+template<class BOp1, class BOp2, class T, class U, class V>
+concept near_semiring = weak_weak_magmaring<BOp1, BOp2, T, U, V> and
+  monoid<BOp1, T, invoke_result_t<BOp2&, U, V>> && semigroup<BOp2, U, V> && requires {
+    typename two_sided_zero_t<BOp2, remove_cvref_t<U>, remove_cvref_t<V>>;
+  };
+```
+
+## Indirect callable requirements
+
+The following concepts are convenience concepts, similar to those already in the C++20 WP. With the
+exception of `indirect_commutative_invocable`, all of the proposed concepts in this section require
+the algebraic structure "be" `writable` to some object. This makes the indirect algebraic structure
+concepts more in line with `sortable` and `permutable` than with `indirect_unary_invocable`, etc.
+
+### Indirect commutative invocable
+
+```cpp
+template<class BOp, class I1, class I2>
+concept indirect_commutative_invocable =
+  readable<I1> &&
+  readable<I2> &&
+  commutative_invocable<BOp&, iter_value_t<I1>&, iter_value_t<I2>&> &&
+  commutative_invocable<BOp&, iter_value_t<I1>&, iter_reference_t<I2>> &&
+  commutative_invocable<BOp&, iter_reference_t<I1>, iter_value_t<I2>&> &&
+  commutative_invocable<BOp&, iter_reference_t<I1>, iter_reference_t<I2>> &&
+  commutative_invocable<BOp&, iter_common_reference_t<I1>, iter_common_reference_t<I2>>;
+```
+
+### Indirect magma
+
+```cpp
+template<class BOp, class I1, class I2, class O>
+concept indirect_magma =
+  readable<I1> &&
+  readable<I2> &&
+  writable<O, indirect_result_t<BOp&, I1, I2>> &&
+  magma<BOp&, iter_value_t<I1>&, iter_value_t<I2>&> &&
+  magma<BOp&, iter_value_t<I1>&, iter_reference_t<I2>&> &&
+  magma<BOp&, iter_reference_t<I1>, iter_value_t<I2>&> &&
+  magma<BOp&, iter_reference_t<I1>, iter_reference_t<I2>> &&
+  magma<BOp&, iter_common_reference_t<I1>, iter_common_reference_t<I2>>;
+```
+
+### Indirect semigroup
+
+```cpp
+template<class BOp, class I1, class I2, class O>
+concept indirect_semigroup = indirect_magma<BOp, I1, I2, O> &&
+  semigroup<BOp&, iter_value_t<I1>&, iter_value_t<I2>&> &&
+  semigroup<BOp&, iter_value_t<I1>&, iter_reference_t<I2>&> &&
+  semigroup<BOp&, iter_reference_t<I1>, iter_value_t<I2>&> &&
+  semigroup<BOp&, iter_reference_t<I1>, iter_reference_t<I2>> &&
+  semigroup<BOp&, iter_common_reference_t<I1>, iter_common_reference_t<I2>>;
+```
+
+### Indirect monoid
+
+```cpp
+template<class BOp, class I1, class I2, class O>
+concept indirect_monoid = indirect_semigroup<BOp, I1, I2, O> &&
+  monoid<BOp&, iter_value_t<I1>&, iter_value_t<I2>&> &&
+  monoid<BOp&, iter_value_t<I1>&, iter_reference_t<I2>&> &&
+  monoid<BOp&, iter_reference_t<I1>, iter_value_t<I2>&> &&
+  monoid<BOp&, iter_reference_t<I1>, iter_reference_t<I2>> &&
+  monoid<BOp&, iter_common_reference_t<I1>, iter_common_reference_t<I2>>;
+```
+
+### Indirect weak-weak-magmaring
+
+```cpp
+template<class BOp1, class BOp2, class I1, class I2, class I3, class O>
+concept indirect_weak_magmaring =
+  indirect_magma<BOp2, I2, I3, O> &&
+  indirect_magma<BOp1, I1, indirect_result_t<BOp2&, I2, I3>*, O> &&
+  weak_magmaring<BOp1&, BOp2&, iter_value_t<I1>&, iter_value_t<I2>&, iter_value_t<I3>&> &&
+  weak_magmaring<BOp1&, BOp2&, iter_value_t<I1>&, iter_value_t<I2>&, iter_reference_t<I3>> &&
+  weak_magmaring<BOp1&, BOp2&, iter_value_t<I1>&, iter_reference_t<I2>, iter_value_t<I3>&> &&
+  weak_magmaring<BOp1&, BOp2&, iter_value_t<I1>&, iter_reference_t<I2>, iter_reference_t<I3>> &&
+  weak_magmaring<BOp1&, BOp2&, iter_reference_t<I1>, iter_value_t<I2>&, iter_value_t<I3>&> &&
+  weak_magmaring<BOp1&, BOp2&, iter_reference_t<I1>, iter_value_t<I2>&, iter_reference_t<I3>> &&
+  weak_magmaring<BOp1&, BOp2&, iter_reference_t<I1>, iter_reference_t<I2>, iter_value_t<I3>&> &&
+  weak_magmaring<BOp1&, BOp2&, iter_reference_t<I1>, iter_reference_t<I2>, iter_reference_t<I3>> &&
+  weak_magmaring<BOp1&, BOp2&, iter_common_reference_t<I1>, iter_common_reference_t<I2>,
+    iter_common_reference_t<I3>>;
+```
+
+### Indirect near-semiring
+
+```
+template<class BOp1, class BOp2, class I1, class I2, class I3, class O>
+concept indirect_near_semiring =
+  IndirectMagmaring<BOp1, BOp2, I1, I2, I3, O> &&
+  NearSemiring<BOp1&, BOp2&, iter_value_t<I1>&, iter_value_t<I2>&, iter_value_t<I3>&> &&
+  NearSemiring<BOp1&, BOp2&, iter_value_t<I1>&, iter_value_t<I2>&, iter_reference_t<I3>> &&
+  NearSemiring<BOp1&, BOp2&, iter_value_t<I1>&, iter_reference_t<I2>, iter_value_t<I3>&> &&
+  NearSemiring<BOp1&, BOp2&, iter_value_t<I1>&, iter_reference_t<I2>, iter_reference_t<I3>> &&
+  NearSemiring<BOp1&, BOp2&, iter_reference_t<I1>, iter_value_t<I2>&, iter_value_t<I3>&> &&
+  NearSemiring<BOp1&, BOp2&, iter_reference_t<I1>, iter_value_t<I2>&, iter_reference_t<I3>> &&
+  NearSemiring<BOp1&, BOp2&, iter_reference_t<I1>, iter_reference_t<I2>, iter_value_t<I3>&> &&
+  NearSemiring<BOp1&, BOp2&, iter_reference_t<I1>, iter_reference_t<I2>, iter_reference_t<I3>> &&
+  NearSemiring<BOp1&, BOp2&, iter_common_reference_t<I1>, iter_common_reference_t<I2>,
+    iter_common_reference_t<I3>>;
+```
+
+## Numeric operation function objects
+
+Just as P0896 redesigned the comparison function objects, P1034 seeks to redesign the numeric
+operation function objects. This will allow us to:
+
+1. Forget about, and -- hopefully -- one day eliminate the templated function objects;
+2. Apply requirements to each operation.
+
+### Plus
+
+```cpp
+namespace std::ranges {
+  template<class T, class U>
+  concept summable-with = // exposition only
+    DefaultConstructible<remove_reference_t<T>> &&
+    DefaultConstructible<remove_reference_t<U>> &&
+    CommonReference<T, U> &&
+    requires(T&& t, U&& u, remove_cvref_t<T> mt, remove_cvref_t<U> mu) {
+      { mt += std::forward<T>(t) } -> CommonReference<T&>;
+      { mu += std::forward<U>(u) } -> CommonReference<U&>;
+      { mt += std::forward<U>(u) } -> CommonReference<T&>;
+      { mu += std::forward<T>(t) } -> CommonReference<U&>;
+      { std::forward<T>(t) + std::forward<T>(t) } -> Common<T>;
+      { std::forward<U>(u) + std::forward<U>(u) } -> Common<U>;
+      { std::forward<T>(t) + std::forward<U>(u) } -> Common<T>;
+      { std::forward<T>(t) + std::forward<U>(u) } -> Common<U>;
+      requires Same<decltype(std::forward<T>(t) + std::forward<U>(u)),
+                    decltype(std::forward<U>(u) + std::forward<T>(t))>;
+    };
+```
+
+<em>
+Editor's note: This is not the same as the dreaded `has_plus`. It's more of a `has_plus+`. There
+should also probably be some axioms, but the author can't quite figure out how to word them with the
+given constraints. (All of the other operators do have semantics, but they've also got a lot more
+info.)
+</em>
+
+```cpp
+  struct plus {
+    template<class T, summable-with<T> U>
+    constexpr decltype(auto) operator()(T&& t, U&& u) const {
+      return std::forward<T>(t) + std::forward<U>(u);
+    }
+
+    using is_transparent = std::true_type;
+  };
+
+  template<class T, class U>
+  requires Magma<ranges::plus, T, U>
+  struct left_identity<ranges::plus, T, U> {
+    constexpr explicit left_identity(ranges::plus, const T&, const U&)
+    {}
+
+    constexpr auto value() const
+    { return T{}; }
+  };
+
+  template<class T, class U>
+  requires Magma<ranges::plus, T, U>
+  struct right_identity<ranges::plus, T, U> {
+    constexpr explicit right_identity(ranges::plus, const T&, const U&)
+    {}
+
+    constexpr auto value() const
+    { return U{}; }
+  };
+} // namespace std::ranges
+```
+
+
+### Negate
+
+```cpp
+namespace std::ranges {
+  template<class T>
+  concept negatable = // exposition-only
+    requires(T&& t) {
+      { -std::forward<T>(t) } -> Common<T>;
+    };
+
+  struct negate {
+    template<negatable T>
+    constexpr decltype(auto) operator()(T&& t) const {
+      return -std::forward<T>(t);
+    }
+
+    using is_transparent = std::true_type;
+  };
+} // namespace std::ranges
+```
+
+### Minus
+
+```cpp
+namespace std::ranges {
+  template<class T, class U>
+  concept differenceable-with = // exposition-only
+    summable-with<T, U> &&
+    negatable<T> &&
+    negatable<U> &&
+    requires(T&& t, U&& u, remove_cvref_t<T> mt, remove_cvref_t<U> mu) {
+      { mt -= std::forward<T>(t) } -> CommonReference<T&>;
+      { mu -= std::forward<U>(u) } -> CommonReference<U&>;
+      { mt -= std::forward<U>(u) } -> CommonReference<T&>;
+      { mu -= std::forward<T>(t) } -> CommonReference<U&>;
+      { std::forward<T>(t) - std::forward<T>(t) } -> Common<T>;
+      { std::forward<U>(u) - std::forward<U>(u) } -> Common<U>;
+      { std::forward<T>(t) - std::forward<U>(u) } -> Common<T>;
+      { std::forward<T>(t) - std::forward<U>(u) } -> Common<U>;
+      requires Same<decltype(std::forward<T>(t) - std::forward<U>(u)),
+                    decltype(std::forward<U>(u) - std::forward<T>(t))>;
+    };
+```
+
+1. `t - t` is equivalent to `T{}`
+2. `t - (-t)` is equivalent to `t + t`
+3. `-t - t` is equivalent to `-(t + t)`
+4. `t + t - t` is equivalent to `t`
+
+```cpp
+  struct minus {
+    template<class T, __differenceable_with<T> U>
+    constexpr decltype(auto) operator()(T&& t, U&& u) const {
+      return std::forward<T>(t) - std::forward<U>(u);
+    }
+
+    using is_transparent = std::true_type;
+  };
+
+  template<class T, class U>
+  requires Magma<ranges::minus, T, U>
+  struct right_identity<ranges::minus, T, U> : private right_identity<ranges::plus, T, U> {
+    using right_identity<ranges::plus, T, U>::value;
+  };
+} // namespace std::ranges
+```
+
+### Product
+
+<em>
+Editor's note: The author feels that the name `multiplies` is not the best name, and saw the
+introduction of a `std::ranges` function object as an opportunity to rename (just as we're dropping
+the class template part). Here, `product{}(x, y)` reads as 'product of `x` and `y`. A potential
+contender to `product` is `times`, which is a better infix name than both `product` and
+`multiplies`.
+</em>
+
+```cpp
+namespace std::ranges {
+  template<class T, class U>
+  concept multiplicable-with = // exposition-only
+    DefaultConstructible<remove_cvref_t<T>> &&
+    DefaultConstructible<remove_cvref_t<U>> &&
+    Constructible<remove_cvref_t<T>, int> && // specifically T{0} and T{1}
+    Constructible<remove_cvref_t<T>, int> && // specifically U{0} and U{1}
+    CommonReference<T, U> &&
+    requires(T&& t, U&& u, remove_cvref_t<T> mt, remove_cvref_t<U> mu) {
+      { mt *= std::forward<T>(t) } -> CommonReference<T&>;
+      { mu *= std::forward<U>(u) } -> CommonReference<U&>;
+      { mt *= std::forward<U>(u) } -> CommonReference<T&>;
+      { mu *= std::forward<T>(t) } -> CommonReference<U&>;
+      { std::forward<T>(t) * std::forward<T>(t) } -> Common<T>;
+      { std::forward<U>(u) * std::forward<U>(u) } -> Common<U>;
+      { std::forward<T>(t) * std::forward<U>(u) } -> Common<T>;
+      { std::forward<T>(t) * std::forward<U>(u) } -> Common<U>;
+      requires Same<decltype(std::forward<T>(t) * std::forward<U>(u)),
+                    decltype(std::forward<U>(u) * std::forward<T>(t))>;;
+    };
+```
+
+1.  * `T{0} == T{}`.
+    * `U{0} == U{}`.
+2.  * `(t *= T{0}) == T{0}`.
+    * `(u *= U{0}) == U{0}`.
+    * `(t *= U{0}) == T{0}`.
+    * `(u *= T{0}) == U{0}`.
+3.  * `(t *= T{1}) == T{1}`.
+    * `(u *= U{1}) == U{1}`.
+    * `(t *= U{1}) == T{1}`.
+    * `(u *= T{1}) == U{1}`.
+2.  * `t * t` is expression-equivalent to `T{t} *= t`.
+    * `u * u` is expression-equivalent to `U{u} *= u`.
+    * `t * u` is expression-equivalent to `common_type_t<T, U>{t} *= common_type_t<T, U>{u}`.
+    * `u * t` is expression-equivalent to `common_type_t<T, U>{u} *= common_type_t<T, U>{t}`.
+3. * `t * T{1} == t` and `T{1} * t == t`, and similarly for `U`.
+
+<em>
+Editor's note: `==` is used in place of "is equivalent to" for readability's sake, since this isn't
+yet at the wording stage. This concept does not have any `equality_comparable` requirements.
+</em>
+
+<em>
+Editor's note: This 'dirty' concept is probably over-constraining, since
+`multiplicable-with<matrix<2, 3>, matrix<3, 2>>` is false, but `m1 * m2` is a valid mathematical
+product.
+
+The author notes that violently violates Eric's second pro-tip above, but isn't sure how to
+restructure, since all of the other 'dirty' concepts don't seem to be over-constrained by `op=`.
+</em>
+
+```
+  struct product {
+    template<class T, __multiplicable_with<T> U>
+    constexpr decltype(auto) operator()(T&& t, U&& u) const {
+      return std::forward<T>(t) * std::forward<U>(u);
+    }
+
+    using is_transparent = std::true_type;
+  };
+
+  template<class T, class U>
+  requires Magma<product, T, U>
+  struct left_identity<product, T, U> {
+    constexpr explicit left_identity(const product&, const T&, const U&)
+    {}
+
+    constexpr auto value() const
+    { return T{1}; }
+  };
+
+  template<class T, class U>
+  requires Magma<product, T, U>
+  struct right_identity<product, T, U> {
+    constexpr explicit right_identity(const product&, const T&, const U&)
+    {}
+
+    constexpr auto value() const
+    { return U{1}; }
+  };
+
+  template<class T, class U>
+  requires Magma<product, T, U>
+  struct left_zero<product, T, U> {
+    constexpr explicit left_zero(const product&, const T&, const U&)
+    {}
+
+    constexpr auto value() const
+    { return T{}; }
+  };
+
+  template<class T, class U>
+  requires Magma<product, T, U>
+  struct right_zero<product, T, U> {
+    constexpr explicit right_zero(const product&, const T&, const U&)
+    {}
+
+    constexpr auto value() const
+    { return U{}; }
+  };
+```
+
+### Quotient
+
+<em>
+Editor's note: The author feels that the name `divides` is not the best name for the operation (it
+clashes with the divides operation from number theory*), and saw the introduction of a `std::ranges`
+function object as an opportunity to rename (just as we're dropping the class template part). Here,
+`quotient{}(x, y)` reads as 'quotient of `x` and `y`. A potential contender to `quotient` is
+`divided_by`, which is a better infix name than both `quotient` and `divides`.
+
+*`x | y`, reads as '`x` divides `y`' is a Boolean expression evaluating whether or not `x / y` is an
+integer.
+</em>
+
+```cpp
+template<class T, class U>
+concept divisible-with = // exposition-only
+  multiplicable-with<T, U> &&
+  requires(T&& t, U&& u, remove_cvref_t<T> mt, remove_cvref_t<U> mu) {
+    { mt /= std::forward<T>(t) } -> CommonReference<T&>;
+    { mu /= std::forward<U>(u) } -> CommonReference<U&>;
+    { mt /= std::forward<U>(u) } -> CommonReference<T&>;
+    { mu /= std::forward<T>(t) } -> CommonReference<U&>;
+    { std::forward<T>(t) / std::forward<T>(t) } -> Common<T>;
+    { std::forward<U>(u) / std::forward<U>(u) } -> Common<U>;
+    { std::forward<T>(t) / std::forward<U>(u) } -> Common<T>;
+    { std::forward<T>(t) / std::forward<U>(u) } -> Common<U>;
+    requires Same<decltype(std::forward<T>(t) / std::forward<U>(u)),
+                  decltype(std::forward<U>(u) / std::forward<T>(t))>;;
+  };
+```
+
+1.  Let `t1` and `t2` be objects of type `T`, and `u1` and `u2` be objects of type `U`. It is
+    undefined for `t2 == T{0}` or `u2 == U{0}` in all of the paragraphs below.
+2.  * `(t2 /= t2) == T{1}`
+    * `(u2 /= u2) == U{1}`.
+3.  * `(t1 *= t2, t1 /= t2) == t1`.
+    * `(u1 *= u2, u1 /= u2) == u1`.
+4.  * `t1 / t2` is expression-equivalent to `T{t1} /= t2`.
+    * `u1 / u2` is expression-equivalent to `U{u1} /= u2`.
+    * `t1 / u2` is expression-equivalent to `common_type_t<T, U>{t1} /= common_type_t<T, U>{u2}`.
+    * `u1 / t2` is expression-equivalent to `common_type_t<T, U>{u1} /= common_type_t<T, U>{t2}`.
+5.  * `T{0} / t2 == T{0}`.
+    * `U{0} / u2 == U{0}`.
+    * `T{0} / u2 == common_type_t<T, U>{0}`.
+    * `U{0} / t2 == common_type_t<T, U>{0}`.
+
+<em>
+Editor's note: `==` is used in place of "is equivalent to" for readability's sake, since this isn't
+yet at the wording stage. This concept does not have any `equality_comparable` requirements.
+</em>
+
+```cpp
+  struct quotient {
+    template<class T, divisible-with<T> U>
+    constexpr decltype(auto) operator()(T&& t, U&& u) const {
+      return std::forward<T>(t) / std::forward<U>(u);
+    }
+  };
+
+  template<class T, class U>
+  requires Magma<quotient, T, U>
+  struct right_identity<quotient, T, U> {
+    constexpr explicit right_identity(quotient, const T&, const U&)
+    {}
+
+    constexpr auto value() const {
+      return U{1};
+    }
+  };
+} // namespace std::ranges
+```
+
+### Modulus
+
+```cpp
+namespace std::ranges {
+  template<class T, class U>
+  concept modulo-with = // exposition-only
+    summable-with<T, U> &&
+    divisible-with<T, U> &&
+    requires(T&& t, U&& u, remove_cvref_t<T> mt, remove_cvref_t<U> mu) {
+      { mt %= std::forward<T>(t) } -> CommonReference<T&>;
+      { mu %= std::forward<U>(u) } -> CommonReference<U&>;
+      { mt %= std::forward<U>(u) } -> CommonReference<T&>;
+      { mu %= std::forward<T>(t) } -> CommonReference<U&>;
+      { std::forward<T>(t) % std::forward<T>(t) } -> Common<T>;
+      { std::forward<U>(u) % std::forward<U>(u) } -> Common<U>;
+      { std::forward<T>(t) % std::forward<U>(u) } -> Common<T>;
+      { std::forward<T>(t) % std::forward<U>(u) } -> Common<U>;
+      requires Same<decltype(std::forward<T>(t) % std::forward<U>(u)),
+                    decltype(std::forward<U>(u) % std::forward<T>(t))>;
+    };
+```
+
+1. Let `n`, `q`, `r`, `t` all be distinct objects of type `T`.
+2. `t % q == q * r + n`.
+
+```cpp
+  struct modulus {
+    template<class T, __modulo_with<T> U>
+    constexpr decltype(auto) operator()(T&& t, U&& u) const {
+      return std::forward<T>(t) % std::forward<U>(u);
+    }
+  };
+
+  template<class T, class U>
+  requires Magma<modulus, T, U>
+  struct left_zero<modulus, T, U> {
+    constexpr explicit left_zero(const modulus&, const T&, const U&)
+    {}
+
+    constexpr auto value() const
+    { return T{0}; }
+  };
+
+  template<class T, class U>
+  requires Magma<modulus, T, U>
+  struct right_zero<modulus, T, U> {
+    constexpr explicit right_zero(const modulus&, const T&, const U&)
+    {}
+
+    constexpr auto value() const
+    { return U{1}; }
+  };
+} // namespace std::ranges
+```
+
+# Appendix A: Performance results
+
+
+<pre class=biblio>
+{
+"concept-design": {
+    "title": "Design of concept libraries for C++",
+    "authors": ["Andrew Sutton", "Bjarne Stroustrup"],
+    "href": "http://www.stroustrup.com/sle2011-concepts.pdf"
+},
+"EoP": {
+    "title": "Elements of Programming",
+    "authors": ["Alexander Stepanov", "Paul McJones"],
+    "href": "http://elementsofprogramming.com/"
+},
+"N3351": {
+    "title": "A Concept Design for the STL",
+    "authors": ["Bjarne Stroustrup", "Andrew Sutton"],
+    "href": "https://wg21.link/n3351"
+},
+"P1033": {
+    "title": "Rangify the uninitialised memory algorithms!",
+    "authors": ["Casey Carter", "Christopher Di Bella"],
+    "href": "https://wg21.link/p1033"
+},
+"N4128": {
+    "title": "Ranges for the Standard Library, Revision 1",
+    "authors": ["Eric Niebler", "Sean Parent", "Andrew Sutton"],
+    "href": "https://wg21.link/n4128"
+},
+"P0896": {
+    "title": "The One Ranges Proposal",
+    "authors": ["Casey Carter", "Eric Niebler", "Christopher Di Bella"],
+    "href": "https://wg21.link/p0896"
+},
+"P0898": {
+    "title": "Standard Library Concepts",
+    "authors": ["Casey Carter", "Eric Niebler"],
+    "href": "https://wg21.link/p0896"
+},
+"StackExchange": {
+    "title": "What's more general than a near-semiring?",
+    "authors": ["Christopher Di Bella"],
+    "href": "https://math.stackexchange.com/questions/3275185/whats-more-general-than-a-near-semiring"
+},
+"inner-product": {
+    "title": "Inner Product",
+    "authors": ["John Renze", "Christopher Stover", "Eric W. Weisstein"],
+    "href": "http://mathworld.wolfram.com/InnerProduct.html"
+}
+}
+</pre>
