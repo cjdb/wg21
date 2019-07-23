@@ -1,0 +1,1185 @@
+\rSec0[support]{Algorithm support}
+
+\begin{quote}
+``Generic Programming pro tip \#2: The "basis operations" of a well-designed concept or concept
+hierarchy is the minimal set of operations that are both sufficient and necessary for efficiently
+implementing all algorithms of interest within a particular domain.''
+\begin{flushright}
+\textemdash \textit{Eric Niebler, Twitter}
+\end{flushright}
+\end{quote}
+
+The following subsections articulate the concept designs and any supporting material (such as
+traits).
+
+\rSec1[support.traits]{Numeric traits}
+
+This section provides exposition for the traits that are used by algebraic concepts. The author is
+aware that the design is not necessarily the most appropriate, and is open to suggestions for
+improvement.
+
+\rSec2[support.traits.identity]{Identity traits}
+
+\pnum
+An identity element $id$ is a special element in a set $S$, such that for all other elements $x$ in
+$S$, given a magma $\cdot$, at least one of $x \cdot id = x$ or $id \cdot x = x$ holds.
+
+\pnum
+If both $x \cdot id = x$ and $id \cdot x = x$ hold, then $id$ is unique (\ref{proof.identity}).
+
+\rSec3[support.traits.identity.left]{Left identity}
+
+\pnum
+\tcode{left_identity} is a type that represents the notion of a \textit{left-identity}.
+
+\begin{itemdecl}
+namespace std {
+  template<class BOp, class T, class U = T>
+  requires magma<BOp, T, U>
+  struct left_identity {};
+
+  template<class BOp, class T, class U>
+  left_identity(BOp&&, T&&, U&&)
+    -> left_identity<remove_cvref_t<BOp>, remove_cvref_t<T>, remove_cvref_t<U>>;
+
+  template<class BOp, class T, class U = T>
+  using left_identity_t = decltype(declval<left_identity<BOp, T, U>>()());
+}
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   Specialisation of \tcode{left_identity}'s first parameter is permitted, but specialising the
+   latter two parameters is ill-formed, no diagnostic required. All specialisations must take the
+   form:
+
+   \begin{codeblock}
+struct binary_op {
+  int operator()(int, int) const;
+};
+
+namespace std {
+  template<class T, class U>
+  requires magma<binary_op, T, U>
+  struct left_identity<binary_op, T, U> {
+    constexpr explicit left_identity(const binary_op&, const T&, const U&) {}
+    constexpr common_type_t<T, U> operator()() const { /* implementation-defined */ }
+  };
+}
+   \end{codeblock}
+\end{itemdescr}
+
+\rSec3[support.traits.identity.right]{Right identity}
+
+\tcode{right_identity} is a type that represents the notion of a \textit{right-identity}.
+
+\begin{itemdecl}
+namespace std {
+  template<class BOp, class T, class U = T>
+  requires magma<BOp, T, U>
+  struct right_identity {};
+
+  template<class BOp, class T, class U>
+  right_identity(BOp&&, T&&, U&&)
+    -> right_identity<remove_cvref_t<BOp>, remove_cvref_t<T>, remove_cvref_t<U>>;
+
+  template<class BOp, class T, class U = T>
+  using right_identity_t = decltype(declval<right_identity<BOp, T, U>>()());
+}
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   Specialisation of \tcode{right_identity}'s first parameter is permitted, but specialising the
+   latter two parameters is ill-formed, no diagnostic required. All specialisations must take the
+   form:
+
+   \begin{codeblock}
+struct binary_op {
+  int operator()(int, int) const;
+};
+
+namespace std {
+  template<class T, class U>
+  requires magma<binary_op, T, U>
+  struct right_identity<binary_op, T, U> {
+    constexpr explicit right_identity(const binary_op&, const T&, const U&) {}
+    constexpr common_type_t<T, U> operator()() const { /* implementation-defined */ }
+  };
+}
+   \end{codeblock}
+\end{itemdescr}
+
+\rSec3[support.traits.identity.two.sided]{Two-sided identity}
+
+\pnum
+\tcode{two_sided_identity} is a type that represents the notion of a \textit{two-sided identity}.
+
+\begin{itemdecl}
+namespace std {
+  template<class BOp, class T, class U>
+  concept @\placeholder{has-two-sided-identity}@ = // \expos
+    requires(BOp bop, const T& t, const U& u) {
+       typename left_identity_t<BOp, T, U>;
+       typename left_identity_t<BOp, U, T>;
+       typename right_identity_t<BOp, T, U>;
+       typename right_identity_t<BOp, U, T>;
+
+       requires same_as<left_identity_t<BOp, T, U>, left_identity_t<BOp, U, T>>;
+       requires same_as<right_identity_t<BOp, T, U>, right_identity_t<BOp, U, T>>;
+       requires same_as<left_identity_t<BOp, T, U>, right_identity_t<BOp, T, U>>;
+    };
+}
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   Let \tcode{left1} be an object of type \tcode{left_identity<BOp, T, U>}, \tcode{left2} be an
+   object of type \tcode{left_identity<BOp, U, T>}, \tcode{right1} be an object of type
+   \tcode{right_identity<BOp, T, U>}, and \tcode{right2} be an object of type
+   \tcode{right_identity<BOp, U, T>}.
+
+   \pnum
+   The expressions \tcode{left1() == left2()}, \tcode{right1() == right2()}, and
+   \tcode{left1() == right1()} are all \tcode{true}.
+
+   \pnum
+   If \tcode{t != left1()} is \tcode{true} and \tcode{u != right1()} is
+   \tcode{true}, then the expressions \tcode{t == invoke(bop, t, right())} and
+   \tcode{u == invoke(bop, left(), u)} are both \tcode{true}.
+\end{itemdescr}
+
+\begin{itemdecl}
+  struct two_sided_identity {
+     template<class T, class U, magma<T, U> BOp>
+     requires @\placeholder{has-two-sided-identity}@<BOp, T, U>
+     constexpr auto operator()(BOp bop, const T& t, const U& u) const;
+  };
+
+  template<class BOp, class T, class U>
+  using two_sided_identity_t =
+    decltype(two_sided_identity{}(declval<BOp&>(), declval<T>(), declval<U>()));
+\end{itemdecl}
+
+\begin{itemdecl}
+template<class T, class U, magma<T, U> BOp>
+requires @\placeholder{has-two-sided-identity}@<BOp, T, U>
+constexpr auto operator()(BOp bop, const T& t, const U& u) const;
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   \expects \tcode{left_identity\{bop, t, u\}() == right_identity\{bop, t, u\}()} is \tcode{true}.
+
+   \pnum
+   \effects Equivalent to:
+   \begin{codeblock}
+      return static_cast<std::common_type_t<T, U>>(left_identity{bop, t, u}());}
+   \end{codeblock}
+\end{itemdescr}
+
+\rSec2[support.traits.zero]{Zero traits}
+
+\pnum
+An zero element $z$ is a special element in a set $S$, such that for all other elements $x$ in
+$S$, given a magma $\cdot$, at least one of $x \cdot z = z$ or $z \cdot x = z$ holds.
+
+\pnum
+If both $x \cdot z = z$ and $z \cdot x = z$ hold, then $z$ is unique (\ref{proof.zero}).
+
+\rSec3[support.traits.zero.left]{Left zero}
+
+\pnum
+\tcode{left_zero} is a type that represents the notion of a \textit{left-zero}.
+
+\begin{itemdecl}
+namespace std {
+  template<class BOp, class T, class U = T>
+  requires magma<BOp, T, U>
+  struct left_zero {};
+
+  template<class BOp, class T, class U>
+  left_zero(BOp&&, T&&, U&&)
+    -> left_zero<remove_cvref_t<BOp>, remove_cvref_t<T>, remove_cvref_t<U>>;
+
+  template<class BOp, class T, class U = T>
+  using left_zero_t = decltype(declval<left_zero<BOp, T, U>>()());
+}
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   Specialisation of \tcode{left_zero}'s first parameter is permitted, but specialising the
+   latter two parameters is ill-formed, no diagnostic required. All specialisations must take the
+   form:
+
+   \begin{codeblock}
+struct binary_op {
+  int operator()(int, int) const;
+};
+
+namespace std {
+  template<class T, class U>
+  requires magma<binary_op, T, U>
+  struct left_zero<binary_op, T, U> {
+    constexpr explicit left_zero(const binary_op&, const T&, const U&) {}
+    constexpr common_type_t<T, U> operator()() const { /* implementation-defined */ }
+  };
+}
+   \end{codeblock}
+\end{itemdescr}
+
+\rSec3[support.traits.zero.right]{Right zero}
+
+\tcode{right_zero} is a type that represents the notion of a \textit{right-zero}.
+
+\begin{itemdecl}
+namespace std {
+  template<class BOp, class T, class U = T>
+  requires magma<BOp, T, U>
+  struct right_zero {};
+
+  template<class BOp, class T, class U>
+  right_zero(BOp&&, T&&, U&&)
+    -> right_zero<remove_cvref_t<BOp>, remove_cvref_t<T>, remove_cvref_t<U>>;
+
+  template<class BOp, class T, class U = T>
+  using right_zero_t = decltype(declval<right_zero<BOp, T, U>>()());
+}
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   Specialisation of \tcode{right_zero}'s first parameter is permitted, but specialising the
+   latter two parameters is ill-formed, no diagnostic required. All specialisations must take the
+   form:
+
+   \begin{codeblock}
+struct binary_op {
+  int operator()(int, int) const;
+};
+
+namespace std {
+  template<class T, class U>
+  requires magma<binary_op, T, U>
+  struct right_zero<binary_op, T, U> {
+    constexpr explicit right_zero(const binary_op&, const T&, const U&) {}
+    constexpr common_type_t<T, U> operator()() const { /* implementation-defined */ }
+  };
+}
+   \end{codeblock}
+\end{itemdescr}
+
+\rSec3[support.traits.zero.two.sided]{Two-sided zero}
+
+\pnum
+\tcode{two_sided_zero} is a type that represents the notion of a \textit{two-sided zero}.
+
+\begin{itemdecl}
+namespace std {
+  template<class BOp, class T, class U>
+  concept @\placeholder{has-two-sided-zero}@ = // \expos
+    requires(BOp bop, const T& t, const U& u) {
+       typename left_zero_t<BOp, T, U>;
+       typename left_zero_t<BOp, U, T>;
+       typename right_zero_t<BOp, T, U>;
+       typename right_zero_t<BOp, U, T>;
+
+       requires same_as<left_zero_t<BOp, T, U>, left_zero_t<BOp, U, T>>;
+       requires same_as<right_zero_t<BOp, T, U>, right_zero_t<BOp, U, T>>;
+       requires same_as<left_zero_t<BOp, T, U>, right_zero_t<BOp, T, U>>;
+    };
+}
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   Let \tcode{left1} be an object of type \tcode{left_zero<BOp, T, U>}, \tcode{left2} be an
+   object of type \tcode{left_zero<BOp, U, T>}, \tcode{right1} be an object of type
+   \tcode{right_zero<BOp, T, U>}, and \tcode{right2} be an object of type
+   \tcode{right_zero<BOp, U, T>}.
+
+   \pnum
+   The expressions \tcode{left1() == left2()}, \tcode{right1() == right2()}, and
+   \tcode{left1() == right1()} are all \tcode{true}.
+
+   \pnum
+   If \tcode{t != left1()} is \tcode{true} and \tcode{u != right1()} is
+   \tcode{true}, then the expressions \tcode{right1() == invoke(bop, t, right1())} and
+   \tcode{left1() == invoke(bop, left1(), u)} are both \tcode{true}.
+\end{itemdescr}
+
+\begin{itemdecl}
+  struct two_sided_zero {
+     template<class T, class U, magma<T, U> BOp>
+     requires @\placeholder{has-two-sided-zero}@<BOp, T, U>
+     constexpr auto operator()(BOp bop, const T& t, const U& u) const;
+  };
+
+  template<class BOp, class T, class U>
+  using two_sided_zero_t =
+    decltype(two_sided_zero{}(declval<BOp&>(), declval<T>(), declval<U>()));
+\end{itemdecl}
+
+\begin{itemdecl}
+template<class T, class U, magma<T, U> BOp>
+requires @\placeholder{has-two-sided-zero}@<BOp, T, U>
+constexpr auto operator()(BOp bop, const T& t, const U& u) const;
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   \expects \tcode{left_zero\{bop, t, u\}() == right_zero\{bop, t, u\}()} is \tcode{true}.
+
+   \pnum
+   \effects Equivalent to:
+   \begin{codeblock}
+      return static_cast<std::common_type_t<T, U>>(left_zero{bop, t, u}());}
+   \end{codeblock}
+\end{itemdescr}
+
+\rSec2[support.traits.inverse]{Inverse traits}
+
+\pnum
+\tcode{inverse_traits} denotes a type that takes an object modelling a \tcode{magma} over an
+arbitrary domain as input, and returns an object whose type models a \tcode{magma} over the same
+domain, where the returned object is the mathematical inverse operation of the input.
+
+\begin{itemdecl}
+  template<class BOp>
+  struct inverse_traits {};
+
+  template<class BOp>
+  using inverse_operation_t = typename inverse_traits::type;
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   Users may specialise this type, provided it is equivalent to:
+   \begin{codeblock}
+struct plus;
+struct minus;
+
+namesapce std {
+  template<>
+  struct inverse_traits<plus> {
+     using type = minus;
+     constexpr type operator()() const { return type{}; }
+  };
+
+  template<>
+  struct inverse_traits<minus> {
+     using type = plus;
+     constexpr type operator()() const { return type{}; }
+  };
+}
+   \end{codeblock}
+
+   \pnum
+   Let \tcode{x} be an object of type \tcode{T}, \tcode{y} be an object of type \tcode{U},
+   \tcode{bop} be an object of type \tcode{BOp}, where \tcode{BOp} models \tcode{magma<T, U>}, and
+   \tcode{inv} be an object of type \tcode{Inv}, where \tcode{Inv} models \tcode{magma<T, U>}.
+
+   \pnum
+   \mandates
+      \begin{itemize}
+         \item If \tcode{is_same_v<inverse_type_t<BOp>, Inv>} is \tcode{true}, then
+               \tcode{is_same_v<inverse_type_t<Inv>, BOp>} is also \tcode{true}, no diagnostic
+               required.
+         \item \tcode{is_same_v<inverse_type_t<BOp>, BOp>} is \tcode{false}, no diagnostic required.
+      \end{itemize}
+   \pnum
+   \expects
+      \begin{itemize}
+         \item \tcode{invoke(inv, invoke(bop, x, y), y) == x} is \tcode{true}.
+         \item \tcode{invoke(inv, invoke(bop, x, y), x) == y} is \tcode{true}.
+      \end{itemize}
+\end{itemdescr}
+
+\reviewernote{
+   This type could be relaxed to permit the inverse of other operations. For example, the inverse of
+   $-x$ is $-(-x)$, and the inverse of \tcode{swap(x, y)} is \tcode{swap(x, y)}.
+}
+
+\rSec1[support.concepts]{Algebraic concepts}
+
+This section describes the concepts required by the numeric algorithms, and are not included in the
+\Cpp standard library.
+
+\rSec2[support.concepts.commutative.op]{Concept commutative operation}
+
+\pnum
+A commutative operation is a binary operation where the order of its operands does not change the
+evaluation of the expression.
+
+\pnum
+\begin{example}
+   Integral arithmetic is commutative.
+\end{example}
+
+\pnum
+\begin{example}
+   Matrix multiplication is not commutative.
+\end{example}
+
+\begin{itemdecl}
+  template<class BOp, class T, class U>
+  concept commutative_operation =
+    regular_invocable<BOp, T, U> &&
+    regular_invocable<BOp, U, T> &&
+    common_with<T, U> &&
+    equality_comparable_with<T, U>;
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   Let \tcode{bop} be an object of type \tcode{BOp}, \tcode{t} be an object of type \tcode{T}, and
+   \tcode{u} be an object of type \tcode{U}, where \tcode{t != u}.
+
+   \pnum
+   The result of \tcode{invoke(bop, t, u)} is expression-equivalent to \tcode{invoke(bop, u, t)}.
+\end{itemdescr}
+
+\rSec2[support.concepts.magma]{Concept magma}
+
+\pnum
+A \textit{magma} is a set $S$ associated with a binary operation $\cdot$, such that $S$ is
+\textit{closed under} $\cdot$.
+
+\pnum
+\begin{example}
+   $(\mathbb{Z}, +)$ is a magma, since we can add any two integers and find that the result is also
+   an integer.
+\end{example}
+
+\pnum
+\begin{example}
+   $(\mathbb{Z}, /)$ is not a magma, since $\frac{2}{3}$ is not an integer.
+\end{example}
+
+\begin{itemdecl}
+  template<class BOp, class T, class U>
+  concept magma =
+    common_with<T, U> &&
+    regular_invocable<BOp, T, T> &&
+    regular_invocable<BOp, U, U> &&
+    regular_invocable<BOp, T, U> &&
+    regular_invocable<BOp, U, T> &&
+    common_with<invoke_result_t<BOp&, T, U>, T> &&
+    common_with<invoke_result_t<BOp&, T, U>, U> &&
+    same_as<invoke_result_t<BOp&, T, U>, invoke_result_t<BOp&, U, T>>;
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   Let \tcode{bop} be an object of type \tcode{BOp}, \tcode{t} be an object of type \tcode{T}, and
+   \tcode{u} be an object of type \tcode{U}.
+
+   \pnum
+   The value \tcode{invoke(bop, t, u)} must return a result that is representable by
+   \tcode{common_type_t<T, U>}.
+\end{itemdescr}
+
+\reviewernote{
+   The term \textit{semigroupoid} is an older name for the notion of a magma, but this seems to have
+   been co-opted by category theory. An less attractive alternative to \tcode{magma} is
+   \tcode{closed_operation}, but the author does not recommend this name (it probably conveys as
+   much information to non-mathematicians as \tcode{magma}).
+}
+
+\rSec2[support.concepts.semigroup]{Concept semigroup}
+
+\pnum
+A \textit{semigroup} $(S, \cdot)$ refines the concept of a magma, by requiring $\cdot$ to be an
+\textit{associative} binary operation.
+
+\pnum
+\begin{example}
+   $(\mathbb{R}, +)$ is a semigroup, since $(1.2 + 2.3) + \pi = 1.2 + (2.3 + \pi)$.
+\end{example}
+
+\pnum
+\begin{example}
+   $(\mathbb{R}, -)$ is not a semigroup, since $(1.2 - 2.3) - \pi \neq 1.2 - (2.3 - \pi)$.
+\end{example}
+
+\begin{itemdecl}
+  template<class BOp, class T, class U>
+  concept semigroup = magma<BOp, T, U>;
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   Let \tcode{bop} be an object of type \tcode{BOp}, \tcode{t} be an object of type \tcode{T}, and
+   \tcode{u} be an object of type \tcode{U}.
+
+   \pnum
+   \tcode{invoke(bop, t, invoke(bop, t, u))} is expression-equivalent to
+   \tcode{invoke(bop, invoke(bop, t, u), u)}.
+
+   \pnum
+   \begin{note}
+      The difference between \tcode{magma} and \tcode{semigroup} is purely semantic.
+   \end{note}
+\end{itemdescr}
+
+\rSec2[support.concepts.monoid]{Concept monoid}
+
+\pnum
+A \textit{monoid} $(S, \cdot)$ refines the concept of a semigroup by requiring $\cdot$ to have a
+two-sided identity element.
+
+\begin{itemdecl}
+  template<class BOp, class T, class U>
+  concept monoid = semigroup<BOp, T, U> && requires {
+    typename two_sided_identity_t<BOp, remove_cvref_t<T>, remove_cvref_t<U>>;
+  };
+\end{itemdecl}
+
+\rSec2[support.concepts.quasigroup]{Concept quasigroup}
+
+\pnum
+A \textit{quasigroup} $(S, \cdot)$ refines the concept of a magma by requiring $\cdot$ have an
+inverse operation.
+
+\begin{example}
+   $(\mathbb{Z}, +)$ is a quasigroup, since subtraction is the inverse operation of addition.
+\end{example}
+
+\begin{example}
+   $(\mathbb{Z}, \text{mod})$ is not a quasigroup, since there is no inverse operation for modulus.
+\end{example}
+
+\begin{itemdecl}
+  template<class BOp, class T, class U>
+  concept quasigroup = magma<BOp, T, U> and requires {
+     typename inverse_operation_t<BOp, T, U>;
+     typename inverse_operation_t<inverse_operation_t<BOp, T, U>, T, U>;
+     requires same_as<BOp, inverse_operation_t<inverse_operation_t<BOp, T, U>, T, U>>;
+  };
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   Let \tcode{t} be an object of type \tcode{T}, \tcode{u} be an object of type \tcode{U},
+   \tcode{bop} be an object of type \tcode{BOp}.
+
+   \pnum
+   There exists an object \tcode{inv} of type \tcode{Inv}, where \tcode{Inv} models
+   \tcode{magma<T, U>}, and
+   \begin{itemize}
+      \item \tcode{invoke(inv, invoke(bop, t, u), t) == u}
+      \item \tcode{invoke(inv, invoke(bop, t, u), u) == t}
+   \end{itemize}
+   are both true.
+   \begin{note}
+      This implies that \tcode{Inv} also models \tcode{quasigroup<T, U>}, with respect to
+      \tcode{inv}.
+   \end{note}
+\end{itemdescr}
+
+\reviewernote{
+   The author wonders if having both \tcode{semigroup} and \tcode{quasigroup} will be confusing for
+   some people. The names \tcode{associative_magma} (for \tcode{semigroup}) and
+   \tcode{invertible_magma} (for \tcode{quasigroup}) have been considered as alternatives.
+}
+
+\rSec2[support.concepts.loop]{Concept loop}
+
+\pnum
+A \textit{loop} $(S, \cdot)$ refines the concept of a quasigroup by requiring $\cdot$ to have a
+two-sided identity element.
+
+\begin{itemdecl}
+  template<class BOp, class T, class U>
+  concept monoid = quasigroup<BOp, T, U> && requires {
+    typename two_sided_identity_t<BOp, remove_cvref_t<T>, remove_cvref_t<U>>;
+  };
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   \tcode{invoke(inv, t, invoke(bop, t, u))} is expression-equivalent to
+   \tcode{invoke(inv, two_sided_identity{}(bop, t, u), t)}.
+
+   \pnum
+   \tcode{invoke(inv, u, invoke(bop, t, u))} is expression-equivalent to
+   \tcode{invoke(inv, two_sided_identity{}(bop, t, u), u)}.
+\end{itemdescr}
+
+\reviewernote{
+   To avoid confusion between computer science loops and abstract algebra loops, the author is
+   considering renaming \tcode{loop} to \tcode{abstract\_loop} or \tcode{algebraic\_loop}.\\
+   \\
+   The solution should be considered for the notion of a module (for obvious reasons), ring (to
+   avoid confusion with types such as \tcode{ring\_buffer}), and to a lesser extent, group (`group'
+   is a \textit{very} abstract term). This proposal introduces neither a \tcode{module} concept, nor
+   a \tcode{ring} concept (but it is plausible that a subsequent paper propose these).
+}
+
+\rSec2[support.concepts.group]{Concept group}
+
+\pnum
+A \textit{group} is a refinement of both a semigroup and a quasigroup\cite{wikipedia_group}.
+
+\begin{itemdecl}
+  template<class BOp, class T, class U>
+  concept group = semigroup<BOp, T, U> && quasigroup<BOp, T, U>;
+\end{itemdecl}
+
+\rSec2[support.concepts.abelian.group]{Concept abelian group}
+
+\pnum
+A \textit{abelian group} refines a group such that the operation is
+commutative\cite{wikipedia_abelian}.
+
+\begin{itemdecl}
+  template<class BOp, class T, class U>
+  concept abelian_group = group<BOp, T, U> && commutative_operation<BOp, T, U>;
+\end{itemdecl}
+
+\reviewernote{
+   An alternative, and possibly more appropriate name for this concept is \tcode{commutative_group}.
+}
+
+\reviewernote{
+   \tcode{group} and \tcode{abelian_group} are the only concepts introduced in this proposal that
+   aren't required by an algorithm, but given their `simple' definition, it would be remiss to omit
+   them. The same cannot be said for the ring hierarchy, as there are more gaps between what is
+   proposed in P1813 and the full definition of a ring.
+}
+
+\rSec2[support.concepts.weak.magmaring]{Concept weak-magmaring}
+
+\pnum
+A \textit{weak-magmaring} $(S, \cdot)$ is a generalisation of the notion of a near-semiring, where:
+\begin{itemize}
+   \item $(S, +)$ is a magma.
+   \item $(S, \cdot)$ is a magma.
+   \item $\cdot$ is distributive over $+$
+   \begin{itemize}
+      \item $a \cdot (b + c) = (a \cdot b) + (a \cdot c)$
+      \item $(a + b) \cdot c = (a \cdot c) + (b \cdot c)$
+   \end{itemize}
+\end{itemize}
+\begin{note}
+   In the definition of a weak-magmaring, $+$ does not refer to canonical addition, and $\cdot$ does
+   not refer to canonical multiplication.
+\end{note}
+
+\begin{itemdecl}
+  template<class BOp1, class BOp2, class T, class U, class V>
+  concept weak_magmaring = magma<BOp2, U, V> && magma<BOp1, T, invoke_result_t<BOp2&, U, V>>;
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   Let \tcode{bop1} be an object of type \tcode{BOp1}, \tcode{bop2} be an object of type
+   \tcode{BOp2}, \tcode{t} be an object of type \tcode{T}, \tcode{u} be an object of type \tcode{U},
+   and \tcode{v} be an object of type \tcode{V}.
+
+   \pnum
+   \tcode{invoke(bop2, invoke(bop1, t, u), v)} is expression-equivalent to
+   \tcode{invoke(bop1, invoke(bop2, t, v), invoke(bop2, u, v))}.
+\end{itemdescr}
+
+\reviewernote{
+   This could be renamed as \tcode{distributive_operation} to avoid introducing novel mathematical
+   terms that lack rigourous definitions. The author is not convinced that the concept definition
+   needs to change for this renaming to be possible.
+}
+
+\rSec2[support.concepts.near.semiring]{Concept near-semiring}
+
+\pnum
+A \textit{near-semiring} $(S, +, \cdot)$ refines the notion of a weak-magmaring, by refining the
+substructures, and introducing the notion of a two-sided zero element.
+\begin{itemize}
+   \item $(S, +)$ is a monoid.
+   \item $(S, \cdot)$ is a semigroup.
+   \item $0 \cdot a = a \cdot 0 = 0$ for all $a$ in $S$.
+\end{itemize}
+
+\begin{itemdecl}
+  template<class BOp1, class BOp2, class T, class U, class V>
+  concept near_semiring = weak_magmaring<BOp1, BOp2, T, U, V> &&
+    monoid<BOp1, T, invoke_result_t<BOp2&, U, V>> && semigroup<BOp2, U, V> && requires {
+      typename two_sided_zero_t<BOp2, remove_cvref_t<U>, remove_cvref_t<V>>;
+    };
+\end{itemdecl}
+
+\rSec2[support.concepts.indirect]{Indirect callable requirements}
+
+The following concepts are convenience concepts, similar to those already in the \Cpp{}20 WP. With
+the exception of \tcode{indirect_commutative_operation}, all of the proposed concepts in this
+section require the algebraic structure model \tcode{writable} to some object. This makes the
+indirect algebraic structure concepts more in line with \tcode{sortable} and \tcode{permutable} than
+with \tcode{indirect_unary_invocable}, etc.
+
+\begin{itemdecl}
+template<class BOp, class I1, class I2>
+concept indirect_commutative_operation =
+  readable<I1> &&
+  readable<I2> &&
+  commutative_operation<BOp&, iter_value_t<I1>&, iter_value_t<I2>&> &&
+  commutative_operation<BOp&, iter_value_t<I1>&, iter_reference_t<I2>> &&
+  commutative_operation<BOp&, iter_reference_t<I1>, iter_value_t<I2>&> &&
+  commutative_operation<BOp&, iter_reference_t<I1>, iter_reference_t<I2>> &&
+  commutative_operation<BOp&, iter_common_reference_t<I1>, iter_common_reference_t<I2>>;
+
+template<class BOp, class I1, class I2, class O>
+concept indirect_magma =
+  readable<I1> &&
+  readable<I2> &&
+  writable<O, indirect_result_t<BOp&, I1, I2>> &&
+  magma<BOp&, iter_value_t<I1>&, iter_value_t<I2>&> &&
+  magma<BOp&, iter_value_t<I1>&, iter_reference_t<I2>&> &&
+  magma<BOp&, iter_reference_t<I1>, iter_value_t<I2>&> &&
+  magma<BOp&, iter_reference_t<I1>, iter_reference_t<I2>> &&
+  magma<BOp&, iter_common_reference_t<I1>, iter_common_reference_t<I2>>;
+
+template<class BOp, class I1, class I2, class O>
+concept indirect_semigroup = indirect_magma<BOp, I1, I2, O> &&
+  semigroup<BOp&, iter_value_t<I1>&, iter_value_t<I2>&> &&
+  semigroup<BOp&, iter_value_t<I1>&, iter_reference_t<I2>&> &&
+  semigroup<BOp&, iter_reference_t<I1>, iter_value_t<I2>&> &&
+  semigroup<BOp&, iter_reference_t<I1>, iter_reference_t<I2>> &&
+  semigroup<BOp&, iter_common_reference_t<I1>, iter_common_reference_t<I2>>;
+
+template<class BOp, class I1, class I2, class O>
+concept indirect_monoid = indirect_semigroup<BOp, I1, I2, O> &&
+  monoid<BOp&, iter_value_t<I1>&, iter_value_t<I2>&> &&
+  monoid<BOp&, iter_value_t<I1>&, iter_reference_t<I2>&> &&
+  monoid<BOp&, iter_reference_t<I1>, iter_value_t<I2>&> &&
+  monoid<BOp&, iter_reference_t<I1>, iter_reference_t<I2>> &&
+  monoid<BOp&, iter_common_reference_t<I1>, iter_common_reference_t<I2>>;
+
+template<class BOp1, class BOp2, class I1, class I2, class I3, class O>
+concept indirect_weak_magmaring =
+  indirect_magma<BOp2, I2, I3, O> &&
+  indirect_magma<BOp1, I1, indirect_result_t<BOp2&, I2, I3>*, O> &&
+  weak_magmaring<BOp1&, BOp2&, iter_value_t<I1>&, iter_value_t<I2>&, iter_value_t<I3>&> &&
+  weak_magmaring<BOp1&, BOp2&, iter_value_t<I1>&, iter_value_t<I2>&, iter_reference_t<I3>> &&
+  weak_magmaring<BOp1&, BOp2&, iter_value_t<I1>&, iter_reference_t<I2>, iter_value_t<I3>&> &&
+  weak_magmaring<BOp1&, BOp2&, iter_value_t<I1>&, iter_reference_t<I2>, iter_reference_t<I3>> &&
+  weak_magmaring<BOp1&, BOp2&, iter_reference_t<I1>, iter_value_t<I2>&, iter_value_t<I3>&> &&
+  weak_magmaring<BOp1&, BOp2&, iter_reference_t<I1>, iter_value_t<I2>&, iter_reference_t<I3>> &&
+  weak_magmaring<BOp1&, BOp2&, iter_reference_t<I1>, iter_reference_t<I2>, iter_value_t<I3>&> &&
+  weak_magmaring<BOp1&, BOp2&, iter_reference_t<I1>, iter_reference_t<I2>, iter_reference_t<I3>> &&
+  weak_magmaring<BOp1&, BOp2&, iter_common_reference_t<I1>, iter_common_reference_t<I2>,
+    iter_common_reference_t<I3>>;
+
+template<class BOp1, class BOp2, class I1, class I2, class I3, class O>
+concept indirect_near_semiring =
+  indirect_weak_magmaring<BOp1, BOp2, I1, I2, I3, O> &&
+  near_semiring<BOp1&, BOp2&, iter_value_t<I1>&, iter_value_t<I2>&, iter_value_t<I3>&> &&
+  near_semiring<BOp1&, BOp2&, iter_value_t<I1>&, iter_value_t<I2>&, iter_reference_t<I3>> &&
+  near_semiring<BOp1&, BOp2&, iter_value_t<I1>&, iter_reference_t<I2>, iter_value_t<I3>&> &&
+  near_semiring<BOp1&, BOp2&, iter_value_t<I1>&, iter_reference_t<I2>, iter_reference_t<I3>> &&
+  near_semiring<BOp1&, BOp2&, iter_reference_t<I1>, iter_value_t<I2>&, iter_value_t<I3>&> &&
+  near_semiring<BOp1&, BOp2&, iter_reference_t<I1>, iter_value_t<I2>&, iter_reference_t<I3>> &&
+  near_semiring<BOp1&, BOp2&, iter_reference_t<I1>, iter_reference_t<I2>, iter_value_t<I3>&> &&
+  near_semiring<BOp1&, BOp2&, iter_reference_t<I1>, iter_reference_t<I2>, iter_reference_t<I3>> &&
+  near_semiring<BOp1&, BOp2&, iter_common_reference_t<I1>, iter_common_reference_t<I2>,
+    iter_common_reference_t<I3>>;
+\end{itemdecl}
+
+\rSec1[support.arithmetic.ops]{Arithmetic function objects}
+
+Just as the P0896 redesigned the comparison function objects, P1813 seeks to redesign the numeric
+operation function objects. This will allow us to:
+
+\begin{itemize}
+   \item Forget about -- and hopefully -- one day eliminate the arithmetic function objects in
+         namespace \tcode{std}.
+   \item Apply requirements to each operation.
+\end{itemize}
+
+\rSec2[support.arithmetic.plus]{Plus}
+
+\begin{itemdecl}
+namespace std::ranges {
+  template<class T, class U>
+  concept @\placeholder{summable-with}@ = // \expos
+    default_initializable<remove_reference_t<T>> &&
+    default_initializable<remove_reference_t<U>> &&
+    common_reference_with<T, U> &&
+    requires(T&& t, U&& u) {
+      { std::forward<T>(t) + std::forward<T>(t) } -> common_with<T>;
+      { std::forward<U>(u) + std::forward<U>(u) } -> common_with<U>;
+      { std::forward<T>(t) + std::forward<U>(u) } -> common_with<T>;
+      { std::forward<U>(u) + std::forward<T>(t) } -> common_with<U>;
+      requires same_as<decltype(std::forward<T>(t) + std::forward<U>(u)),
+                       decltype(std::forward<U>(u) + std::forward<T>(t))>;
+    };
+}
+\end{itemdecl}
+\reviewernote{
+   This is not the same as the dreaded \tcode{has_plus}; it's more of a \tcode{has_plus+}. There
+   should also probably be some axioms, but the author hasn't yet figured out how to describe them.
+   (All other arithmetic function objects have explicit axioms.)
+}
+
+\begin{itemdecl}
+  struct plus {
+    template<class T, @\placeholder{summable-with}@<T> U>
+    constexpr decltype(auto) operator()(T&& t, U&& u) const {
+      return std::forward<T>(t) + std::forward<U>(u);
+    }
+
+    using is_transparent = std::true_type;
+  };
+
+  template<class T, class U>
+  requires magma<ranges::plus, T, U>
+  struct left_identity<ranges::plus, T, U> {
+    constexpr explicit left_identity(ranges::plus, const T&, const U&)
+    {}
+
+    constexpr common_type_t<T, U> operator()() const
+    { return T{}; }
+  };
+
+  template<class T, class U>
+  requires magma<ranges::plus, T, U>
+  struct right_identity<ranges::plus, T, U> {
+    constexpr explicit right_identity(ranges::plus, const T&, const U&)
+    {}
+
+    constexpr common_type_t<T, U> operator()() const
+    { return U{}; }
+  };
+
+  template<>
+  struct inverse_traits {
+    using type = minus;
+    constexpr type operator()() const noexcept
+    { return type{}; }
+  };
+}
+\end{itemdecl}
+
+\rSec2[support.arithmetic.negate]{Negate}
+
+\begin{itemdecl}
+namespace std::ranges {
+  template<class T>
+  concept @\placeholder{negatable}@ = // \expos
+    requires(T&& t) {
+      { -std::forward<T>(t) } -> common_with<T>;
+    };
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   Let \tcode{t} be an object of type \tcode{T}.
+
+   \pnum
+   The expression \tcode{-t != t} is \tcode{true}.
+
+   \pnum
+   \tcode{-(-t)} is expression-equivalent to \tcode{t}.
+\end{itemdescr}
+
+\begin{itemdecl}
+  struct negate {
+    template<@\placeholder{negatable}@ T>
+    constexpr decltype(auto) operator()(T&& t) const {
+      return -std::forward<T>(t);
+    }
+
+    using is_transparent = std::true_type;
+  };
+}
+\end{itemdecl}
+
+\reviewernote{
+   \tcode{negate} is not a binary operation, but it is plausible for there to be an
+   \tcode{inverse_operation<negate>} specialisation where \tcode{operator()} returns
+}
+
+\rSec2[support.arithmetic.minus]{Minus}
+
+\begin{itemdecl}
+namespace std::ranges {
+  template<class T, class U>
+  concept @\placeholder{differenceable-with}@ = // \expos
+    @\placeholder{summable-with}@<T, U> &&
+    @\placeholder{negatable}@<T> &&
+    @\placeholder{negatable}@<U> &&
+    requires(T&& t, U&& u) {
+      { std::forward<T>(t) - std::forward<T>(t) } -> common_with<T>;
+      { std::forward<U>(u) - std::forward<U>(u) } -> common_with<U>;
+      { std::forward<T>(t) - std::forward<U>(u) } -> common_with<T>;
+      { std::forward<U>(u) - std::forward<T>(t) } -> common_with<U>;
+      requires same_as<decltype(std::forward<T>(t) - std::forward<U>(u)),
+                       decltype(std::forward<U>(u) - std::forward<T>(t))>;
+    };
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   Let \tcode{t1} and \tcode{t2} be objects of type \tcode{T}, and \tcode{u1} and \tcode{u2} be
+   objects of type \tcode{U}, where \tcode{t1 != t2} and \tcode{u1 != u2}.
+
+   \pnum
+   \tcode{t1 - t2} is equivalent to \tcode{t1 + -t2}, \tcode{u1 - u2} is equivalent to
+   \tcode{u1 + -u2}, and \tcode{t - u} is equivalent to \tcode{t + -u}.
+
+   \pnum
+   \tcode{t - t} is expression-equivalent to \tcode{T\{\}}, \tcode{u - u} is expression-equivalent
+   to \tcode{U\{\}}, and if \tcode{t == u}, then \tcode{t - u} is expression-equivalent to
+   \tcode{common_type_t<T, U>\{\}}.
+
+   \pnum
+   \tcode{t - (-t)} is equivalent to \tcode{t + t}, \tcode{u - (-u)} is equivalent to \tcode{u + u},
+   and \tcode{t - (-u)} is equivalent to \tcode{t + u}.
+
+   \pnum
+   \tcode{-t1 - t2} is equivalent to \tcode{-(t1 + t2)}, \tcode{-u1 - u2} is equivalent to
+   \tcode{-(u1 + u2)}, and \tcode{-t - u} is expression-equivalent to \tcode{-(t + u)}.
+
+   \pnum
+   \tcode{t + u - t} is expression-equivalent to \tcode{static_cast<common_type_t<T, U>(t)}, and
+   \tcode{t + u - u} is expression-equivalent to \tcode{static_cast<common_type_t<T, U>(u)}.
+\end{itemdescr}
+
+\begin{itemdecl}
+  struct minus {
+    template<class T, @\placeholder{differenceable-with}@<T> U>
+    constexpr decltype(auto) operator()(T&& t, U&& u) const {
+      return std::forward<T>(t) - std::forward<U>(u);
+    }
+
+    using is_transparent = std::true_type;
+  };
+
+  template<class T, class U>
+  requires Magma<ranges::minus, T, U>
+  struct right_identity<ranges::minus, T, U> : private right_identity<ranges::plus, T, U> {
+    using right_identity<ranges::plus, T, U>::value;
+  };
+
+  template<>
+  struct inverse_traits<minus> {
+     using type = ranges::plus;
+     constexpr type operator()() const noexcept
+     { return type{}; }
+  }
+}
+\end{itemdecl}
+
+\rSec2[support.arithmetic.times]{Times}
+
+\reviewernote{
+   The term \tcode{multiplies} is -- in the author's opinion -- not the best name, and so the author
+   would like to take the opportunity of renmaing this function object so that one can more
+   naturally describe the computation.\\
+   \\
+   A potential alternative is \tcode{product}, this is the result of multiplication, not the
+   operation itself (we'd need to renmae \tcode{plus} to \tcode{sum}, etc., to facilitate that
+   idea).
+}
+
+\begin{itemdecl}
+namespace std::ranges {
+  template<class T, class U>
+  concept @\placeholder{multiplicable-with}@ = // \expos
+    @\placeholder{summable-with}@<T, U> &&
+    constructible_from<remove_cvref_t<T>, int> && // specifically T{0} and T{1}
+    constructible_from<remove_cvref_t<T>, int> && // specifically U{0} and U{1}
+    common_reference_with<T, U> &&
+    requires(T&& t, U&& u) {
+      { std::forward<T>(t) * std::forward<T>(t) } -> common_with<T>;
+      { std::forward<U>(u) * std::forward<U>(u) } -> common_with<U>;
+      { std::forward<T>(t) * std::forward<U>(u) } -> common_with<T>;
+      { std::forward<U>(u) * std::forward<T>(t) } -> common_with<U>;
+      requires same_as<decltype(std::forward<T>(t) * std::forward<U>(u)),
+                       decltype(std::forward<U>(u) * std::forward<T>(t))>;;
+    };
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   \tcode{T\{0\}} is equivalent to \tcode{T\{\}}, and \tcode{U\{0\}} is equivalent to \tcode{U\{\}}.
+
+   \pnum
+   The expressions \tcode{t * T\{\} == T\{\}}, \tcode{u * U\{\} == U\{\}},
+   \tcode{t * U\{\} == U\{\}}, and \tcode{u * T\{\} == T\{\}} are all \tcode{true}.
+
+   \pnum
+   The expressions \tcode{t * T\{1\} == t}, \tcode{T\{1\} * t == t}, \tcode{u * U\{1\} == u},
+   \tcode{U\{1\} * u == u}, \tcode{u * T\{1\} == u}, \tcode{T\{1\} * u == u},
+   \tcode{t * U\{1\} == t}, and \tcode{U\{1\} * t == t} are all \tcode{true}.
+
+   \pnum
+   TODO: state that \tcode{t1 * t2} is equivalent to a summation of itself in a way that doesn't
+   unnecessarily restrict matrices and other mathematical objects.
+\end{itemdescr}
+
+\begin{itemdecl}
+  struct times {
+    template<class T, @\placeholder{multiplicable-with}@<T> U>
+    constexpr decltype(auto) operator()(T&& t, U&& u) const {
+      return std::forward<T>(t) * std::forward<U>(u);
+    }
+
+    using is_transparent = std::true_type;
+  };
+
+  template<class T, class U>
+  requires magma<times, T, U>
+  struct left_identity<times, T, U> {
+    constexpr explicit left_identity(const times&, const T&, const U&)
+    {}
+
+    constexpr auto operator()() const
+    { return T{1}; }
+  };
+
+  template<class T, class U>
+  requires magma<times, T, U>
+  struct right_identity<times, T, U> {
+    constexpr explicit right_identity(const times&, const T&, const U&)
+    {}
+
+    constexpr auto operator()() const
+    { return U{1}; }
+  };
+
+  template<class T, class U>
+  requires magma<times, T, U>
+  struct left_zero<times, T, U> {
+    constexpr explicit left_zero(const times&, const T&, const U&)
+    {}
+
+    constexpr auto operator()() const
+    { return T{}; }
+  };
+
+  template<class T, class U>
+  requires magma<times, T, U>
+  struct right_zero<times, T, U> {
+    constexpr explicit right_zero(const times&, const T&, const U&)
+    {}
+
+    constexpr auto operator()() const
+    { return U{}; }
+  };
+
+  template<>
+  struct inverse_traits<times> {
+     using type = divided_by;
+     constexpr type operator()() const noexcept
+     { return type{}; }
+  };
+}
+\end{itemdecl}
+
+\rSec2[support.arithmetic.divided_by]{Divided by}
+
+\reviewernote{
+   The term \tcode{divides} clashes with the predicate \textit{divides}, which is used to indicate
+   that a quotient is an integer. The author recommends renaming this operation to
+   \tcode{divided_by}. A potential alternative is \tcode{quotient}, but this has the same issues as
+   \tcode{product}.
+}
+
+\begin{itemdecl}
+namespace std::ranges {
+  template<class T, class U>
+  concept @\placeholder{divisible-with}@ = // \expos
+    @\placeholder{multiplicable-with}@<T, U> &&
+    @\placeholder{subtractible-with}@<T, U> &&
+    requires(T&& t, U&& u) {
+      { std::forward<T>(t) / std::forward<T>(t) } -> common_with<T>;
+      { std::forward<U>(u) / std::forward<U>(u) } -> common_with<U>;
+      { std::forward<T>(t) / std::forward<U>(u) } -> common_with<T>;
+      { std::forward<U>(u) / std::forward<T>(t) } -> common_with<U>;
+      requires same_as<decltype(std::forward<T>(t) / std::forward<U>(u)),
+                       decltype(std::forward<U>(u) / std::forward<T>(t))>;;
+    };
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   Let \tcode{t1} and \tcode{t2} be objects of type \tcode{T}, and \tcode{u1} and \tcode{u2} be
+   objects of type \tcode{U}. It is undefined for \tcode{t2 == T{0}} or \tcode{u2 == U{0}} to be
+   \tcode{true} in all of the paragraphs below.
+
+   \pnum
+   The expressions
+   \begin{itemize}
+      \item \tcode{(t1 / t2) * t2 == t1},
+      \item \tcode{(t1 * t2) / t2 == t1},
+      \item \tcode{(u1 / u2) * u2 == u1},
+      \item \tcode{(u1 * u2) / u2 == u1},
+      \item \tcode{(t1 / u2) * u2 == t1},
+      \item \tcode{(t1 * u2) / u2 == t1},
+      \item \tcode{(u1 / t2) * t2 == u1}, and
+      \item \tcode{(u1 * t2) / t2 == u1}
+   \end{itemize}
+   are all \tcode{true}.
+
+   \pnum
+   The expressions \tcode{T\{\} / t2 == T\{\}}, \tcode{U\{\} / u2 == U\{\}},
+   \tcode{T\{\} / u2 == common_type_t<T, U>\{\}}, \tcode{U\{\} / t2 == common_type_t<T, U>\{\}} are
+   all \tcode{true}.
+
+   \pnum
+   TODO: insert requirement that specifies division is repeated subtraction.
+\end{itemdescr}
+
+\begin{itemdecl}
+  struct divided_by {
+    template<class T, @\placeholder{divisible-with}@<T> U>
+    constexpr decltype(auto) operator()(T&& t, U&& u) const {
+      return std::forward<T>(t) / std::forward<U>(u);
+    }
+  };
+
+  template<class T, class U>
+  requires magma<divided_by, T, U>
+  struct right_identity<divided_by, T, U> {
+    constexpr explicit right_identity(divided_by, const T&, const U&)
+    {}
+
+    constexpr auto value() const {
+      return U{1};
+    }
+  };
+
+  template<>
+  struct inverse_traits<divided_by> {
+    using type = times;
+    constexpr type operator()() const noexcept
+    { return type{}; }
+  };
+}
+\end{itemdecl}
+
+\rSec2[support.arithmetic.modulus]{Modulus}
+
+\begin{itemdecl}
+namespace std::ranges {
+  template<class T, class Q>
+  concept @\placeholder{modulo-with}@ = // \expos
+    @\placeholder{divisible-with}@<T, Q> &&
+    requires(T&& t, Q&& q) {
+      { std::forward<T>(t) % std::forward<T>(t) } -> common_with<T>;
+      { std::forward<Q>(q) % std::forward<Q>(q) } -> common_with<Q>;
+      { std::forward<T>(t) % std::forward<Q>(q) } -> common_with<T>;
+      { std::forward<Q>(q) % std::forward<T>(t) } -> common_with<Q>;
+      requires same_as<decltype(std::forward<T>(t) % std::forward<Q>(q)),
+                       decltype(std::forward<Q>(q) % std::forward<T>(t))>;
+    };
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   Let \tcode{n} and \tcode{r} be objects of type \tcode{common_type_t<T, Q>}.
+
+   \pnum
+   The expression \tcode{t == q * n + r} is \tcode{true} if and only if \tcode{t \% q == r} is
+   \tcode{true}.
+\end{itemdescr}
+
+\begin{itemdecl}
+  struct modulus {
+    template<class T, @\placeholder{modulo-with}@<T> U>
+    constexpr decltype(auto) operator()(T&& t, U&& u) const {
+      return std::forward<T>(t) % std::forward<U>(u);
+    }
+  };
+
+  template<class T, class U>
+  requires magma<modulus, T, U>
+  struct left_zero<modulus, T, U> {
+    constexpr explicit left_zero(modulus, const T&, const U&)
+    {}
+
+    constexpr auto operator()() const
+    { return T{0}; }
+  };
+}
+\end{itemdecl}

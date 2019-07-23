@@ -1,0 +1,465 @@
+%!TEX root = D1813.tex
+\rSec0[algorithms]{Algorithms}
+
+\begin{quote}
+``We start with algorithms because it is algorithms we want to specify cleanly, precisely,
+completely, and readably. If we can specify algorithms well, our concepts and the language
+mechanisms we use to specify the concepts are adequate. If not, no amount of sophistication in
+language mechanisms will help us.''
+\begin{flushright}
+\textemdash \textit{N3351, §2}
+\end{flushright}
+\end{quote}
+
+\begin{quote}
+``Generic Programming pro tip: Although Concepts are constraints on types, you don't find them by
+looking at the types in your system. You find them by studying the algorithms.''
+\begin{flushright}
+\textemdash \textit{Eric Niebler, Twitter}
+\end{flushright}
+\end{quote}
+
+\rSec1[algorithms.home]{Where do the numeric algorithms belong?}
+
+The numeric algorithms have lived in \tcode{<numeric>} since the original implementation of STL, yet
+many developers frequently question why they are not found in \tcode{<algorithm>}. With standard
+module units on the horizon, it might seem pointless to discuss the validity of choosing to separate
+the numeric algorithms from the rest of their kin. This section aims to provide some guidance for
+when LEWG ultimately drafts the design for which entities reside in what module units.
+
+TODO: fill me in.
+
+\rSec1[algorithms.sequenced]{Sequenced numeric algorithms}
+
+The `sequenced numeric algorithms' are the algorithms found in \tcode{<numeric>}, introduced in the
+STL; most of which made their way into \Cpp{}98. This family of algorithms performs computations in
+a sequential manner, from left-to-right, or from the first element in the sequence to the last.
+For some binary operation \tcode{bop}, and two expressions \tcode{x} and \tcode{y}, the expression
+\tcode{bop(x, y)} need only be equality-preserving \cxxiref{concepts.equality}; the expression
+\tcode{bop(x, y)} doesn't need to be \textit{associative}, nor does it need to be
+\textit{commutative}. That is, \tcode{bop(x, bop(y, z))} is not required to return the same result
+as \tcode{bop(bop(x, y), z)}, and \tcode{bop(x, y)} does not need to return the same result as
+\tcode{bop(y, x)}.
+
+\pnum
+\begin{example}
+   Addition is an associative operation: $1 + (2 + 3) = 6$ and $(1 + 2) + 3 = 6$ also. Subtraction
+   is not an associative operation: $1 - (2 - 3) = 2$ and $(1 - 2) - 3 = -4$.
+\end{example}
+
+\pnum
+\begin{example}
+   Addition is an commutative operation: $1 + 2 = 3$ and $2 + 1 = 3$ also. Subtraction is not a
+   commutative operation: $1 - 2 = -1$ and $2 - 1 = 1$.
+\end{example}
+
+\pnum
+\begin{note}
+   An operation does not need to be both associative and commutative; nor does it need to be
+   neither.
+   \begin{example}
+      Matrix multiplication is associative, but not commutative\cite{wolfram-matrix-multiplication}.
+   \end{example}
+\end{note}
+
+\rSec2[algorithms.accumulate]{Accumulate}
+
+\tcode{accumulate} is an algorithm that performs a fold operation, or in other words, takes a
+sequence of values and reduces them into a single value according to some operation. This is a
+generalisation of a summation.  The algorithm -- modelled after what's currently in the
+International Standard -- has a fairly straightforward declaration.
+
+\begin{itemdecl}
+template<input_iterator I, sentinel_for<I>, movable T, class Proj = identity,
+         indirect_magma<const T*, projected<I, Proj>, T*> BOp = ranges::plus>
+constexpr accumulate_result<I, T>
+  accumulate(I first, S last, T init, BOp bop = {}, Proj proj = {});
+
+template<input_range R, movable T, class Proj = identity,
+         indirect_magma<const T*, projected<iterator_t<R>, Proj>, T*> BOp = ranges::plus>
+constexpr accumulate_result<safe_iterator_t<R>, T>
+  accumulate(R&& r, T init, BOp bop = {}, Proj proj = {});
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+A \textit{magma} is a binary operation \tcode{bop} over a set of elements $S$, where the result of
+\tcode{bop(x, y)} is also in the set, or alternatively, \tcode{bop} is closed under
+$S$\cite{wikipedia_magma}. Because different types may represent the same set of elements (e.g. all
+of \tcode{int}, \tcode{long long}, and \tcode{double} can be used to represent a subset of
+integers), \tcode{BOp} does not need to be a homogeneous binary operation. For equational reasoning
+purposes, the types are expected to have a common type, and so \tcode{bop(0, vector{0})} does not
+model a \tcode{magma}. Similarly, \tcode{bop(x, y)}, where \tcode{x} and \tcode{y} are possibly
+different types is expected to share a type common to both \tcode{x} and \tcode{y}. The type of
+\tcode{bop(x, y)} must be the same as the type of \tcode{bop(y, x)}. magma also requires \tcode{BOp}
+to model \tcode{regular_invocable}. Finally, a magma is only concerned with closure: they do not
+impose any requirements on associativity, nor on commutativity, so although the types of
+\tcode{bop(x, y)} and \tcode{bop(y, x)} need to match, there is no requirement for their values to
+match.
+\end{itemdescr}
+
+It might also be nice to use \tcode{accumulate} without an initial value, similarly to \Cpp{}17's
+\tcode{std::reduce}. It would certainly be convenient to use \tcode{accumulate(r)} or even
+\tcode{accumulate(r, ranges::times\{\})}, where \tcode{r} is an arbitrary range, and
+\tcode{ranges::times} is a modernisation of \tcode{std::multiplies}. The former is fairly trivial
+to do: we can default \tcode{init = T\{\}} and call it a day, just as \tcode{std::reduce} has, but
+the author feels that this is lacking. An \textit{ideal} \tcode{init}-less \tcode{accumulate} should
+permit the caller to specify a range, optionally an operation, and optionally a projection. This
+requires great care, because \tcode{accumulate(r, times\{\})} when \tcode{init = T\{\}} would always
+produce a single result: \tcode{T\{\}}. The reasons for why this is not desirable should be obvious.
+
+By instead choosing an appropriate way to represent an operation's identity element,
+\tcode{accumulate(r, bop, proj)} becomes a viable candidate to add to our overload set. An
+\textit{identity element} $id$ is an element in aset $S$, where $x \cdot id$ is equivalent to $x$,
+or $id \cdot x$ is equivalent to $x$. $x \cdot id$ is called a \textit{right-identity}, because $id$
+is on the right-hand-side of $x$, and $id \cdot x$ is called a \textit{left-identity}. When $id$ is
+both a left-identity and a right-identity, we call it a \textit{two-sided identity} (mathematicians
+should note that \tcode{std::identity} is a function object\cxxiref{func.identity}).
+
+\pnum
+\begin{example}
+   $0$ is the two-sided identity element for addition of real numbers: $x + 0 = x = 0 + x = x$.
+\end{example}
+
+\pnum
+\begin{example}
+   $1$ is the two-sided identity element for multiplication of real numbers: $1(x) = x = x(1) = x$.
+\end{example}
+
+With an interface that requires a two-sided identity, we can now declare our additions to the
+\tcode{accumulate} overload set.
+
+\begin{itemdecl}
+template<input_iterator I, sentinel_for<I> S, class Proj = identity,
+         indirect_monoid<projected<I, Proj>, projected<I, Proj>,
+                         iter_value_t<projected<I, Proj>>*> BOp = ranges::plus>
+  requires movable<iter_value_t<projected<I, Proj>>>
+constexpr accumulate_result<I, iter_value_t<projected<I, Proj>>>
+  accumulate(I first, S last, BOp bop = {}, Proj proj = {});
+
+template<input_range R, class Proj = identity,
+         indirect_monoid<projected<iterator_t<R>, Proj>,
+                         projected<iterator_t<R>, Proj>,
+                         iter_value_t<projected<iterator_t<R>, Proj>>* = ranges::plus>
+  requires movable<iter_value_t<projected<iterator_t<R>, Proj>>>
+constexpr accumulate_result<safe_iterator_t<R>, iter_value_t<projected<iterator_t<R>, Proj>>>
+  accumulate(R&& r, BOp bop = {}, Proj proj = {});
+\end{itemdecl}
+\begin{itemdescr}
+A \textit{monoid} is a twice-removed refinement over magma: it requires \tcode{BOp} be an
+associative operation (this is a \textit{semigroup}\cite{wikipedia_semigroup}), and it requires that
+\tcode{BOp} have a two-sided identity element\cite{wikipedia_monoid}. How this is achieved is
+covered later, but it is a good idea to note now that the notion of identities are defined using a
+new set of traits (numeric traits). This overload subset designates the return type to be the same
+as the iterator's value type, so the requirement for \tcode{T} to be \tcode{movable} must be moved
+appropriately.
+\end{itemdescr}
+
+\rSec2[algorithms.partial.sum]{Partial sum}
+
+In mathematics, a partial sum is a summation of the first $N$ elements of a
+sequence\cite{wolfram-partial-sum}.
+
+$$S_N = \sum_{k = 0}^{N - 1} a_k$$
+
+The \Cpp{} algorithm \tcode{partial_sum} is a generalisation of a partial sum, which writes the
+$k$th evaluation of \tcode{accumulate} to an output range. The interface is extremely similar to
+that of \tcode{accumulate}.
+
+\begin{codeblock}
+template<input_iterator I, sentinel_for<I> S1, weakly_incrementalbe O, sentinel_for<O> S2,
+         class Proj = identity,
+         indirect_magma<projected<I, Proj>, projected<I, Proj>, O> BOp = ranges::plus>
+  requires indirectly_copyable_storable<I, O>
+constexpr partial_sum_result<I, O>
+  partial_sum(I first, S1 last, O result, S2 result_last, BOp bop = {}, Proj proj = {});
+
+template<input_range R, range O, class Proj = identity,
+         indirect_magma<projected<iterator_t<R>, Proj>,
+                        projected<iterator_t<R>, Proj>,
+                        iterator_t<O>> BOp = ranges::plus>
+  requires indirectly_copyable_storable<iterator_t<I>, iterator_t<O>>
+constexpr partial_sum_result<safe_iterator_t<R>, safe_iterator_t<O>>
+  partial_sum(R&& r, O&& result, BOp bop = {}, Proj proj = {});
+\end{codeblock}
+
+Unlike \tcode{accumulate}, \tcode{partial_sum} doesn't require an initial value: it instead
+designates \tcode{invoke(proj, *first)} as the initial value. \tcode{partial_sum} requires its
+binary operation model a \tcode{magma} over its projected input range for the same reasons as
+\tcode{accumulate}. The output of \tcode{partial_sum}'s value-type must be copyable, and movable via
+a cache\cxxiref{alg.req.ind.copy}.
+
+\reviewernote{
+   The above paragraph is poorly worded. Input on how to rephrase is appreciated.
+}
+
+To minimise the likelidhood of writing to an beyond an output range that is smaller than the input
+range, both overloads have been slightly altered to take two full ranges instead of a
+range-and-a-half. The range-and-a-half overloads can be emulated using \tcode{unreachable_t}.
+
+\rSec2[algorithms.adjacent.difference]{Adjacent difference}
+
+\tcode{adjacent_difference} is a specialised transformation over adjacent elements in an input range
+to compute the inverse of a \tcode{partial_sum} \iref{proof.adjacent.difference}. This yields some
+interesting properties about \tcode{adjacent_difference}'s requirements, as shown below.
+
+\begin{itemdecl}
+template<input_iterator I, sentinel_for<I> S1, weakly_incrementalbe O, sentinel_for<O> S2,
+         class Proj = identity,
+         indirect_loop<projected<I, Proj>, projected<I, Proj>, O> BOp = ranges::minus>
+  requires requires indirectly_copyable_storable<I, O>
+constexpr adjacent_difference_result<I, O>
+  adjacent_difference(I first, S1 last, O result, S2 result_last, BOp bop = {}, Proj proj = {});
+
+template<input_range R, range O, class Proj = identity,
+         indirect_loop<projected<iterator_t<R>, Proj>,
+                       projected<iterator_t<R>, Proj>,
+                       iterator_t<O>> BOp = ranges::minus>
+  requires indirectly_copyable_storable<iterator_t<I>, iterator_t<O>>
+constexpr adjacent_difference_result<safe_iterator_t<R>, safe_iterator_t<O>>
+  adjacent_difference(R&& r, O&& result, BOp bop = {}, Proj proj = {});
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   A \textit{loop} is another twice-removed refinement over a magma. Specifically, it requires that
+   the binary operation have an inverse operation (this is a
+   \textit{quasigroup}\cite{wikipedia_quasigroup}), and a two-sided identity. It is necessary for
+   \tcode{adjacent_difference} to require a loop, so that we can guarantee that it is the inverse
+   algorithm of \tcode{partial_sum}.
+
+   It's important to note that despite appearing to have similar use-cases, both the the interface
+   and implementation for \tcode{adjacent_difference} are distinct from
+   \tcode{transform}\cxxiref{alg.transform}:
+
+   \begin{description}
+      \item[Varying interface]
+         \tcode{adjacent_difference} requires that its binary operation model
+         \tcode{regular_invocable}\cxxiref{concept.regularinvocable}, while \tcode{transform} only
+         requires its binary operation model
+         \tcode{invocable}\cxxiref{concept.invocable}\cxxiref{indirectcallable.indirectinvocable}.
+      \item[Varying implementation]
+         \tcode{transform} applies its operands in the order of left-to-right, à la
+         \tcode{op(*first1, *first2)}, while \tcode{adjacent_difference} applies its operands in the
+         \textit{opposite} order, à la \tcode{bop(prev, *first)}.
+   \end{description}
+\end{itemdescr}
+
+\reviewernote{
+   Despite \textit{loop} being the technical term for this algebraic structure, the author does not
+   encourage the using the name \tcode{loop} \textit{directly}, due to the likelihood of it being
+   confused with the computer science term `loop'. See \ref{support.concepts.loop} for possible
+   alternative (ugly) names.
+}
+
+\rSec2[algorithms.inner.product]{Inner Product}
+
+\tcode{inner_product} generalises an algebraic inner product into a map-reduce operation.
+
+\begin{itemdecl}
+template<input_iterator I1, sentinel_for<I1> S1, input_iterator I2, sentinel_for<I2> S2,
+         movable T, class Proj1 = identity, class Proj2 = identity,
+         class BOp1 = ranges::plus, class BOp2 = ranges::times>
+  requires indirect_weak_magmaring<BOp1, BOp2, const T*,
+                                   projected<I1, Proj1>, projected<I2, Proj2>, T*>
+constexpr inner_product_result<I1, I2, T>
+ inner_product(I1 first1, S1 last1, I2 first2, S2 last2, T init,
+               BOp1 bop1 = {}, BOp2 bop2 = {}, Proj1 proj1 = {}, Proj2 proj2 = {});
+
+template<input_range R1, input_range R2, class BOp1 = ranges::plus, class BOp2 = ranges::times,
+         movable T, class Proj1 = identity, class Proj2 = identity>
+  requires indirect_weak_magmaring<BOp1, BOp2, const T*,
+                                   projected<iterator_t<R1>, Proj1>,
+                                   projected<iterator_t<R2>, Proj2>, T*>
+constexpr inner_product_result<safe_iterator_t<R1>, safe_iterator_t<R2>, T>
+  inner_product(R1&& r1, R2&& r2, T init, BOp1 bop1 = {}, BOp2 bop2 = {},
+                Proj1 proj1 = {}, Proj2 proj2 = {});
+\end{itemdecl}
+\begin{itemdescr}
+   \pnum
+   A \tcode{weak_magmaring} is an extreme generalisation of the well-known semiring algebraic
+   structure that establishes a relationship between two magmas. Specifically, it describes that a
+   magma \tcode{BOp2} is \textit{distributive} over \tcode{BOp1}. Given three objects of possibly
+   distinct -- but related -- types, \tcode{x}, \tcode{y}, and \tcode{z}, the expression
+   \tcode{bop2(x, bop1(y, z))} is equivalent to \tcode{bop1(bop2(x, y), bop2(x, z))}.
+
+   \pnum
+   \begin{example}
+      Multiplication is distributive over addition: $x(y + z) = xy + yz$.
+   \end{example}
+
+   \pnum
+   Mathematicians note that weak-magmaring is a generalisation of a near-semiring, named by the
+   author, to fit the requirements. The author asked around on StackExchange\cite{stack-exchange-wm}
+   before naming this algebraic structure, but it seems that the structure is too general to be of
+   interest outside of this use-case. The naming decision stems from that fact that a near-semiring
+   weakens $(S, \cdot)$ from a monoid to a semigroup, and a weak-magmaring weakens $(S, \cdot)$ from
+   a semiring to a magma. A more appropriate name might exist: near-semirings still require $(S, +)$
+   to model a monoid, but a near-magma weakens this requirement to a magma as well.
+
+   \pnum
+   Similarly to \tcode{adjacent_difference}, \tcode{inner_product} is not quite the same as
+   \Cpp{}17's \tcode{transform_reduce}, which is expected to be far more permissive with its
+   operations.
+\end{itemdescr}
+
+Care has been taken to ensure that \tcode{inner_product} is not over-constraining, and that only
+types that directly interact are required to have a common type. This means the following code
+doesn't meet the requirements for \tcode{inner_product}.
+
+\begin{codeblock}
+auto words_to_ints = [](string_view const word) -> int {
+   // ...
+};
+auto const data1 = vector{"one"s, "two"s, "three"s, "four"s, "five"s};
+auto const data2 = vector{"six"s, "seven"s, "eigth"s, "nine"s, "ten"s};
+return inner_product(data1, data2, 0, ranges::plus{}, words_to_ints);
+// error: words_to_ints doesn't model magma<string, string>, since
+//        common<invoke_result_t<words_to_ints, string, string>, int> is false.
+\end{codeblock}
+
+A user that wants to perform this operation should instead use the following:
+\begin{codeblock}
+auto as_words = view::transform(words_to_ints);
+return accumulate(view::zip_with(data1 | as_words, data2 | as_words, ranges::times{}));
+\end{codeblock}
+\reviewernote{
+   The author is aware that \tcode{zip_with_view} is yet to be standardised: this use-case
+   exasperates the need for such a library feature.
+}
+
+Similarly to \tcode{accumulate}, by refining our requirements, it's possible to eliminate the need
+for an initial value, thereby making this possible:
+
+\begin{codeblock}
+auto ints = view::iota(0);
+auto slice = [](auto const drop, auto const take) {
+   return view::drop(drop) | view::take(take);
+};
+return inner_product(ints | slice(100, 10), ints | slice(10, 10));
+\end{codeblock}
+
+\begin{codeblock}
+template<input_iterator I1, sentinel_for<I1> S1, input_iterator I2, sentinel_for<I2> S2,
+         class BOp1 = ranges::plus, class BOp2 = ranges::times,
+         class Proj1 = identity, class Proj2 = identity>
+requires indirect_near_semiring<BOp1, BOp2,
+                                const iter_value_t<projected<I1, Proj1>>*,
+                                projected<I1, Proj1>,
+                                projected<I2, Proj2>,
+                                iter_value_t<projected<I1, Proj1>>*>
+constexpr inner_product_result<I1, I2, iter_value_t<projected<I1, Proj1>>>
+inner_product(I1 first1, S1 last1, I2 first2, S2 last2, BOp1 bop1 = {}, BOp2 bop2 = {},
+              Proj1 proj1 = {}, Proj2 proj2 = {});
+
+template<input_range R1, input_range R2, class Proj1 = identity, class Proj2 = identity,
+         class BOp1 = ranges::plus, class BOp2 = ranges::times>
+requires indirect_near_semiring<BOp1, BOp2,
+                                const iter_value_t<projected<iterator_t<R1>, Proj1>>*,
+                                projected<iterator_t<R1>, Proj1>,
+                                projected<iterator_t<R2>, Proj2>,
+                                iter_value_t<projected<iterator_t<R1>, Proj1>>*>
+constexpr inner_product_result<safe_iterator_t<R1>, safe_iterator_t<R2>,
+                               iter_value_t<projected<iterator_t<R1>, Proj1>>>
+inner_product(R1&& r1, R2&& r2, BOp1 bop1 = {}, BOp2 bop2 = {},
+              Proj1 proj1 = {}, Proj2 proj2 = {});
+\end{codeblock}
+
+A \textit{near-semiring} is a refinement of a weak-magmaring, and naturally arises from studying
+functions on monoids\cite{wikipedia_near_semiring}. A near-semiring requires that \tcode{BOp1} model
+a monoid, and that \tcode{BOp2} model a semigroup. As a near-semiring refines a weak-magmaring, it
+subsumes the distributive property. It also introduces the notion of an
+\textit{annhiliating element}\cite{wikipedia_absorb}. In mathematics, an annihilating element is a
+special element in a set for certain operations, such that when applied with any other element in
+the set, the result of the operation is the annihliating element. It is the complete opposite of an
+identity element.
+
+\begin{example}
+   For example, scalar multiplication's annihilating element is $0$: $0x = 0$ and $x0 = 0$.
+\end{example}
+
+Semigroup theory refers to annihilating elements as the \textit{zero element}, as there is only one
+notion of zero.
+
+\reviewernote{
+   While a zero element is not strictly a necessity for \tcode{inner_product}, it is a fundamental
+   property of a near-semiring, and so it has been included in the requirements for a
+   \tcode{near_semiring}.
+}
+
+\rSec2[algorithms.iota]{Iota}
+
+\reviewernote{
+   As the \Cpp{}20 WP contains \tcode{iota_view}, it is unclear to the author whether or not there
+   is a place for an algorithm \tcode{iota}. This subsection will be filled out, either in favour or
+   against, after receiving guidance.
+}
+
+\rSec2[algorithms.power]{Power}
+
+\reviewernote{
+   While reviewing the history of the original STL implementation, the author noted that there
+   existed an extension algorithm called \tcode{power}. The current revision of this document does
+   not explore this algorithm, but a future revision may.
+}
+
+\rSec1[algorithms.unsequenced]{Unsequenced numeric algorithms}
+
+The `unsequenced numeric algorithms' are the \tcode{<numeric>} algorithms introduced in \Cpp{}17.
+These are a further generalisation of the sequenced numeric algorithms, and may perform computations
+out-of-order. As such, in order to guarantee equality-preservation, these algorithms will require
+their operations be both associative and commutative.
+
+\rSec2[algorithms.reduce]{Reduce}
+
+\tcode{reduce} is the unsequenced counterpart to \tcode{accumulate}. Its declaration is fairly
+similar to that of \tcode{accumulate}, except for the refinements introduced by this section.
+
+\begin{codeblock}
+template<input_iterator I, sentinel_for<I>, movable T, class Proj = identity,
+         indirect_commutative_semigroup<const T*, projected<I, Proj>, T*> BOp = ranges::plus>
+constexpr reduce_result<I, T>
+  reduce(I first, S last, T init, BOp bop = {}, Proj proj = {});
+
+template<input_range R, movable T, class Proj = identity,
+         indirect_commutative_semigroup<const T*,
+                                        projected<iterator_t<R>, Proj>, T*> BOp = ranges::plus>
+constexpr reduce_result<safe_iterator_t<R>, T>
+  reduce(R&& r, T init, BOp bop = {}, Proj proj = {});
+
+template<input_iterator I, sentinel_for<I> S, class Proj = identity,
+         indirect_commutative_monoid<projected<I, Proj>, projected<I, Proj>,
+                                     iter_value_t<projected<I, Proj>>*> BOp = ranges::plus>
+requires movable<iter_value_t<projected<I, Proj>>>
+constexpr reduce_result<I, iter_value_t<projected<I, Proj>>>
+  reduce(I first, S last, BOp bop = {}, Proj proj = {});
+
+template<input_range R, class Proj = identity,
+         indirect_commutative_monoid<projected<iterator_t<R>, Proj>,
+                                     projected<iterator_t<R>, Proj>,
+                                     iter_value_t<projected<iterator_t<R>, Proj>>* = ranges::plus>
+requires movable<iter_value_t<projected<iterator_t<R>, Proj>>>
+constexpr reduce_result<safe_iterator_t<R>, iter_value_t<projected<iterator_t<R>, Proj>>>
+  reduce(R&& r, BOp bop = {}, Proj proj = {});
+\end{codeblock}
+
+\tcode{commutative_semigroup} and \tcode{commutative_monoid} respectively refine \tcode{semigroup}
+and \tcode{monoid} so that \tcode{BOp} is a commutative operation. This is achieved by introducing a
+\tcode{commutative_operation} concept, which requires that for two distinct values \tcode{x} and
+\tcode{y}, \tcode{bop(x, y)} is has same result as \tcode{bop(y, x)}.
+
+\reviewernote{
+   This document does not yet define the concepts \tcode{commutative_semigroup} and co, but one can
+   `imagine' them being equivalent to \tcode{semigroup<T, U> \&\& commutative_operation<T, U>}, etc.
+}
+
+\rSec2[algorithms.inclusive.scan]{Inclusive scan}
+
+This revision does not explore the requirements for \tcode{inclusive_scan}.
+
+\rSec2[algorithms.exclusive.scan]{Exclusive scan}
+
+This revision does not explore the requirements for \tcode{exclusive_scan}.
+
+\rSec2[algorithms.transform.reduce]{Transform reduce}
+
+This revision does not explore the requirements for \tcode{transform_reduce}.

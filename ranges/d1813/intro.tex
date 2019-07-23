@@ -1,0 +1,113 @@
+\rSec0[intro]{Introduction}
+
+\begin{quote}
+``Every time someone asks why we didn’t cover \tcode{<numeric>} and \tcode{<memory>} algorithms: We
+thought 187 pages of TS was enough.''
+\begin{flushright}
+\textemdash \textit{Casey Carter}
+\end{flushright}
+\end{quote}
+
+\rSec1[intro.motivation]{Motivation}
+
+N3351\cite{N3351} served as the basis for the Ranges TS\cite{N4685}, which was merged into the
+\Cpp{}20 Working Paper\cite{P0898}\cite{P0896}. N3351 focused on defining concepts for the standard
+library, which is achieved by looking at the use-cases that concepts are designed for: generic
+algorithms. Specifically, N3351 looked at pinning down the concepts relevant to the algorithms found
+in \tcode{<algorithm>} after \Cpp{}11. All known bodies of work from N4128\cite{N4128} through to
+P0896 and P0898 -- with the exception of P1033\cite{P1033} -- have continued to focus on studying
+and refining the contents of \tcode{<algorithm>}. P1033 takes the extremely low-hanging fruit and
+adds the uninitialised-memory algorithms from \tcode{<memory>} to the mix. To the author's best
+knowledge, all that's left to be added are possibly a few algorithms introduced in \Cpp{}20, and all
+of the algorithms in \tcode{<numeric>}.
+
+The numeric algorithms weren't abandoned or forgotten: given the limited resources, there simply
+wasn't enough time to study all of the algorithms in \tcode{<algorithm>} and \tcode{<numeric>}, and
+also introduce the basis for range adaptors in \Cpp{}20. Now that we're moving into the \Cpp{}23
+design space, we should start reviewing the numeric algorithms in the same light as N3351 considered
+the \tcode{<algorithm>} algorithms.
+
+A complete design is not as simple as taking the concepts introduced in P0896, slapping them on the
+numeric algorithms, and calling it a day. These algorithms have different requirements to those in
+\tcode{<algorithm>}, and P1813 takes aim at what those might look like. The current revision chooses
+to focus on only those algorithms introduced in \Cpp{}98 and \tcode{reduce}; the remaining \Cpp{}17
+numeric algorithms are left to a subsequent revision.
+
+\rSec1[intro.design.ideals]{Design ideals}
+
+The following section has been lifted almost completely verbatim from N3351. This serves as a
+reminder that the design ideals have not really changed since N3351's publication in 2012.
+Non-editorial changes are represented by showing \changed{what is present in N3351}{and what is
+present in P1813}.
+\begin{enumerate}
+   \item The concepts for the STL must be mathematically and logically sound. By this, we mean to
+         emphasise the fact that we should be able to reason about properties of programs (e.g.
+         correctness) with respect to the semantics of the language and the types used in those
+         programs.
+   \item The concepts used should express general ideas in the application domain (hence the name
+         `concepts') rather than mere programming language artifacts. Thinking about concepts as a
+         yet another `contract' language can lead to partially formed ideas. Contracts force
+         programmers to think about requirements on individual functions or interfaces, whereas
+         concepts should represent fully formed abstractions.
+   \item The concepts should specify both syntactic and semantic requirements (``concepts are all
+         about semantics'' -- Alex Stepanov). A concept without semantics only partially specifies
+         an interface and cannot be reasoned about; the absence of semantics is the opposite of
+         soundness (``it is insanity'' -- Alex Stepanov).
+   \item Symbols and identifiers should be associated with their conventional meanings. Overloads
+         should have well defined semantics and not change the usual meaning of the symbol or name.
+   \item The concepts as used to specify algorithms should be terse and readable. An algorithm's
+         requirements must not restate the syntax of its implementation.
+   \item The number of concepts used should be low, in order to make them easier to understand and
+         remember.
+   \item An algorithm's requirements must not inhibit the use of very common code patterns in its
+         implementation.
+   \item An algorithm should not contain requirements for syntax that it does not use, thereby
+         unnecessarily limiting its generality.
+   \item The STL with concepts should be compatible with \changed{\Cpp{}11}{\Cpp{}20}, except where
+         that compatibility would imply a serious violation of one of the first two aims.
+\end{enumerate}
+
+The following quote has also been extracted from N3351.
+
+``Every generic library design must choose the style in which it describes template requirements.
+The ways in which requirements are specified has a direct impact on the design of the concepts
+used to express them, and (as always) there are direct consequences of that choice. For example,
+we could choose to state template requirements in terms of the exact syntax requirements of the
+template. This leads to concept designs that have large numbers of small yntactic predicates (e.g.
+\tcode{HasPlus}, \tcode{HasComma}, etc.). The benefit of this style of constraint is that templates
+are more broadly adaptable: there are potentially more conforming types with which the template will
+interoperate. On the downside, exact requirements tend to be more verbose, decreasing the
+likelihood that the intended abstraction will be adequately communicated to the library’s users.
+The C++0x design is, in many aspects, a product of this style.
+
+On the other end of the spectrum, we could choose to express requirements in terms of the required
+abstraction instead of the required syntax. This approach can lead to (far) fewer concepts in the
+library design because related syntactic requirements are grouped to create coherent, meaningful
+abstractions. Requirements can also be expressed more tersely, needing fewer concepts to express a
+set of requirements that describe how types are used in an algorithm. The use of abstract concepts
+also allows an algorithm to have more conforming implementations, giving a library author an
+opportunity to modify (i.e. maintain) a template’s implementation without impacting its
+requirements. The obvious downside to this style is that it over-constrains templates; there may
+be types that conform to a minimal set of operations used by a template, but not the full set of
+operations required by the concept. The concepts presented in \textit{Elements of Programming}
+approach this end of the spectrum.''
+
+Similarly to N3351, P1813 aims to hold itself in-between these two extremes.
+
+\rSec1[intro.organisation]{Organisation}
+
+Similarly to N3351, P1813 is broken into a section for declaring algorithms with concept
+requirements, and a section for defining concepts. This document is intended to be read in
+sequentially, with many sections depending on exposition from previous sections.
+
+\rSec1[intro.assumed.knowledge]{Assumed knowledge}
+
+The following sections assume familiarity with the concepts library \cxxiref{concepts}, the
+iterator concepts \cxxiref{iterator.concepts}, the indirect callable requirements
+\cxxiref{indirectcallable}, the common algorithm requirements \cxxiref{alg.req}, the range
+requirements \cxxiref{range.req}, and the way in which algorithms are specified in namespace
+\tcode{std::ranges} \cxxiref{algorithms}.
+
+Readers should consult \textit{Design of concept libraries for \Cpp{}}\cite{concept-design} prior to
+reading the remainder of P1813. Readers are also encouraged to consult \textit{Elements of
+Programming}\cite{EoP} and N3351 as necessary.
