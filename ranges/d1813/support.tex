@@ -12,6 +12,11 @@ implementing all algorithms of interest within a particular domain.''
 The following subsections articulate the concept designs and any supporting material (such as
 traits).
 
+\reviewernote{
+  This section's `wording' is not intended to be seen by LWG (hence why the chapter isn't titled
+  `Proposed Wording').
+}
+
 \rSec1[support.traits]{Numeric traits}
 
 This section provides exposition for the traits that are used by algebraic concepts. The author is
@@ -177,8 +182,8 @@ constexpr auto operator()(BOp bop, const T& t, const U& u) const;
 \rSec2[support.traits.zero]{Zero traits}
 
 \pnum
-An zero element $z$ is a special element in a set $S$, such that for all other elements $x$ in
-$S$, given a magma $\cdot$, at least one of $x \cdot z = z$ or $z \cdot x = z$ holds.
+A zero element $z$ is a special element in a set $S$, such that for all other elements $x$ in $S$,
+given a magma $\cdot$, at least one of $x \cdot z = z$ or $z \cdot x = z$ holds.
 
 \pnum
 If both $x \cdot z = z$ and $z \cdot x = z$ hold, then $z$ is unique (\ref{proof.zero}).
@@ -447,6 +452,13 @@ A \textit{magma} is a set $S$ associated with a binary operation $\cdot$, such t
    $(\mathbb{Z}, /)$ is not a magma, since $\frac{2}{3}$ is not an integer.
 \end{example}
 
+\reviewernote{
+   The term \textit{semigroupoid} is an older name for the notion of a magma, but this seems to have
+   been co-opted by category theory. An less attractive alternative to \tcode{magma} is
+   \tcode{closed_operation}, but the author does not recommend this name (it probably conveys as
+   much information to non-mathematicians as \tcode{magma}).
+}
+
 \begin{itemdecl}
   template<class BOp, class T, class U>
   concept magma =
@@ -469,12 +481,25 @@ A \textit{magma} is a set $S$ associated with a binary operation $\cdot$, such t
    \tcode{common_type_t<T, U>}.
 \end{itemdescr}
 
+The decision to require common types for a over \tcode{magma<T, U>} is similar to the reason that
+\tcode{equality\_comparable\_with} requires \tcode{common\_reference\_with}: this ensures that when
+an algorithm requires a \tcode{magma}, we are able to \textit{equationally reason} about those
+requirements. It's possible to overload \tcode{operator+(int, vector<int> const\&)}, but that
+doesn't follow the canonical usage of $+$. Does \tcode{1 + vector\{1, 2, 3\}} mean `concatenate
+\tcode{vector\{1, 2, 3\}} to the end of a temporary \tcode{vector\{1\}}'? Is it a shorthand for
+\tcode{accumulate(vector\{1, 2, 3\}, 1)}? The intention is unclear, and so \tcode{std::plus<>} (sic)
+should not model \tcode{magma<int, vector<int{>}>}.
+
 \reviewernote{
-   The term \textit{semigroupoid} is an older name for the notion of a magma, but this seems to have
-   been co-opted by category theory. An less attractive alternative to \tcode{magma} is
-   \tcode{closed_operation}, but the author does not recommend this name (it probably conveys as
-   much information to non-mathematicians as \tcode{magma}).
+  This implies that the author is not a fan of $+$ as a way of concatenating strings. It's not
+  ideal, but since this is already a standard practice, the author has chosen not to -- probably
+  fruitlessly -- wage war on this specific case.
 }
+
+Similarly, if the result type is not related to its parameters, the operation lacks the ability to
+be equationally reasoned about. While a programmer might have a good local reason to write a matrix
+multiplication declared as \tcode{mat16 operator*(mat4 const\& x, mat4 const\&)}, this does not
+adhere to the usual rules of mathematics, and is out-of-scope for generic programming.
 
 \rSec2[support.concepts.semigroup]{Concept semigroup}
 
@@ -553,12 +578,12 @@ inverse operation.
 
    \pnum
    There exists an object \tcode{inv} of type \tcode{Inv}, where \tcode{Inv} models
-   \tcode{magma<T, U>}, and
+   \tcode{magma<T, U>}, and the expressions
    \begin{itemize}
       \item \tcode{invoke(inv, invoke(bop, t, u), t) == u}
       \item \tcode{invoke(inv, invoke(bop, t, u), u) == t}
    \end{itemize}
-   are both true.
+   are both \tcode{true}.
    \begin{note}
       This implies that \tcode{Inv} also models \tcode{quasigroup<T, U>}, with respect to
       \tcode{inv}.
@@ -613,6 +638,12 @@ A \textit{group} is a refinement of both a semigroup and a quasigroup\cite{wikip
   concept group = semigroup<BOp, T, U> && quasigroup<BOp, T, U>;
 \end{itemdecl}
 
+\reviewernote{
+  The author is open to simplifying the group heirarchy by following the design presented in EoP,
+  where a group refines a monoid by requiring inverse operation. This would eliminate the confusion
+  between `semigroup' and `quasigroup', and won't introduce any concept-like diamond problems.
+}
+
 \rSec2[support.concepts.abelian.group]{Concept abelian group}
 
 \pnum
@@ -630,7 +661,7 @@ commutative\cite{wikipedia_abelian}.
 
 \reviewernote{
    \tcode{group} and \tcode{abelian_group} are the only concepts introduced in this proposal that
-   aren't required by an algorithm, but given their `simple' definition, it would be remiss to omit
+   aren't required by an algorithm, but given their `simple' definitions, it would be remiss to omit
    them. The same cannot be said for the ring hierarchy, as there are more gaps between what is
    proposed in P1813 and the full definition of a ring.
 }
@@ -777,7 +808,8 @@ operation function objects. This will allow us to:
 \begin{itemize}
    \item Forget about -- and hopefully -- one day eliminate the arithmetic function objects in
          namespace \tcode{std}.
-   \item Apply requirements to each operation.
+   \item Apply requirements to each operation to ensure that they're semantically sound (what does
+         it `mean' to evaluate \tcode{1 + vector\{1, 2, 3\}}?)
 \end{itemize}
 
 \rSec2[support.arithmetic.plus]{Plus}
@@ -879,7 +911,12 @@ namespace std::ranges {
 
 \reviewernote{
    \tcode{negate} is not a binary operation, but it is plausible for there to be an
-   \tcode{inverse_operation<negate>} specialisation where \tcode{operator()} returns
+   \tcode{inverse_operation<negate>} specialisation where \tcode{operator()} returns an object of
+   type \tcode{negate}.
+}
+
+\reviewernote{
+  Should a type that models \placeholder{negatable} also model \tcode{totally_ordered}?
 }
 
 \rSec2[support.arithmetic.minus]{Minus}
@@ -927,6 +964,11 @@ namespace std::ranges {
    \tcode{t + u - u} is expression-equivalent to \tcode{static_cast<common_type_t<T, U>(u)}.
 \end{itemdescr}
 
+\reviewernote{
+  If \placeholder{negatable} is refined to require \tcode{totally_ordered}, it stands to reason that
+  \placeholder{differenceable-with} requires \tcode{totally_ordered_with}.
+}
+
 \begin{itemdecl}
   struct minus {
     template<class T, @\placeholder{differenceable-with}@<T> U>
@@ -938,7 +980,7 @@ namespace std::ranges {
   };
 
   template<class T, class U>
-  requires Magma<ranges::minus, T, U>
+  requires magma<ranges::minus, T, U>
   struct right_identity<ranges::minus, T, U> : private right_identity<ranges::plus, T, U> {
     using right_identity<ranges::plus, T, U>::value;
   };
@@ -956,11 +998,11 @@ namespace std::ranges {
 
 \reviewernote{
    The term \tcode{multiplies} is -- in the author's opinion -- not the best name, and so the author
-   would like to take the opportunity of renmaing this function object so that one can more
+   would like to take the opportunity of rename this function object so that one can more
    naturally describe the computation.\\
    \\
    A potential alternative is \tcode{product}, this is the result of multiplication, not the
-   operation itself (we'd need to renmae \tcode{plus} to \tcode{sum}, etc., to facilitate that
+   operation itself (we'd need to rename \tcode{plus} to \tcode{sum}, etc., to facilitate that
    idea).
 }
 
@@ -994,9 +1036,10 @@ namespace std::ranges {
    \tcode{U\{1\} * u == u}, \tcode{u * T\{1\} == u}, \tcode{T\{1\} * u == u},
    \tcode{t * U\{1\} == t}, and \tcode{U\{1\} * t == t} are all \tcode{true}.
 
-   \pnum
+\reviewernote{
    TODO: state that \tcode{t1 * t2} is equivalent to a summation of itself in a way that doesn't
    unnecessarily restrict matrices and other mathematical objects.
+}
 \end{itemdescr}
 
 \begin{itemdecl}
@@ -1107,8 +1150,9 @@ namespace std::ranges {
    \tcode{T\{\} / u2 == common_type_t<T, U>\{\}}, \tcode{U\{\} / t2 == common_type_t<T, U>\{\}} are
    all \tcode{true}.
 
-   \pnum
+\reviewernote{
    TODO: insert requirement that specifies division is repeated subtraction.
+}
 \end{itemdescr}
 
 \begin{itemdecl}

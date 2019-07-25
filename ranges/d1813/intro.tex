@@ -100,6 +100,10 @@ Similarly to N3351, P1813 is broken into a section for declaring algorithms with
 requirements, and a section for defining concepts. This document is intended to be read in
 sequentially, with many sections depending on exposition from previous sections.
 
+Unlike N3351, P1813 does not introduce concept definitions at their first point-of-use: it instead
+sequentially defines them in the pre-wording-but-looks-like-wording \ref{support}. P1813 also
+contains an appendix for proving mathematical assertions.
+
 \rSec1[intro.assumed.knowledge]{Assumed knowledge}
 
 The following sections assume familiarity with the concepts library \cxxiref{concepts}, the
@@ -111,3 +115,11 @@ requirements \cxxiref{range.req}, and the way in which algorithms are specified 
 Readers should consult \textit{Design of concept libraries for \Cpp{}}\cite{concept-design} prior to
 reading the remainder of P1813. Readers are also encouraged to consult \textit{Elements of
 Programming}\cite{EoP} and N3351 as necessary.
+
+\rSec1[intro.implementation]{Implementation}
+
+This design has partially been implemented in cmcstl2. The original design and the ideas articulated
+in this document have slightly diverged, but not to the point where the author is convinced that the
+design has become un-implementable.
+
+The author also hopes to implement this in range-v3 for broader coverage.

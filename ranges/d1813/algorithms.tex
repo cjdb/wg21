@@ -27,7 +27,9 @@ module units on the horizon, it might seem pointless to discuss the validity of 
 the numeric algorithms from the rest of their kin. This section aims to provide some guidance for
 when LEWG ultimately drafts the design for which entities reside in what module units.
 
-TODO: fill me in.
+\reviewernote{
+   This section is pending reviewer input.
+}
 
 \rSec1[algorithms.sequenced]{Sequenced numeric algorithms}
 
@@ -248,7 +250,8 @@ constexpr adjacent_difference_result<safe_iterator_t<R>, safe_iterator_t<O>>
    Despite \textit{loop} being the technical term for this algebraic structure, the author does not
    encourage the using the name \tcode{loop} \textit{directly}, due to the likelihood of it being
    confused with the computer science term `loop'. See \ref{support.concepts.loop} for possible
-   alternative (ugly) names.
+   alternative (ugly) names, and \ref{support.concepts.group} for a possible (and preferred)
+   redesign.
 }
 
 \rSec2[algorithms.inner.product]{Inner Product}
@@ -323,7 +326,7 @@ auto as_words = view::transform(words_to_ints);
 return accumulate(view::zip_with(data1 | as_words, data2 | as_words, ranges::times{}));
 \end{codeblock}
 \reviewernote{
-   The author is aware that \tcode{zip_with_view} is yet to be standardised: this use-case
+   The author painfully is aware that \tcode{zip_with_view} is yet to be standardised: this use-case
    exasperates the need for such a library feature.
 }
 
