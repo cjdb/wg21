@@ -1,0 +1,2436 @@
+<pre class='metadata'>
+Title: Input range adaptors
+Shortname: P1035
+Level: 4
+Status: P
+Group: wg21
+Editor: Christopher Di Bella, cjdb.ns@gmail.com
+Editor: Casey Carter, casey@carter.com
+Editor: Corentin Jabot, corentin.jabot@gmail.com
+URL: https://wg21.link/p1035
+Abstract: P1035 proposes to introduce seven additional range adaptors in the C++20 timeframe.
+Audience: LEWG
+Markup Shorthands: markdown yes
+Default Highlight: CPP
+Line Numbers: no
+Date: 2018-10-08
+</pre>
+
+# Changes
+
+## San Diego Polls
+
+The following polls were taken by LEWG during the San Diego meeting.
+
+<table>
+   <tr>
+      <th>Abbreviation</th>
+      <th>SF</th>
+      <th>F</th>
+      <th>N</th>
+      <th>A</th>
+      <th>SA</th>
+   </tr>
+   <tr>
+      <td>Term</td>
+      <td>Strongly Favour</td>
+      <td>Favour</td>
+      <td>Neutral</td>
+      <td>Against</td>
+      <td>Strongly Against</td>
+   </tr>
+</table>
+
+> We want to prioritize `basic_istream_view` for C++20 in Kona.
+
+<table>
+   <tr>
+      <th>SF</th>
+      <th>F</th>
+      <th>N</th>
+      <th>A</th>
+      <th>SA</th>
+   </tr>
+   <tr>
+      <td>0</td>
+      <td>2</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+   <tr>
+</table>
+
+> We want to prioritize addition of `range_difference_t`, `range_value_t`, `range_reference_t`,
+    `range_rvalue_reference_t` for C++20 in Kona.
+
+<table>
+   <tr>
+      <th>SF</th>
+      <th>F</th>
+      <th>N</th>
+      <th>A</th>
+      <th>SA</th>
+   </tr>
+   <tr>
+      <td>0</td>
+      <td>2</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+   </tr>
+</table>
+
+> We want to prioritize `take_while_view` for C++20 in Kona.
+
+<table>
+   <tr>
+      <th>SF</th>
+      <th>F</th>
+      <th>N</th>
+      <th>A</th>
+      <th>SA</th>
+   </tr>
+   <tr>
+      <td>2</td>
+      <td>9</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+   </tr>
+</table>
+
+> We want to prioritize `drop_view` for C++20 in Kona.
+
+<table>
+   <tr>
+      <th>SF</th>
+      <th>F</th>
+      <th>N</th>
+      <th>A</th>
+      <th>SA</th>
+   </tr>
+   <tr>
+      <td>3</td>
+      <td>5</td>
+      <td>5</td>
+      <td>0</td>
+      <td>0</td>
+   </tr>
+</table>
+
+> We want to prioritize `drop_while_view` for C++20 in Kona.
+
+<table>
+   <tr>
+      <th>SF</th>
+      <th>F</th>
+      <th>N</th>
+      <th>A</th>
+      <th>SA</th>
+   </tr>
+   <tr>
+      <td>2</td>
+      <td>6</td>
+      <td>5</td>
+      <td>0</td>
+      <td>0</td>
+   </tr>
+</table>
+
+> We prefer types for `keys_view` and `values_view` (in addition).
+
+<table>
+   <tr>
+      <th>SF</th>
+      <th>F</th>
+      <th>N</th>
+      <th>A</th>
+      <th>SA</th>
+   </tr>
+   <tr>
+      <td>0</td>
+      <td>10</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+   </tr>
+</table>
+
+> We want to prioritize `keys()` and `values()` (and their type forms) for C++20 in Kona.
+
+<table>
+   <tr>
+      <th>SF</th>
+      <th>F</th>
+      <th>N</th>
+      <th>A</th>
+      <th>SA</th>
+   </tr>
+   <tr>
+      <td>5</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+   </tr>
+</table>
+
+> Approval
+
+<table>
+   <tr>
+      <th>Result</th>
+      <th>Poll</th>
+   </tr>
+   <tr>
+      <td>9</td>
+      <td>Add conversions (`const`-qualified assignments) to `pair`/`tuple`</td>
+   </tr>
+   <tr>
+      <td>6</td>
+      <td>Use a hidden implementation detail type</td>
+   </tr>
+   <tr>
+      <td>5</td>
+      <td>Ask EWG to fix proxy references (`zip` doesn’t happen for C++23 or worse)</td>
+   </tr>
+   <tr>
+      <td>0</td>
+      <td>Do not want `zip()`</td>
+   </tr>
+   <tr>
+      <td>14</td>
+      <td>Ask EWG to fix proxy references, and decouple from `zip`</td>
+   </tr>
+</table>
+
+> Interest in `zip_longest()` (where the value type is `tuple<optional<T>...>` or `tuple<T...>` with
+    some value)
+
+<table>
+   <tr>
+      <th>SF</th>
+      <th>F</th>
+      <th>N</th>
+      <th>A</th>
+      <th>SA</th>
+   </tr>
+   <tr>
+      <td>2</td>
+      <td>3</td>
+      <td>5</td>
+      <td>3</td>
+      <td>0</td>
+   </tr>
+</table>
+
+## From R3 to R4
+
+* Proposes that `iterator_t` and `sentinel_t` require `Range` in their interface.
+* Adjusts associated types for ranges so that they don't explicitly require `Range` (this is
+    deferred to `iterator_t`).
+* Adjusts `keys_view` and `values_view` as per LEWG's request.
+
+## From R2 to R3
+
+* Adds polls from San Diego meeting.
+* Removed `range_size_t` and `range_common_iterator_t` from the associated types.
+* Added justification for why `is_object_v` is necessary for `take_while_view`.
+* Replaced contract-specified pre-conditions with text-specified pre-conditions.
+* Removed concept `StreamInsertable`, as it is not relevant to the contents of this paper.
+* Replaced concept `StreamExtractable` with exposition-only concept `stream-extractable`.
+    * This was done, in part, to balance the fact that a concept would exist for `operator>>` but not
+         `operator<<`.
+* Replaced pros and cons of `__tuple_hack` with `const`-qualified overloads for `std::tuple` and
+    necessary `common_type` and `basic_common_type` specialisations.
+
+### Changes promised for R4
+
+* Apply additions to `std::tuple` to `std::pair` also.
+* Considering `zip_longest`.
+* Changes to `keys` and `values`.
+
+## From R1 to R2
+
+* Expanded acknowledgements and co-authors.
+* Removed `zip_with_view`.
+* Added `zip_view`.
+* Added `keys` and `values`.
+* Added content for associated types for ranges.
+
+## From R0 to R1
+
+* Revised `istream_range`.
+   * Renamed to `basic_istream_view`.
+   * Introduced some relevant concepts.
+* Introduced `drop_view`, `take_while_view`, `drop_while_view`.
+* Teased `zip_with_view`.
+* Teased associated types for ranges.
+
+# Acknowledgements
+
+We would like to acknowledge the following people for their assistance with this proposal:
+
+* Eric Niebler, for providing [[range-v3]] as a reference implementation.
+* Tim Song, Steve Downey, and Barry Revzin for their reviews of P1035.
+
+# Motivation
+
+[[P0789]] introduces the notion of a range adaptor and twelve pioneering range adaptors that
+improve declarative, range-based programming. For example, it is possible to perform an inline,
+in-place, lazy reverse like so:
+
+```cpp
+namespace ranges = std::ranges;
+namespace view = std::ranges::view;
+
+// Old
+auto i = ranges::find(ranges::rbegin(employees), ranges::rend(employees), "Lovelace", &employee::surname);
+
+// New
+auto j = ranges::find(employees | view::reverse, "Lovelace", &employee::surname);
+[[assert: i == j]];
+```
+
+P1035 recognises that P0789 introduces only a few of the widely experimented-with range adaptors in
+[[range-v3]], and would like to add a few more to complete the C++20 phase of range adaptors.
+
+# Proposals
+
+Unless otherwise requested, each sub-subsection below should be polled individually from other
+sub-subsections. Two major questions are to be asked per range adaptor. It is up to LEWG to decide
+the exact phrasing, but the author's intentions are listed below.
+
+1. Do we want this range adaptor in C++20?
+    1. As-is?
+    2. With modifications, as suggested by LEWG?
+2. If we do not want this range adaptor in C++20, do we want it in C++23?
+    1. As-is?
+    2. With modificaitons, as suggested by LEWG?
+
+## `zip_view`
+
+<b>Note: This section was formerly titled <i><code>zip_with_view</code></i> in P1035R1. Due to
+complications in the design process, `zip_with_view` will not be proposed, but `zip_view` shall be.
+A subsubsection below articulates how to emulate `zip_with_view` below.</b>
+
+### Motivation
+
+A zip, also known as a [[convolution]] operation, performs a transformation on multiple input
+ranges. The typical zip operation transforms several input ranges into a single input range
+containing a tuple with the <i>i</i>th element from each range, and terminates when the smallest
+finite range is delimited.
+
+Iterating over multiple ranges simultaneously is a useful feature. Both [[EWG43]] and [[P0026]] ask
+for this functionality at a language level. While these papers request a useful feature that
+benefits raw loops, they don't address algorithmic composition, which is important for ensuring both
+correctness and simplicity. A `zip_view` will allow programmers to iterate over multiple ranges at
+the same time when requiring either a raw loop or an algorithm.
+
+<table>
+  <tr><th>Current (C++17)</th><th>Proposed (C++20)</th></tr>
+  <tr>
+    <td>
+      <xmp>
+auto x = vector<float>{/* ... */};
+auto y = vector<float>{/* ... */};
+// ...
+auto xit = begin(x);
+auto yit = begin(y);
+for (; xit != end(x) and yit != end(y); ++xit, (void)++yit) {
+   // ...
+}
+      </xmp>
+    </td>
+    <td>
+      <xmp>
+auto x = vector<float>{/* ... */};
+auto y = vector<float>{/* ... */};
+// ...
+for (auto xy = view::zip(x, y); auto [xi, yi] : xy) {
+   // ...
+}
+      </xmp>
+    </td>
+  </tr>
+</table>
+
+Another motivating example for using `zip` involves replacing raw loops with algorithms and range
+adaptors, but still being able to index the operation in question.
+
+<table>
+  <tr><th>Current (C++17)</th><th>Proposed (C++20)</th></tr>
+  <tr>
+   <td>
+<xmp>
+auto v = vector(istream_iterator<int>(cin),
+                istream_iterator<int>());
+auto weighted_sum = 0;
+for (auto i = 0; i < ranges::distance(v); ++i) {
+   weighted_sum += i * v[i];
+}
+</xmp>
+   </td>
+   <td>
+<xmp>
+auto in = view::zip(view::iota(0), istream_view<int>(cin));
+auto const weighted_sum = accumulate(begin(in), end(in),
+   [](auto const a, auto const b){
+      auto const [index, in] = b;
+      return a + (index * in);
+   });
+</xmp>
+   </td>
+  </tr>
+</table>
+
+Finally, people who work in the parallelism and heterogeneous industries are not able to take full
+advantage of the Parallel STL at present due to the limited number of input ranges each algorithm
+can support. `zip_view` will permit this (see [[P0836]] &sect;2.1 for how this is beneficial).
+
+
+The benefits of this proposed approach include:
+
+* More <i>declared</i> operations, leading to more declarative -- rather than imperative -- styled
+    programming.
+* Eliminates state.
+* A resulting expression can be declared `const` without needing to rely on IILE.
+* Temporary storage is eliminated, which helps to improve correctness, clarity, and performance.
+    P0836 &sect;2.1 expands on the performance benefits for heterogeneous programming.
+
+#### `zip_with` in C++20
+
+`zip_with` is a generalisation of `zip`, such that we can apply an <i>n</i>-ary function in place of
+the `transform`s above. The following is an example of how `zip_with` can refine `zip` when tuples
+are not necessary.
+
+```cpp
+vector<float> const x = // ...
+vector<float> const y = // ...
+float const a = // ...
+// ...
+auto ax = x | view::transform([a](auto const x) noexcept { return a * x; });
+auto saxpy = view::zip_with(plus<>{}, ax, y);
+auto const result = vector(begin(saxpy), end(saxpy));
+```
+
+As `zip_with_view` is no longer proposed in C++20, users wanting `zip_with` functionality will be
+required to use something akin to:
+
+<xmp>
+template<class F>
+constexpr auto compose_apply(F&& f) {
+   return [f = std::forward<F>(f)](auto&& t) {
+      return std::apply(std::forward<F>(f), std::forward<decltype(t)>(t));
+   };
+};
+
+// ...
+auto saxpy = zip(ax, y) | transform(compose_apply(plus<>{}));
+</xmp>
+
+This isn't an ideal approach, but some of the finer details of `zip_with_view` that are independent
+of `zip_view` are still being worked out, and this should not preclude the usage of zipping ranges
+for maximum composability.
+
+### Problems with `pair` and `tuple`
+
+`zip_view` requires a value type to store the values of the iterators to the ranges that are
+iterated over, and a reference type to access those values via an iterator to the range.
+Additionally, the concept "`Writable` wants `const` proxy references to be assignable, so we need a
+tuple-like type with `const`-qualified assignment operators"[[cmcstl2]].
+
+Both range-v3 and the cmcstl2 implementation above use an exposition-only type derived from
+`tuple` (both) or `pair` (range-v3 only) that permits a `CommonReference` between
+`tuple<Ts...>&` (an lvalue reference to the value type) and `tuple<Ts&...>` (the perceived reference
+type). This is deemed to be a hack by both Eric Niebler and Casey Carter; a careful reader might
+notice that the above implementation specifies this as `__tuple_hack` (which has conveniently been
+left out of P1035).
+
+Adding a third (and possibly fourth) tuple type that is exposition-only is <i>not</i> ideal: this
+requires extensions to both `pair` and `tuple` so that they are compatible with `__tuple_hack` and
+`__pair_hack`, specialisations for all tuple utilities will be required, and overloads to `get`,
+`apply`, etc. are also necessary.
+
+Alternatively, we can provide an implicit conversion from `tuple<Ts...>&` to `tuple<Ts&...>`, and
+ensure that a `common_reference` exists (à la `basic_common_reference`), and similarly for the other
+reference types.
+
+<xmp>
+template<class... Ts>
+struct tuple {
+   // ...
+
+   constexpr tuple const& operator=(tuple<_Elements...> const&)
+   requires (__stl2::Assignable<_Elements const&, _Elements const&> and ...);
+
+   constexpr tuple const& operator=(tuple<_Elements...>&&)
+   requires (__stl2::Assignable<_Elements const&, _Elements> and ...);
+
+   template<class... Us>
+   requires sizeof...(Ts) == sizeof...(Us) and (Assignable<Ts const&, Us const&> and ...)
+   constexpr tuple const& operator=(tuple<Us...> const& other) const;
+
+   template<class... Us>
+   requires sizeof...(Ts) == sizeof...(Us) and (Assignable<Ts const&, Us const&> and ...)
+   constexpr tuple const& operator=(tuple<Us...>&& other) const;
+
+   constexpr operator tuple<remove_reference_t<_Elements>&...>() noexcept;
+   constexpr operator tuple<remove_reference_t<_Elements> const&...>() const noexcept;
+   constexpr operator tuple<remove_reference_t<_Elements>&&...>() noexcept;
+   constexpr operator tuple<remove_reference_t<_Elements> const&&...>() const noexcept;
+};
+
+template<class... Ts>
+requires (requires { typename common_type_t<Ts, Ts&>; } && ...)
+struct common_type<tuple<Ts&...>, std::tuple<Ts...>> {
+   using type = tuple<common_type_t<Ts&, Ts>...>;
+};
+template<class... Ts>
+requires (requires { typename common_type_t<Ts, Ts&>; } && ...)
+struct common_type<std::tuple<Ts...>, tuple<Ts&...>>	{
+   using type = tuple<common_type_t<Ts&, Ts>...>;
+};
+
+// lvalue to rvalue reference
+template<class... Ts>
+requires (requires { typename common_type_t<Ts, remove_reference_t<Ts>&&>; } && ...)
+struct common_type<tuple<remove_reference_t<Ts>&&...>, std::tuple<Ts...>> {
+   using type = tuple<common_type_t<remove_reference_t<Ts>&&, Ts>...>;
+};
+template<class... Ts>
+requires (requires { typename common_type_t<Ts, remove_reference_t<Ts>&&>; } && ...)
+struct common_type<std::tuple<Ts...>, tuple<remove_reference_t<Ts>&&...>>	{
+   using type = tuple<common_type_t<remove_reference_t<Ts>&&, Ts>...>;
+};
+
+template<class... Ts,
+   template <class> class TQual, template <class> class UQual>
+requires (requires { typename common_reference_t<TQual<Ts>, UQual<remove_reference_t<Ts>&&>>; } && ...)
+struct basic_common_reference<tuple<remove_reference_t<Ts>&&...>, std::tuple<Ts...>, TQual, UQual> {
+   using type = tuple<common_reference_t<TQual<remove_reference_t<Ts>&&>, UQual<Ts>>...>;
+};
+template<class... Ts,
+   template <class> class TQual, template <class> class UQual>
+requires (requires { typename common_reference_t<TQual<Ts>, UQual<remove_reference_t<Ts>&&>>; } && ...)
+struct basic_common_reference<std::tuple<Ts...>, tuple<remove_reference_t<Ts>&&...>, TQual, UQual> {
+   using type = tuple<common_reference_t<TQual<Ts>, UQual<remove_reference_t<Ts>&&>>...>;
+};
+
+template<template<class> class TQual, template <class> class UQual>
+struct basic_common_reference<tuple<>, tuple<>, TQual, UQual> {
+   using type = tuple<>;
+};
+</xmp>
+
+#### Ensure `tuple` and `pair` assignment operators are `constexpr`
+
+To ensure that the `constexpr`-ness of `zip_view` is not accidentally inhibited, this paper also
+requests that there be some discussion on making the assignment operators of `pair` and `tuple`
+`constexpr`.
+
+### Example implementation
+
+The following implementation has been taken and modified from cmcstl2:
+
+<xmp>
+template<View... Rs>
+struct zip_view : view_interface<zip_view<Rs...>> {
+private: // begin exposition-only
+   template <bool Const, class Indices> struct __zipperator;
+   template <bool Const, class Indices> struct __sentinel;
+
+   static constexpr bool all_simple = (simple-view<Rs> && ...);
+   static constexpr bool all_forward = (ForwardRange<Rs> && ...);
+   static constexpr bool all_forward_const = (ForwardRange<const Rs> && ...);
+   static constexpr bool all_sized = (SizedRange<Rs> && ...);
+   static constexpr bool all_sized_const = (SizedRange<const Rs> && ...);
+
+   tuple<Rs...> ranges_ {};
+public:// end exposition-only
+   zip_view() = default;
+
+   constexpr zip_view(Rs... rs)
+   noexcept((is_nothrow_move_constructible_v<Rs> && ...))
+   requires sizeof...(Rs) != 0
+
+   constexpr auto begin();
+   constexpr auto begin() const requires all_forward_const;
+
+   constexpr auto end() requires all_forward;
+   constexpr auto end() const;
+
+   constexpr auto size() requires all_sized;
+   constexpr auto size() const requires all_sized_const;
+};
+
+template <class... Rs>
+zip_view(Rs&&...) -> zip_view<all_view<Rs>...>;
+</xmp>
+
+#### `zip_view` constructors
+
+```cpp
+constexpr zip_view(Rs... rs) noexcept(is_nothrow_move_constructible_v<Rs> && ...)
+requires (sizeof...(Rs) != 0);
+```
+
+1. <i>Effects</i>: Initialises `ranges_` with `rs...`.
+
+#### `zip_view` begin
+
+```cpp
+constexpr auto begin();
+constexpr auto begin() const requires all_forward_const;
+```
+
+2. <i>Effects</i>: Returns an iterator containing a tuple of iterators to the beginning of each
+    range, such that the first iterator corresponds to the beginning of the first range, the second
+    tuple corresponds to the beginning of the second range, and so on.
+
+#### `zip_view` end
+
+```cpp
+constexpr auto end() requires all_forward;
+constexpr auto end() const;
+```
+
+3. <i>Effects</i>: Returns a sentinel containing a tuple of sentinels to the end of each range, such
+    that the first sentinel corresponds to the end of the first range, the second sentinel
+    corresponds to the end of the second range, and so on.
+
+```cpp
+constexpr auto size() requires all_sized;
+constexpr auto size() requires all_sized_const;
+```
+
+4. <i>Effects</i>: Equivalent to returning the size of the smallest range in `ranges_`.
+
+#### `zip_view<Rs...>` iterator (exposition-only)
+
+```cpp
+template<View... Rs>
+template<bool Const, size_t... Is>
+struct zip_view<Rs...>::__zipperator<Const, index_sequence<Is...>> {
+private:
+   template<class R>
+   using maybe_const = conditional_t<Const, R const, R>;
+
+   static constexpr bool all_random_access =
+      (RandomAccessRange<maybe_const<Rs>> && ...);
+   static constexpr bool all_bidi =
+      (BidirectionalRange<maybe_const<Rs>> && ...);
+   static constexpr bool all_forward =
+      (ForwardRange<maybe_const<Rs>> && ...);
+   static constexpr bool all_input =
+      (InputRange<maybe_const<Rs>> && ...);
+
+   static_assert(!Const || all_forward);
+   static_assert(Same<index_sequence_for<Rs...>,
+      index_sequence<Is...>>);
+
+   zip_view<Rs...>* parent_ = nullptr;
+   tuple<iterator_t<maybe_const<Rs>>...> iterators_{};
+public:
+   using value_type = tuple<iter_value_t<iterator_t<maybe_const<Rs>>>...>;
+   using iterator_category = see-below;
+   using difference_type = see-below;
+
+   __zipperator() = default;
+   explicit constexpr __zipperator(Parent& parent);
+   constexpr __zipperator(Parent& parent) requires all_forward;
+   constexpr __zipperator(Parent& parent, difference_type n) requires all_random_access;
+
+   constexpr auto operator*();
+   constexpr auto operator*() const
+   requires (dereferenceable<const iterator_t<maybe_const<Rs>>> && ...);
+
+   constexpr __zipperator& operator++();
+   constexpr auto operator++(int);
+
+   constexpr __zipperator& operator--() requires all_bidi;
+   constexpr __zipperator operator--(int) requires all_bidi;
+
+   friend constexpr bool operator==(const __zipperator& x, const __zipperator& y)
+   requires all_forward;
+   friend constexpr bool operator!=(const __zipperator& x, const __zipperator& y)
+   requires all_forward;
+
+   friend constexpr bool operator==(const __zipperator& x, default_sentinel) requires !all_forward;
+   friend constexpr bool operator==(default_sentinel y, const __zipperator& x) requires !all_forward;
+   friend constexpr bool operator!=(const __zipperator& x, default_sentinel y) requires !all_forward;
+   friend constexpr bool operator!=(default_sentinel y, const __zipperator& x) requires !all_forward;
+
+   friend constexpr bool operator==(const __zipperator& x, const Sent& y) requires all_forward;
+   friend constexpr bool operator==(const Sent& y, const __zipperator& x) requires all_forward;
+   friend constexpr bool operator!=(const __zipperator& x, const Sent& y) requires all_forward;
+   friend constexpr bool operator!=(const Sent& y, const __zipperator& x) requires all_forward;
+
+   friend constexpr bool operator<(const __zipperator& x, const __zipperator& y) requires all_random_access;
+   friend constexpr bool operator>(const __zipperator& x, const __zipperator& y) requires all_random_access;
+   friend constexpr bool operator<=(const __zipperator& x, const __zipperator& y) requires all_random_access;
+   friend constexpr bool operator>=(const __zipperator& x, const __zipperator& y) requires all_random_access;
+
+   constexpr __zipperator& operator+=(difference_type n) requires all_random_access;
+
+   friend constexpr __zipperator operator+(const __zipperator& x, difference_type n) requires all_random_access;
+   friend constexpr __zipperator operator+(difference_type n, const __zipperator& x) requires all_random_access;
+
+   constexpr __zipperator& operator-=(difference_type n) requires all_random_access;
+   friend constexpr __zipperator operator-(const __zipperator& x, difference_type n) requires all_random_access;
+   friend constexpr difference_type operator-(const __zipperator& x, const __zipperator& y)
+   requires (SizedSentinel<iterator_t<maybe_const<Rs>>, iterator_t<maybe_const<Rs>>> && ...);
+
+   constexpr auto operator[](difference_type n) const requires all_random_access;
+
+   friend constexpr auto iter_move(const __zipperator& x)
+   requires ((Readable<iterator_t<maybe_const<Rs>>> && ...));
+
+   friend constexpr void iter_swap(const __zipperator& x, const __zipperator& y);
+   requires (IndirectlySwappable<iterator_t<maybe_const<Rs>>> && ...)
+};
+```
+
+#### `zip_view::__zipperator` members
+
+```cpp
+using iterator_category = see-below;
+```
+
+5. <i>Effects</i>: If `(RandomAccessRange<Rs> && ...)` is satisfied, then `iterator_category`
+    denotes `random_access_iterator_tag`. Otherwise, if `(BidirectionalRange<Rs> && ...)`, then
+    `iterator_category` denotes `bidirectional_iterator_tag`. Otherwise, if
+    `(ForwardRange<Rs> && ...)`, then `iterator_category` denotes `forward_iterator_category`.
+    Otherwise, if `(InputRange<Rs> && ...)` is satisfied, then `iterator_category` denotes
+    `input_iterator_tag`. Otherwise, `iterator_category` denotes `output_iterator_category`.
+
+```cpp
+using difference_type = see-below;
+```
+
+6. <i>Effects</i>: If `sizeof...(Rs) == 0`, then `difference_type` denotes `int`. Otherwise,
+    `difference_type` denotes `common_type_t<iterator_t<conditional_t<Const, const Rs, Rs>>...>`.
+
+#### `zip_view::__zipperator` constructors
+
+```cpp
+explicit constexpr __zipperator(Parent& parent);
+```
+
+7. <i>Effects</i>: Initialises `parent_` with `std::addressof(parent)`.
+
+```cpp
+constexpr __zipperator(Parent& parent) requires all_forward;
+```
+
+8. <i>Effects</i>: Initialises `parent_` with `std::addressof(parent)` and `iterators_` with the
+    iterator to the first element in each range (respectively).
+
+```cpp
+constexpr __zipperator(Parent& parent, difference_type n) requires all_random_access;
+```
+
+9. <i>Effects</i>: Initiaises `parent_` with `std::addressof(parent)` and `iterators_` with the
+    <i>n</i>th iterator to each range (respectively). For any range `r` in `Rs...`, a program is
+    undefined if `n > size(r)`.
+
+#### `zip_view::__zipperator` element access
+
+```cpp
+constexpr auto operator*();
+constexpr auto operator*() const;
+```
+
+10. <i>Effects</i>: Returns a tuple of references to the elements of each range denoted by `*i` for
+    each iterator in the `__zipperator`.
+
+```cpp
+constexpr auto operator[](difference_type n) const requires all_random_access;
+```
+
+11. <i>Effects</i>: Equivalent to `return *(*this + n);`.
+
+#### `zip_view::__zipperator` advance
+
+```cpp
+constexpr __zipperator& operator++();
+```
+9. <i>Effects</i>: Equivalent to incrementing each iterator in `iterators_`.
+12. <i>Returns</i>: `*this`.
+
+``` cpp
+constexpr auto operator++(int);
+```
+
+13. <i>Effects</i>: Equivalent to:
+
+```cpp
+if constexpr (all_forward) {
+   auto temp = *this;
+   ++*this;
+   return temp;
+}
+else {
+   ++*this;
+}
+```
+<br />
+```cpp
+constexpr __zipperator& operator--() requires all_bidi;
+```
+
+14. <i>Effects</i>: Equivalent to decrementing each iterator in `iterators_`.
+
+```cpp
+constexpr __zipperator operator--(int) requires all_bidi;
+```
+
+15. <i>Effects</i>: Equivalent to:
+
+```cpp
+auto temp = *this;
+--*this;
+return temp;
+```
+<br />
+```cpp
+constexpr __zipperator& operator+=(difference_type n) requires all_random_access;
+```
+
+16. <i>Effects</i>: Equivalent to calling `ranges::advance(E, n)` on each iterator in `iterators_`,
+    where `E` is a placeholder for the iterator expression.
+
+```cpp
+constexpr __zipperator& operator-=(difference_type n) requires all_random_access;
+```
+
+17. <i>Effects</i>: Equivalent to `return *this += -n;`.
+
+#### `zip_view::__zipperator` comparisons
+
+```cpp
+friend constexpr bool operator==(const __zipperator& x, const __zipperator& y) requires all_forward;
+```
+
+18. <i>Effects</i>: Equivalent to <code>return x.iterators_ == y.iterators_;</code>.
+
+```cpp
+friend constexpr bool operator==(const __zipperator& x, default_sentinel) requires !all_forward;
+friend constexpr bool operator==(default_sentinel y, const __zipperator& x) requires !all_forward;
+```
+
+19. <i>Effets</i>: Returns `true` if at least one iterator in `iterators_` is equivalent to the
+    sentinel of its corresponding range, `false` otherwise.
+
+```cpp
+friend constexpr bool operator==(const __zipperator& x, const Sent& y) requires all_forward;
+friend constexpr bool operator==(const Sent& y, const __zipperator& x) requires all_forward;
+```
+
+20. <i>Effects</i>: Returns `true` if at least one iterator in `iterators_` is equivalent to the
+    sentinel.
+
+```cpp
+friend constexpr bool operator!=(const __zipperator& x, const __zipperator& y) requires all_forward;
+friend constexpr bool operator!=(const __zipperator& x, default_sentinel y) requires !all_forward;
+friend constexpr bool operator!=(default_sentinel y, const __zipperator& x) requires !all_forward;
+friend constexpr bool operator!=(const __zipperator& x, const Sent& y) requires all_forward;
+friend constexpr bool operator!=(const Sent& y, const __zipperator& x) requires all_forward;
+```
+
+21. <i>Effects</i>: Equivalent to `return !(x == y);`.
+
+```cpp
+friend constexpr bool operator<(const __zipperator& x, const __zipperator& y) requires all_random_access;
+```
+
+22. <i>Effects</i>: Equivalent to `return x.iterators_ < y.iterators_;`.
+
+```cpp
+friend constexpr bool operator>(const __zipperator& x, const __zipperator& y) requires all_random_access;
+```
+
+23. <i>Effects</i>: Equivalent to `return y < x;`
+
+```cpp
+friend constexpr bool operator<=(const __zipperator& x, const __zipperator& y) requires all_random_access;
+```
+
+24. <i>Effects</i>: Equivalent to `return !(y < x);`
+
+```cpp
+friend constexpr bool operator>=(const __zipperator& x, const __zipperator& y) requires all_random_access;
+```
+
+25. <i>Effects</i>: Equivalent to `return !(x < y);`
+
+#### `zip_view<Rs...>::__zipperator` arithmetic
+
+```cpp
+friend constexpr __zipperator operator+(const __zipperator& x, difference_type n) requires all_random_access;
+friend constexpr __zipperator operator+(difference_type n, const __zipperator& x) requires all_random_access;
+```
+
+26. <i>Effects</i>: Equivalent to:
+
+```cpp
+auto temp = x;
+temp += n;
+return temp;
+```
+<br />
+```cpp
+friend constexpr __zipperator operator-(const __zipperator& x, difference_type n) requires all_random_access;
+```
+
+27. <i>Effects</i>: Equivalent to `return x + -n;`.
+
+```cpp
+friend constexpr difference_type operator-(const __zipperator& x, const __zipperator& y)
+requires (SizedSentinel<iterator_t<maybe_const<Rs>>, iterator_t<maybe_const<Rs>>> && ...)
+```
+
+28. <i>Effects</i>: If `sizeof...(Rs) == 0`, then returns 0. Otherwise returns the greatest distance
+    between iterators in `x.iterators_` and `y.iterators_`.
+
+#### `zip_view<Rs...>::__zipperator` iter_move
+
+```cpp
+friend constexpr auto iter_move(const __zipperator& x) requires ((Readable<iterator_t<maybe_const<Rs>>> && ...));
+```
+
+29. <i>Effects</i>: Returns a tuple containing expressions equivalent to `iter_move` applied to each
+    of `x.iterators_`.
+
+#### `zip_view<Rs...>::__zipperator` iter_swap
+
+```cpp
+friend constexpr void iter_swap(const __zipperator& x, const __zipperator& y)
+requires (IndirectlySwappable<iterator_t<maybe_const<Rs>>> && ...);
+```
+
+30. <i>Effects</i>: Equivalent to `iter_swap` applied to each iterator in `x.iterators_` and
+    `y.iterators_`.
+
+#### `zip_view<Rs...>` sentinel (exposition-only)
+
+```cpp
+template<View... Rs>
+template<bool Const, size_t... Is>
+struct zip_view<Rs...>::__sentinel<Const, index_sequence<Is...>> {
+private:
+   using Iter = typename zip_view<Rs...>::template
+      __zipperator<Const, index_sequence<Is...>>;
+   friend Iter;
+
+   using Parent = conditional_t<Const, const zip_view<Rs...>, zip_view<Rs...>>;
+   static constexpr bool all_forward =
+      (ForwardRange<maybe_const<Rs>> && ...);
+   static_assert(all_forward);
+   static_assert(Same<index_sequence_for<Rs...>,
+      index_sequence<Is...>>);
+
+   tuple<sentinel_t<maybe_const<Rs>>...> last_;
+public:
+   __sentinel() = default;
+   explicit constexpr __sentinel(Parent& parent);
+};
+```
+
+## `view::zip`
+
+The name `view::zip` denotes a range view adaptor. Let `rs...` denote a pack expansion of the
+parameter pack `Rs...`. Then, the expression `view::zip(rs...)` is
+expression-equivalent to:
+
+1. `zip_view{rs...}` if `(Range<Rs> && ...) && (is_object_v<Rs> && ...)` is satisfied.
+2. Otherwise `view::zip(rs...)` is ill-formed.
+
+
+## `basic_istream_view`
+
+### Motivation
+
+`istream_iterator` is an abstraction over a `basic_istream` object, so that it may be used as though
+it were an input iterator. It is a great way to populate a container from the get-go, or fill a
+container later in its lifetime. This is great, as copy is a standard algorithm that cleanly
+communicates that we're copying something from one range into another. There aren’t any Hidden
+Surprises<sup>TM</sup>. This is also good when writing generic code, because the generic library
+author does not need to care how things are inserted at the end of `v`, only that they are.
+
+<table>
+  <tr><th>Without <code>istream_iterator</code></th><th>With <code>istream_iterator</code></th></tr>
+  <tr><td><xmp>
+auto v = []{
+   auto result = vector<int>{};
+   for (auto i = 0; cin >> i;) {
+      result.push_back(i);
+   }
+}();
+// ...
+for (auto i = 0; cin >> i;) {
+   result.push_back(i);
+}
+  </xmp></td>
+  <td><xmp>
+auto v = vector(istream_iterator<int>{cin},
+   istream_iterator<int>{});
+// ...
+copy(istream_iterator<int>{cin},
+   istream_iterator<int>{},
+   back_inserter(v));
+  </xmp></td>
+  </tr>
+</table>
+
+The problem with `istream_iterator` is that we need to provide a bogus `istream_iterator<T>{}`
+(or `default_sentinel{}`) every time we want to use it; this acts as the sentinel for
+`istream_iterator`. It is bogus, because the code is equivalent to saying "from the first element of
+the istream range until the last element of the istream range", but an `istream` range does not have
+a last element. Instead, we denote the end of an istream range to be when the `istream`'s failbit is
+set. This is otherwise known as the <i>end-of-stream</i> iterator value, but it doesn’t denote a
+'past-the-last element' in the same way that call to `vector<T>::end` does. Because it is the same
+for every range, the <i>end-of-stream</i> object may as well be dropped, so that we can write code
+that resembles the code below.
+
+```cpp
+auto v = vector(ranges::istream_view<int>{cin});
+// ...
+copy(ranges::istream_view<int>{cin}, back_inserter(v));
+```
+
+This code is cleaner: we are implicitly saying "until our `basic_istream` object fails, insert our
+input into the back of `v`". There is less to read (and type!), and the code is simpler for it.
+
+### Interface
+
+```cpp
+template<class T, class CharT = char, class Traits = char_traits<CharT>>
+concept stream-extractable = see below; // exposition only
+
+template<Semiregular Val, class CharT, class Traits = char_traits<CharT>>
+requires stream-extractable<Val, CharT, Traits>
+class basic_istream_view : public view_interface<basic_istream_view<Val, CharT, Traits>> {
+public:
+   basic_istream_view() = default;
+
+   explicit constexpr basic_istream_view(basic_istream<CharT, Traits>& stream);
+
+   constexpr auto begin();
+   constexpr default_sentinel end() const noexcept;
+private:
+   struct __iterator; // exposition-only
+   basic_istream<CharT, Traits>* stream_; // exposition-only
+   Val object_; // exposition-only
+};
+
+template<class T, class CharT, class Traits>
+basic_istream_view<T, CharT, Traits> istream_view(basic_istream<CharT, Traits>& in);
+```
+
+#### Exposition-only concept `stream-extractable`
+
+The exposition-only concept `stream-extractable` checks that the input type is compatible with the
+`istream` operator model.
+
+```cpp
+template<class T, class CharT = char, class Traits = char_traits<CharT>>
+concept stream-extractable = // exposition only
+   requires(basic_istream<CharT, Traits>& is, T& t) {
+      { is >> t } -> Same<basic_istream<CharT, Traits>>&;
+   };
+```
+
+1. <i>Remarks</i>: `std::addressof(is) == std::addressof(is << t)`.
+
+#### `basic_istream_view` constructor
+
+```cpp
+explicit constexpr basic_istream_view(basic_istream<CharT, Traits>& stream);
+```
+
+2. <i>Effects</i>: Initialises `stream_` to `std::addressof(stream)`.
+
+#### `basic_istream_view` begin
+
+```cpp
+constexpr auto begin();
+```
+
+3. <i>Effects</i>: Equivalent to
+
+```cpp
+*stream_ >> object_;
+return __iterator{*this};
+```
+
+#### `basic_istream_view` end
+
+```cpp
+constexpr default_sentinel end() const noexcept;
+```
+
+4. <i>Returns</i>: `default_sentinel{}`.
+
+#### `basic_istream_view::__iterator`
+
+```cpp
+template<class Val, class CharT, class Traits>
+class basic_istream_view<Val, CharT, Traits>::__iterator {
+public:
+   using iterator_category = input_iterator_tag;
+   using difference_type = ptrdiff_t;
+   using value_type = Val;
+
+   __iterator() = default;
+
+   explicit constexpr __iterator(basic_istream_view<Val>& parent) noexcept;
+
+   __iterator& operator++();
+   void operator++(int);
+
+   Val& operator*() const;
+
+   friend bool operator==(__iterator x, default_sentinel);
+   friend bool operator==(default_sentinel y, __iterator x);
+   friend bool operator!=(__iterator x, default_sentinel y);
+   friend bool operator!=(default_sentinel y, __iterator x);
+private:
+   basic_istream_view<Val, CharT, Traits>* parent_ = nullptr; // exposition-only
+};
+```
+
+#### `basic_istream_view::__iterator` constructor
+
+```cpp
+explicit constexpr __iterator(basic_istream_view<Val>& parent) noexcept;
+```
+
+5. <i>Effects</i>: Initialises `parent_` with `std::addressof(parent_)`.
+
+#### `basic_istream_view::__iterator` next
+
+```cpp
+__iterator& operator++();
+void operator++(int);
+```
+
+6. <i>Effects</i>: Equivalent to
+
+```cpp
+*parent_->stream_ >> parent_->object_;
+```
+
+#### `basic_istream_view::__iterator` value
+
+```cpp
+Val& operator*() const;
+```
+
+7. <i>Effects</i>: Equivalent to `return parent_->value_;`
+
+#### `basic_istream_view::__iterator` comparison functions
+
+```cpp
+friend bool operator==(__iterator x, default_sentinel);
+```
+
+8. <i>Effects</i>: Equivalent to `return !*x.parent_->stream_;`.
+
+```cpp
+friend bool operator==(default_sentinel y, __iterator x);
+```
+
+9. <i>Returns</i>: `x == y`.
+
+```cpp
+friend bool operator!=(__iterator x, default_sentinel y);
+```
+
+10. <i>Returns</i>: `!(x == y)`.
+
+```cpp
+friend bool operator!=(default_sentinel y, __iterator x);
+```
+
+11. <i>Returns</i>: `!(x == y)`.
+
+
+#### `basic_istream_view` factory
+
+```cpp
+template<class T, class CharT, class Traits>
+basic_istream_view<T, CharT, Traits> istream_view(basic_istream<CharT, Traits>& s);
+```
+
+12. <i>Effects</i>: Equivalent to `return basic_istream_view<T, CharT, Traits>{s};`.
+
+## Introducing associated types for ranges
+
+<b>Note: This section was formerly titled <i>Reviewing `iter_value_t`, etc., and introducing
+`range_value_t`, etc.</i> in P1035R1, but the current title is more accurate.</b>
+
+[[P1037]] introduced `iter_difference_t`, `iter_value_t`, `iter_reference_t`, and
+`iter_rvalue_reference_t`, which dispatch to templates that correclty identify the associated
+types for iterators (formerly known as iterator traits). The current mechanism supports iterators,
+but not ranges. For example, in order to extract an range's value type, we are required to do one of
+three things:
+
+<ol>
+   <li>
+      Use the traditional `typename T::value_type`. As we have had template aliases since C++11,
+      this has probably been abandoned in many projects (not cited).
+   </li>
+   <li>
+      Define our own associated type à la
+
+<xmp>
+template<class T>
+requires requires { typename T::value_type; }
+using value_type = typename T::value_type;
+</xmp>
+
+This was apparently possible in the Ranges TS (albeit in much more detail) 
+[[iter.assoc.types.value_type]], but P1037 has redefined `value_type_t` as `iter_value_t`, which
+focuses on iterators, rather than anything defining `value_type` alias. We <i>could</i> do this in
+C++20, but we then risk `R::value_type` being different to `R::iterator::value_type` (consider
+`vector<int const>::value_type` and `vector<int const>::iterator::value_type`, which are `int const`
+and `int`, respectively)[[value_type]].
+   </li>
+
+   <li>
+      Use `iter_value_t<iterator_t<R>>`, which what we probably want, and is also a mouthful.
+   </li>
+</ol>
+
+When discussing extending `iter_value_t` so that it can also operate on ranges, Casey Carter had
+this to say:
+
+<blockquote>
+   What should `iter_value_t<T>` be when `T` is an iterator with value type `U` and a range with
+   value type `V`?
+
+   Alternately: What is `iter_value_t<array<const int>>`? `array<const int>::value_type` is
+   `const int`, but `iter_value_t<iterator_t<array<const int>>` is `int`.
+
+   Specific examples aside, early attempts to make the associated type aliases "polymorphic" kept
+   running into ambiguities that we had to disambiguate or simply declare broken.
+
+   I'd rather see `range_value_t` et al proposed.
+</blockquote>
+
+P1035 introduces shorthands for `iter_foo_t<iterator_t<R>>` as `range_foo_t<R>`, which in turn have
+been taken from range-v3.
+
+```cpp
+template<class R>
+using range_difference_t = iter_difference_t<iterator_t<R>>;
+
+template<class R>
+using range_value_t = iter_value_t<iterator_t<R>>;
+
+template<class R>
+using range_reference_t = iter_reference_t<iterator_t<R>>;
+
+template<class R>
+using range_rvalue_reference_t = iter_rvalue_reference_t<iterator_t<R>>;
+```
+
+These have an enormous amount of usage in range-v3, and will ensure consistency between generic code
+that uses ranges and generic code that uses iterators (which are essential for underpinning all
+range abstractions in C++).
+
+### Amendment to the associated iterator types
+
+The previous revision of P1035 imposed explicit `Range` and `InputRange` requirements on the above
+associated types. While reviewing a Pull Request to add these to cmcstl2, Casey noted that requiring
+`Range` and `InputRange` on the above was not the best approach. The rationale -- taken from a Slack
+converation -- is:
+
+> Since the "Better Safer Range Access CPOs" work was merged, the definition of `Range` no longer
+> depends on `iterator_t` and `sentinel_t`; they could be constrained to require `Range`. If that
+> were the case, the `range_foo_t = foo<iterator_t<X>>` aliases wouldn't need to be so constrained,
+> because they would already be ill-formed when passed a non-`Range`.
+>
+> We're big on pushing requirements into the "leaves" of the design to put errors closer to the user
+> and as early as possible, seems like a reasonable change to me.
+>
+> We couldn't do it in the TS era, because `Range` depended on `iterator_t` and `sentinel_t` - but
+> that's no longer the case.
+
+P1035 proposes that `iterator_t` and `sentinel_t` instead require `Range`. That is,
+
+```diff
+- template<class T>
++ template<Range T>
+    using iterator_t = decltype(ranges::begin(declval<T&>()));
+
+- template<class T>
++ template<Range T>
+    using sentinel_t = decltype(ranges::end(declval<T&>()));
+```
+
+## `take_while_view`
+
+### Motivation
+
+P0789 introduces `take_view`, which rangifies the iterator pair
+`{ranges::begin(r), ranges::next(ranges::begin(r), n, ranges::end(r))}`. As an example:
+
+```cpp
+auto v = vector{0, 1, 2, 3, 4, 5};
+cout << distance(v | view::take(3)) << '\n'; // prints 3
+copy(v | view::take(3), ostream_iterator<int>(cout, " ")); // prints 0 1 2
+copy(v | view::take(distance(v)), ostream_iterator<int>(cout, " ")); // prints 0 1 2 3 4 5
+```
+
+`take_while_view` will provide slightly different functionality, akin to having a sentinel that
+checks if a certain predicate is satisfied.
+
+<table>
+   <tr>
+      <th>Current</th>
+      <th>Proposed</th>
+   </tr>
+   <tr>
+   <td>
+   <xmp>
+    namespace ranges = std::experimental::ranges;
+
+    template <ranges::Integral I>
+    constexpr bool is_odd(I const i) noexcept
+    {
+       return i % 2;
+    }
+
+    struct is_odd_sentinel {
+       template <ranges::Iterator I>
+       constexpr friend bool operator==(I const& a,
+          is_odd_sentinel) noexcept
+       {
+          return is_odd(*a);
+       }
+
+       template <ranges::Iterator I>
+       constexpr friend bool operator==(is_odd_sentinel const a,
+          I const& b) noexcept
+       {
+          return b == a;
+       }
+
+       template <ranges::Iterator I>
+       constexpr friend bool operator!=(I const& a,
+          is_odd_sentinel const b) noexcept
+       {
+          return not (a == b);
+       }
+
+       template <ranges::Iterator I>
+       constexpr friend bool operator!=(is_odd_sentinel const a,
+          I const& b) noexcept
+       {
+          return not (b == a);
+       }
+    };
+
+    int main()
+    {
+       auto v = vector{0, 6, 8, 9, 10, 16};
+       ranges::copy(
+         ranges::begin(v),
+         is_odd_sentinel{},
+         ranges::ostream_iterator<int>(cout, "\n"));
+    }
+   </xmp>
+   </td>
+   <td>
+   <xmp>
+    namespace ranges = std::experimental::ranges;
+
+    template <ranges::Integral I>
+    constexpr bool is_odd(I const i) noexcept
+    {
+       return i % 2;
+    }
+
+    template <ranges::Integral I>
+    constexpr bool is_even(I const i) noexcept
+    {
+       return not is_odd(i);
+    }
+
+    int main()
+    {
+       namespace view = ranges::view;
+       auto v = vector{0, 6, 8, 9, 10, 16};
+       ranges::copy(
+          v | view::take_while(is_even<int>),
+          ranges::ostream_iterator<int>(cout, "\n"));
+    }
+   </xmp>
+   </td>
+   </tr>
+   <tr>
+      <td><a href="https://wandbox.org/permlink/7UXazMHnbxfOfODQ">Wandbox demo</a></td>
+      <td><a href="https://wandbox.org/permlink/2nS3bzVuQX1DR0yJ">Wandbox demo</a></td>
+   </tr>
+</table>
+
+The former requires that a user define their own sentinel type: something that while not
+expert-friendly, is yet to be established as a widespread idiom in C++, and providing a
+range adaptor for this purpose will help programmers determine when a sentinel is _not_
+necessary.
+
+### Notes
+* There is a slight programmer overhead in the naming: the author felt that both
+    `is_odd_sentinel` and `is_even_sentinel` were applicable names: ultimately, the name
+    `is_odd_sentinel` was chosen because it describes the delimiting condition. An equally
+    valid reason could probably be made for `is_even_sentinel`.
+* A sentinel that takes a lambda may be of interest to LEWG. If there is interest in
+    this, a proposal could be made in the C++23 timeframe.
+
+### Interface and specification
+
+```cpp
+template <View R, class Pred>
+requires
+   InputRange<R> &&
+   is_object_v<Pred> &&
+   IndirectUnaryPredicate<const Pred, iterator_t<R>>
+class take_while_view : public view_interface<take_while_view<R, Pred>> {
+   template<bool> class __sentinel; // exposition-only
+public:
+   take_while_view() = default;
+   constexpr take_while_view(R base, Pred pred);
+
+   template <ViewableRange O>
+   requires constructible-from-range<R, O>
+   constexpr take_while_view(O&& o, Pred pred);
+
+   constexpr R base() const;
+   constexpr const Pred& pred() const;
+
+   constexpr auto begin() requires (!simple-view<R>);
+   constexpr auto begin() const requires Range<const R>;
+
+   constexpr auto end() requires (!simple-view<R>);
+   constexpr auto end() const requires Range<const R>;
+private:
+   R base_; // exposition-only
+   semiregular<Pred> pred_; // exposition-only
+};
+
+template<class R, class Pred>
+take_while_view(R&&, Pred) -> take_while_view<all_view<R>, Pred>;
+```
+
+#### Post-San Diego notes
+
+A remark was made in San Diego that `is_object_v<Pred>` is an unnecessary requirement. If we look to
+`filter_view` and `transform_view` as prior example, we see that both require invocable objects.
+
+#### `take_while_view` constructors
+
+```cpp
+constexpr take_while_view(R base, Pred pred);
+```
+
+1. <i>Effects</i>: Initialises `base_` with `base` and initialises `pred_` with `pred`.
+
+```cpp
+template <ViewableRange O>
+requires constructible-from-range<R, O>
+constexpr take_while_view(O&& o, Pred pred);
+```
+
+2. <i>Effects</i>: Initialises `base_` with `view::all(std::forward<O>(o))` and initialises
+    `pred_` with `pred`.
+
+#### `take_while_view` conversion
+
+```cpp
+constexpr R base() const;
+```
+
+1. <i>Returns</i>: `base_`.
+
+```cpp
+constexpr const Pred& pred() const;
+```
+
+2. <i>Returns</i>: `pred_`.
+
+#### `take_while_view` range begin
+
+```cpp
+constexpr auto begin() requires (!simple-view<R>);
+constexpr auto begin() const requries Range<const R>
+```
+
+1. <i>Effects</i>: Equivalent to `return ranges::begin(base_);`.
+
+#### `take_while_view` range end
+
+```cpp
+constexpr auto end() requires (!simple-view<R>);
+constexpr auto end() const requires Range<const R>;
+```
+
+1. <i>Effects</i>: Equivalent to `return __sentinel<is_const_v<decltype(*this)>>(&pred());`.
+
+### `take_while_view::__sentinel`
+
+```cpp
+template<class R, class Pred>
+template<bool Const>
+class take_while_view<R, Pred>::__sentinel {
+   using Parent = conditional_t<Const, const take_while_view, take_while_view>;
+   using Base = conditional_t<Const, const R, R>;
+   sentinel_t<Base> end_{}; // exposition-only
+   const Pred* pred_{}; // pred
+public:
+   __sentinel() = default;
+   constexpr explicit __sentinel(sentinel_t<Base> end, const Pred* pred);
+   constexpr __sentinel(__sentinel<!Const> s)
+     requires Const && ConvertibleTo<sentinel_t<R>, sentinel_t<Base>>
+
+   constexpr sentinel_t<Base> base() const { return end_; }
+
+   friend constexpr bool operator==(const __sentinel& x, const iterator_t<Base>& y);
+   friend constexpr bool operator==(const iterator_t<Base>& x, const __sentinel& y);
+   friend constexpr bool operator!=(const __sentinel& x, const iterator_t<Base>& y);
+   friend constexpr bool operator!=(const iterator_t<Base>& x, const __sentinel& y);
+};
+```
+
+### `take_while_view::__sentinel` constructor
+
+```cpp
+constexpr explicit __sentinel(sentinel_t<Base> end, const Pred* pred);
+```
+
+1. <i>Effects</i>: Initialises `end_` with `end`, and `pred_` with `pred`.
+
+```cpp
+constexpr __sentinel(__sentinel<!Const> s)
+   requires Const && ConvertibleTo<sentinel_t<R>, sentinel_t<Base>>;
+```
+
+2. <i>Effects</i> Initialises `end_` with `s.end_` and `pred_` with `s.pred_`.
+
+### `take_while_view::__sentinel` conversion
+
+```cpp
+constexpr sentinel_t<Base> base() const;
+```
+
+3. <i>Effects</i>: Equivalent to `return end_;`
+
+### `take_while_view::__sentinel` comparisons
+
+```cpp
+friend constexpr bool operator==(const __sentinel& x, const iterator_t<Base>& y)
+```
+
+4. <i>Effects</i>: Equivalent to `return x.end_ != y && !(*x.pred_)(*y);`.
+
+```cpp
+friend constexpr bool operator==(const iterator_t<Base>& x, const __sentinel& y);
+```
+
+5. <i>Effects</i>: Equivalent to `return y == x;`.
+
+```cpp
+friend constexpr bool operator!=(const __sentinel& x, const iterator_t<Base>& y);
+```
+
+6. <i>Effects</i>: Equivalent to `!(x == y);`.
+
+```cpp
+friend constexpr bool operator!=(const iterator_t<Base>& x, const __sentinel& y);
+```
+
+7. <i>Effects</i>: Equivalent to `!(y == x);`.
+
+## `view::take_while`
+
+The name `view::take_while` denotes a range adaptor object. Let `E` and `F`
+be expressions such that type `T` is `decltype((E))`. Then, the expression 
+`view::take_while(E, F)`is expression-equivalent to:
+
+1. `take_while_view{E, F}` if `T` models `InputRange` and if `F` is an object, and
+    models `IndirectUnaryPredicate`.
+2. Otherwise `ranges::view::take_while(E, F)` is ill-formed.
+
+## `drop_view`
+
+### Motivation
+
+`drop_view` is the complement to `take_view`: instead of providing the user with the
+first <i>n</i> elements, it provides the user with all <i>but</i> the first <i>n</i> elements.
+
+<table>
+   <tr>
+      <th>Current (C++17)</th>
+      <th>Proposed (C++20)</th>
+   </tr>
+   <tr>
+      <td><xmp>
+auto begin = next(begin(employees), 5, end(employees));
+auto result = find(begin, end(employees), "Lovelace", &employees::surname);
+      </xmp></td>
+      <td><xmp>
+namespace view = ranges::view;
+auto result = find(employees | view::drop(5), "Lovelace", &employees::surname);
+      </xmp></td>
+   </tr>
+</table>
+
+### Interface
+
+```cpp
+template<View R>
+class drop_view : public view_interface<drop_view<R>> {
+   using D = iter_difference_t<iterator_t<R>>; // exposition-only
+public:
+   drop_view();
+   constexpr drop_view(R base, D count);
+
+   template<ViewableRange O>
+   requires constructible-from-range<R, O>
+   constexpr drop_view(O&& o, D count);
+
+   constexpr R base() const;
+
+   constexpr auto begin() requires (!(simple-view<R> && RandomAccessRange<R>));
+   constexpr auto begin() const requires Range<const R> && RandomAccessRange<const R>;
+   constexpr auto end() requires (!simple-view<R>);
+   constexpr auto end() const requires Range<const R>;
+
+   constexpr auto size() requires (!simple-view<R>) && SizedRange<R>;
+   constexpr auto size() const requires SizedRange<const R>;
+private:
+   R base_; // exposition-only
+   D count_; // exposition-only
+};
+
+template<Range R>
+drop_view(R&&, iter_difference_t<iterator_t<R>>) -> drop_view<all_view<R>>;
+```
+
+#### `drop_view` constructor
+
+```cpp
+constexpr drop_view(R base, D count);
+```
+
+1. <i>Effects</i>: Initialises `base_` with `base` and `count_` with `count`.
+2. <i>Expects</i>: `0 < count`.
+
+```cpp
+template<ViewableRange O>
+requires constructible-from-range<R, O>
+constexpr drop_view(O&& o, D count);
+```
+
+3. <i>Effects</i>: Initialises `base_` with `view::all(std::forward<O>(o))` and `count_` with
+    `count`.
+4. <i>Expects</i>: `0 < count`.
+
+#### `drop_view` conversion
+
+```cpp
+constexpr R base() const;
+```
+
+5. <i>Effects</i>: Equivalent to `return base_`.
+
+#### `drop_view` range begin
+
+```cpp
+constexpr auto begin() requires (!(simple-view<R> && RandomAccessRange<R>));
+constexpr auto begin() const requires Range<const R> && RandomAccessRange<const R>;
+```
+
+6. <i>Effects</i>: Equivalent to `return ranges::next(ranges::begin(base_), count_, ranges::end(base_));`.
+7. <i>Remarks</i>: In order to provide the amortized constant time complexity required by the
+    Range concept, the first overload caches the result within the `drop_view` for use on
+    subsequent calls.
+
+#### `drop_view` range end
+
+```cpp
+constexpr auto end() requires (!simple-view<R>);
+constexpr auto end() const requires Range<const R>;
+```
+
+8. <i>Effects</i>: Equivalent to `return ranges::end(base_);`.
+
+#### `drop_view` size
+
+```cpp
+constexpr auto size() requires (!simple-view<R>) && SizedRange<R>;
+constexpr auto size() const requires SizedRange<const R>;
+```
+
+9. Equivalent to:
+
+```cpp
+auto const size = ranges::size(base_);
+auto const count = static_cast<decltype(size)>(count_);
+return size < count ? 0 : size - count;
+```
+
+## `view::drop`
+
+The name `view::drop` denotes a range adaptor object. Let `E` and `F` be expressions such that type
+`T` is `decltype((E))`. Then, the expression  `view::drop(E, F)`is expression-equivalent to:
+
+1. `drop_view{E, F}` if `T` models `InputRange` and `F` is implicitly convertible to
+    `iter_difference_t<iterator_t<T>>`.
+2. Otherwise `view::drop(E, F)` is ill-formed.
+
+## `drop_while_view`
+
+### Motivation
+
+The motivation for `drop_while_view` is the union of `drop_view` and `take_while_view`.
+
+<table>
+  <tr><th>Current (C++17)</th><th>Proposed (C++20) v1</th></tr>
+  <tr>
+    <td>
+      <xmp>
+auto begin = find_if_not(employees,
+   [](auto const holidays){ return holidays < 20; },
+   &employee::holidays);
+
+transform(begin, end(employees),
+   ostream_iterator<string>(cout, "\n"),
+   [](auto const& e) { return e.given_name() + e.surname(); });
+      </xmp>
+  </td>
+      <td>
+         <xmp>
+auto excess_holidays = employees
+                     | view::drop_while([](auto const e) { return e.holidays() < 20; });
+transform(excess_holidays, ostream_iterator<string>(cout, "\n"),
+   [](auto const& e) { return e.given_name() + e.surname(); });
+         </xmp>
+      </td>
+  </tr>
+</table>
+
+### Interface
+
+```cpp
+template<View R, class Pred>
+requires
+  InputRange<R> &&
+  is_object_v<Pred> &&
+  IndirectUnaryPredicate<const Pred, iterator_t<R>>
+class drop_while_view : public view_interface<drop_while_view<R, Pred>> {
+public:
+   drop_while_view() = default;
+
+   constexpr drop_while_view(R base, Pred pred);
+
+   template<ViewableRange O>
+   requires constructible-from-range<R, O>
+   constexpr drop_while_view(O&& o, Pred pred);
+
+   constexpr R base() const;
+   constexpr Pred pred() const;
+
+   constexpr auto begin();
+   constexpr auto end();
+private:
+   R base_; // exposition-only
+   semiregular<Pred> pred_; // exposition-only
+};
+
+template<class R, class Pred>
+drop_while_view(R&&, Pred) -> drop_while_view<all_view<R>, Pred>;
+```
+
+#### `drop_while_view` constructors
+
+```cpp
+constexpr drop_while_view(R base, Pred pred);
+```
+
+1. <i>Effects</i>: Initialises `base_` with `base` and initialises `pred_` with `pred`.
+
+```cpp
+template<ViewableRange O>
+requires constructible-from-range<R, O>
+constexpr drop_while_view(O&& o, Pred pred)
+```
+
+2. <i>Effects</i>: Initialises `base_` with `view::all(std::forward<O>(o))`, and intialises
+    `pred_` with `pred`.
+
+#### `drop_while_view` conversion
+
+```cpp
+constexpr R base() const;
+```
+
+3. <i>Returns</i>: `base_`.
+
+```cpp
+constexpr Pred pred() const;
+```
+
+4. <i>Returns</i>: `pred_`.
+
+#### `drop_while_view` begin
+
+```cpp
+constexpr auto begin();
+```
+
+5. <i>Effects</i>: Equivalent to `return ranges::find_if_not(base_, std::ref(pred_));`.
+6. <i>Remarks</i>: In order to provide the amortized constant time complexity required by the `Range`
+    concept, the first overload caches the result within the `drop_while_view` for use on subsequent
+    calls. Without this, applying a `reverse_view` over a `drop_view` would have quadratic iteration
+    complexity.
+
+#### `drop_while_view` end
+
+7. <i>Effects</i>: Equivalent to `return ranges::end(base_);`.
+
+## `view::drop_while`
+
+The name `view::drop_while` denotes a range adaptor object. Let `X` and `Y` be expressions such that
+type `T` is `decltype((X))` and `F` is `decltype((Y))`. Then, the expression
+`view::drop_while(X, Y)`is expression-equivalent to:
+
+1. `drop_while_view{X, Y}` if `T` models `InputRange`, and `Y` is an object, and `F`| and models
+    `IndirectUnaryPredicate`.
+2. Otherwise `view::drop_while(E, F)` is ill-formed.
+
+## `keys` and `values`
+
+### Motivation
+
+It is frequent to want to iterate over the keys or the values of an associative container. There is
+currently no easy way to do that. It can be approximated using `ranges::view::transform`, given how
+frequently such operation is needed we think their addition would make manipulation of associative
+containers easier by more clearly expressing the intent.
+
+<table>
+   <tr>
+      <th>Current</th>
+      <th>Proposed</th>
+   </tr>
+   <tr>
+   <td>
+   <xmp>
+   for(auto && name : map | view::transform(&std::pair<const int,int>::first)) {
+        std::format("Hello {}", name);
+   }
+   </xmp>
+   </td>
+   <td>
+   <xmp>
+    for(auto && name :  map | view::keys) {
+        std::format("Hello {}", name);
+    }
+   </xmp>
+   </tr>
+</table>
+
+These views have been part of ranges-v3 and we also have implemented them in cmcstl2. A lot of
+languages and frameworks (notably JS, Python, Qt, Java, [[Boost.Range]]) offer methods to extract
+the keys or values of an associative container, often through `.keys()` and `.values()` operations,
+respectively.
+
+<xmp>
+std::vector<std::tuple<int, int, int>> vector_of_tuple = {
+    {0,  1,  2},
+    {3,  4,  5},
+    {6,  7,  8},
+    {9, 10, 11}
+};
+
+lst = view::elements<2>(vector_of_tuple);
+//lst == {2, 5, 8, 11}
+</xmp>
+
+* `keys_view` and the corresponding adaptor `view::keys` iterate over the first elements of a
+    sequence of tuple-like objects of size 2 (tuple of size other than two cannot be considered as
+    representing a key-value pair).
+
+It can be defined as:
+
+<xmp>
+template <InputRange R>
+requires std::tuple_size_v<iter_value_t<iterator_t<R>>> == 2
+using keys_view = elements_view<R, 0>;
+</xmp>
+
+* `values_view` and the corresponding adaptor `view::values` iterate over the second elements of a
+    sequence of tuple-like objects of size 2 (tuple of size other than two cannot be considered as
+    representing a key-value pair).
+
+It can be defined as:
+
+<xmp>
+template <InputRange R>
+requires std::tuple_size_v<iter_value_t<iterator_t<R>>> == 2
+using values_view = elements_view<R, 1>;
+</xmp>
+
+And used as:
+
+<xmp>
+auto total_zeroes = ranges::count(map | ranges::view::values, 0);
+</xmp>
+
+### Interface
+
+<xmp>
+namespace ranges {
+   template<InputRange R, size_t N>
+   requries View<R> && N < tuple_size_v<range_value_t<R>>
+   class elements_view : public view_interface<elements_view<R, N>> {
+   private:
+      template<bool Const> struct __iterator; // exposition-only
+      template<bool Const> struct __sentinel; // exposition-only
+      R base_;                                // exposition-only
+   public:
+      elements_view() = default;
+
+      constexpr explicit elements_view(R base);
+
+      constexpr R base() const noexcept;
+
+      constexpr auto begin()
+        requires (!simple-view<const R>);
+
+      constexpr auto begin() const
+        requires simple-view<const R>;
+
+      constexpr auto end()
+        requires (!simple-view<const R>);
+
+      constexpr auto end() const
+        requires simple-view<const R>;
+
+      constexpr auto size() const
+        requires SizedRange<R> && (!simple-view<const R>);
+
+      constexpr auto size() const
+        requires SizedRange<const R> && simple-view<const R>;
+   };
+
+   template<class R>
+   using keys_view = elements_view<all_view<R>, 0>;
+
+   template<class R>
+   using values_view = elements_view<all_view<R>, 1>;
+</xmp>
+
+#### `elements_view` constructor
+
+<xmp>
+constexpr explicit elements_view(R base);
+</xmp>
+
+1. <i>Effects</i>: Initialises `base_` with `base`.
+
+#### `elements_view` conversion
+
+<xmp>
+constexpr R base() const noexcept;
+</xmp>
+
+2. <i>Effects</i>: Equivalent to `return base_;`.
+
+#### `elements_view` range begin
+
+<xmp>
+constexpr auto begin()
+  requires (!simple-view<const R>);
+
+constexpr auto begin() const
+  requires simple-view<const R>;
+</xmp>
+
+3. <i>Effects</i>: Equivalent to `return __iterator<is_const_v<decltype(*this)>>(*this, begin(base_));`.
+
+#### `elements_view` range end
+
+<xmp>
+constexpr auto end()
+  requires (!simple-view<const R>);
+
+constexpr auto end() const
+  requires simple-view<const R>;
+</xmp>
+
+4. <i>Effects</i>: Equivalent to `return __iterator<is_const_v<decltype(*this)>>(*this, end(base_));`.
+
+#### `elements_view` range size
+
+<xmp>
+constexpr auto size() const
+  requires SizedRange<R> && (!simple-view<const R>);
+
+constexpr auto size() const
+  requires SizedRange<const R> && simple-view<const R>;
+</xmp>
+
+5. <i>Effects</i>: Equivalent to `return size(base_);`.
+
+### `elements_view<R, N>` iterator
+
+<xmp>
+template<class R, std::size_t N>
+template<bool Const>
+class elements_view<R, N>::__iterator { // exposition-only
+private:
+   using __parent = conditional_t<Const, const elements_view, elements_view>;
+   using __base = conditional_t<Const, const R, R>;
+   friend __iterator<!Const>;
+   friend __sentinel<Const>;
+
+   __parent* parent_ = nullptr;
+   iterator_t<__base> current_{};
+public:
+   using iterator_category = iterator_category_t<iterator_t<Base>>;
+   using value_type = remove_cvref_t<tuple_element_t<N, range_value_t<__base>>>;
+   using difference_type = range_difference_t<__base>;
+
+   __iterator() = default;
+
+   constexpr explicit __iterator(__parent& parent, iterator_t<__base> current);
+
+   constexpr explicit __iterator(__iterator<!Const> i)
+   requires Const && ConvertibleTo<iterator_t<R>, iterator_t<__base>>;
+
+   constexpr iterator_t<Base> base() const noexcept;
+
+   constexpr decltype(auto) operator*() const;
+
+   constexpr __iterator& operator++();
+
+   constexpr void operator++(int)
+   requires (!ForwardRange<Base>);
+
+   constexpr __iterator operator++(int)
+   requires ForwardRange<Base>;
+
+   constexpr __iterator& operator--()
+   requires BidirectionalRange<Base>;
+
+   constexpr __iterator operator--(int)
+   requires BidirectionalRange<Base>;
+
+   constexpr __iterator operator+=(difference_type n)
+   requires RandomAccessRange<Base>;
+
+   constexpr __iterator operator-=(difference_type n)
+   requires RandomAccessRange<Base>;
+
+   constexpr decltype(auto) operator[](difference_type n)
+   requires RandomAccessRange<Base>;
+
+   constexpr friend bool operator==(const __iterator& x, const __iterator& y)
+   requires EqualityComparable<iterator_t<Base>>;
+
+   constexpr friend bool operator!=(const __iterator& x, const __iterator& y)
+   requires EqualityComparable<iterator_t<Base>>;
+
+   constexpr friend bool operator<(const __iterator& x, const __iterator& y)
+   requires RandomAccessRange<Base>;
+
+   constexpr friend bool operator<=(const __iterator& x, const __iterator& y)
+   requires RandomAccessRange<Base>;
+
+   constexpr friend bool operator>=(const __iterator& x, const __iterator& y)
+   requires RandomAccessRange<Base>;
+
+   constexpr friend bool operator>(const __iterator& x, const __iterator& y)
+   requires RandomAccessRange<Base>;
+
+   constexpr friend __iterator operator+(const __iterator& x, const difference_type& y)
+   requires RandomAccessRange<Base>;
+
+   constexpr friend __iterator operator+(const difference_type& x, const __iterator& x)
+   requires RandomAccessRange<Base>;
+
+   constexpr friend __iterator operator-(const __iterator& x, const difference_type& y)
+   requires RandomAccessRange<Base>;
+
+   constexpr friend difference_type operator-(const __iterator& x, const __iterator& y)
+   requires RandomAccessRange<Base>;
+};
+</xmp>
+
+#### `elements_view<R, N>::__iterator` constructors
+
+<xmp>
+constexpr explicit __iterator(__parent& parent, iterator_t<__base> current);
+</xmp>
+
+1. <i>Effects</i>: Initialises `parent_` with `std::addressof(parent)` and `current_` with
+    `current`.
+
+<xmp>
+   constexpr explicit __iterator(__iterator<!Const> i)
+   requires Const && ConvertibleTo<iterator_t<R>, iterator_t<__base>>;
+</xmp>
+
+2. <i>Effects</i>: Initialises `parent_` with `i.parent_` and `current_` with `i.current_`.
+
+#### `elements_view<R, N>::__iterator` conversion
+
+<xmp>
+constexpr iterator_t<Base> base() const noexcept;
+</xmp>
+
+3. <i>Effects</i>: Equivalent to `return current_;`.
+
+#### `elements_view<R, N>::__iterator` successor
+
+<xmp>
+constexpr __iterator& operator++();
+</xmp>
+
+4. <i>Effects</i>: Equivalent to `++current_; return *this;`.
+
+<xmp>
+constexpr void operator++(int)
+requires (!ForwardRange<Base>);
+</xmp>
+
+5. <i>Effects</i>: Equivalent to `++current_;`.
+
+<xmp>
+constexpr __iterator operator++(int)
+requires ForwardRange<Base>;
+</xmp>
+
+6. <i>Effects</i>: Equivalent to
+
+<xmp>
+auto temp = *this;
+++current_;
+return temp;
+</xmp>
+
+#### `elements_view<R, N>::__iterator` predecessor
+
+<xmp>
+constexpr __iterator& operator--()
+requires BidirectionalRange<Base>;
+</xmp>
+
+7. <i>Effects</i>: Equivalent to `--current_; return *this;`.
+
+<xmp>
+constexpr __iterator operator--(int)
+requires BidirectionalRange<Base>;
+</xmp>
+
+8. <i>Effects</i>: Equivalent to
+
+<xmp>
+auto temp = *this;
+--current_;
+return temp;
+</xmp>
+
+#### `elements_view<R, N>::__iterator` advance
+
+<xmp>
+constexpr __iterator operator+=(difference_type n)
+requires RandomAccessRange<Base>;
+</xmp>
+
+9. <i>Effects</i>: Equivalent to `current_ += n; return *this;`.
+
+<xmp>
+constexpr __iterator operator-=(difference_type n)
+requires RandomAccessRange<Base>;
+</xmp>
+
+10. <i>Effects</i>: Equivalent to `current_ -= n; return *this;`.
+
+<xmp>
+constexpr friend __iterator operator+(const __iterator& x, const difference_type& y)
+requires RandomAccessRange<Base>;
+</xmp>
+
+11. <i>Effects</i>: Equivalent to
+
+<xmp>
+constexpr friend __iterator operator+(const difference_type& x, const __iterator& x)
+requires RandomAccessRange<Base>;
+</xmp>
+
+12. <i>Effects</i>: Equivalent to
+
+<xmp>
+constexpr friend __iterator operator-(const __iterator& x, const difference_type& y)
+requires RandomAccessRange<Base>;
+</xmp>
+
+13. <i>Effects</i>: Equivalent to
+
+<xmp>
+constexpr friend difference_type operator-(const __iterator& x, const __iterator& y)
+requires RandomAccessRange<Base>;
+</xmp>
+
+14. <i>Effects</i>: Equivalent to
+
+#### `elements_view<R, N>::__iterator` access
+
+<xmp>
+constexpr decltype(auto) operator*() const;
+</xmp>
+
+15. <i>Effects</i>: Equivalent to `return std::get<N>(*current_);`.
+
+<xmp>
+constexpr decltype(auto) operator[](difference_type n)
+requires RandomAccessRange<Base>;
+</xmp>
+
+15. <i>Effects</i>: Equivalent to `return *(current_ + n);`.
+
+#### `elements_view<R, N>::__iterator` comparisons
+
+<xmp>
+constexpr friend bool operator==(const __iterator& x, const __iterator& y)
+requires EqualityComparable<iterator_t<Base>>;
+</xmp>
+
+16. <i>Effects</i>: Equivalent to `return x.current_ == y.current_;`.
+
+<xmp>
+constexpr friend bool operator!=(const __iterator& x, const __iterator& y)
+requires EqualityComparable<iterator_t<Base>>;
+</xmp>
+
+17. <i>Effects</i>: Equivalent to `return !(x == y)`.
+
+<xmp>
+constexpr friend bool operator<(const __iterator& x, const __iterator& y)
+requires RandomAccessRange<Base>;
+</xmp>
+
+18. <i>Effects</i>: Equivalent to `return x.current_ < y.current_;`.
+
+<xmp>
+constexpr friend bool operator<=(const __iterator& x, const __iterator& y)
+requires RandomAccessRange<Base>;
+</xmp>
+
+19. <i>Effects</i>: Equivalent to `return !(y < x);`.
+
+<xmp>
+constexpr friend bool operator>=(const __iterator& x, const __iterator& y)
+requires RandomAccessRange<Base>;
+</xmp>
+
+20. <i>Effects</i>: Equivalent to `return !(x < y);`.
+
+<xmp>
+constexpr friend bool operator>(const __iterator& x, const __iterator& y)
+requires RandomAccessRange<Base>;
+</xmp>
+
+21. <i>Effects</i>: Equivalent to `return y < x;`.
+
+### `elements_view<R, N>` sentinel
+
+<xmp>
+template<class R, std::size_t N>
+template<bool Const>
+class elements_view<R, N>::__sentinel { // exposition-only
+private:
+   using __parent = conditional_t<Const, const elements_view, elements_view>;
+   using __base = conditional_t<Const, const R, R>;
+
+   sentinel_t<__base> end_{};
+   friend __sentinel<!Const>;
+public:
+   __sentinel() = default;
+
+   constexpr explicit __sentinel(__sentinel<__base> end);
+   constexpr explicit __sentinel(__sentinel<!Const> i)
+   requires Const && ConvertibleTo<sentinel_t<R>, sentinel_t<const R>>;
+
+   constexpr sentinel_t<Base> base() const;
+
+   constexpr friend bool operator==(const __iterator<Const>& x, const __sentinel& y);
+   constexpr friend bool operator==(const __sentinel x, const __iterator<Const>& y);
+
+   constexpr friend bool operator!=(const __iterator<Const>& x, const __sentinel& y);
+   constexpr friend bool operator!=(const __sentinel x, const __iterator<Const>& y);
+
+   friend constexpr range_difference_t<__base>
+   operator-(const __iterator<Const>& x, const __sentinel& y)
+   requires SizedSentinel<sentinel_t<__base>, iterator_t<__base>>;
+
+   friend constexpr range_difference_t<__base>
+   operator-(const __sentinel& x, const __iterator<Const>& y)
+   requires SizedSentinel<sentinel_t<__base>, iterator_t<__base>>;
+};
+</xmp>
+
+#### `elements_view<R, N>::__sentinel` constructors
+
+<xmp>
+constexpr explicit __sentinel(__sentinel<__base> end);
+</xmp>
+
+1. <i>Effects</i>: Initialises `end_` with `end`.
+
+<xmp>
+constexpr explicit __sentinel(__sentinel<!Const> i)
+requires Const && ConvertibleTo<sentinel_t<R>, sentinel_t<const R>>;
+</xmp>
+
+2. <i>Effects</i>: Initialises `end_` with `i.end`.
+
+#### `elements_view<R, N>::__sentinel` conversion
+
+<xmp>
+constexpr sentinel_t<Base> base() const;
+</xmp>
+
+3. <i>Effects</i>: Equivalent to `return base_;`.
+
+#### `elements_view<R, N>::__sentinel` comparison
+
+<xmp>
+constexpr friend bool operator==(const __iterator<Const>& x, const __sentinel& y);
+</xmp>
+
+4. <i>Effects</i>: Equivalent to `return x.current_ == y.end_;`.
+
+<xmp>
+constexpr friend bool operator!=(const __iterator<Const>& x, const __sentinel& y);
+</xmp>
+
+5. <i>Effects</i>: Equivalent to `return !(x == y);`.
+
+<xmp>
+constexpr friend bool operator==(const __sentinel x, const __iterator<Const>& y);
+constexpr friend bool operator!=(const __sentinel x, const __iterator<Const>& y);
+</xmp>
+
+6. <i>Effects</i>: Equivalent to `return y == x;` and `return y != x;`, respectively.
+
+#### `elements_view<R, N>::__sentinel` distance
+
+<xmp>
+friend constexpr range_difference_t<__base>
+operator-(const __iterator<Const>& x, const __sentinel& y)
+requires SizedSentinel<sentinel_t<__base>, iterator_t<__base>>;
+</xmp>
+
+7. <i>Effects</i>: Equivalent to `return x.current_ - y.end_;`.
+
+<xmp>
+friend constexpr range_difference_t<__base>
+operator-(const __sentinel& x, const __iterator<Const>& y)
+requires SizedSentinel<sentinel_t<__base>, iterator_t<__base>>;
+</xmp>
+
+8. <i>Effects</i>: Equivalent to `return -(y - x)`.
+
+### `view::keys`
+
+The name `view::keys` denotes a range adaptor object. Let `X` be an expression such that `T` is
+`decltype((X))`. Then, the expression `view::keys(X)` is expression-equivalent to:
+
+1. `keys_view{X}` if `T` models `InputRange` and `range_value_t<T>` models `pair-like`
+    [range.subrange].
+2. Otherwise `view::keys(X)` is ill-formed.
+
+### `view::values`
+
+The name `view::values` denotes a range adaptor object. Let `X` be an expression such that `T` is
+`decltype((X))`. Then, the expression `view::values(X)` is expression-equivalent to:
+
+1. `values_view{X}` if `T` models `InputRange` and `range_value_t<T>` models `pair-like`
+    [range.subrange].
+2. Otherwise `view::values(X)` is ill-formed.
+
+### `view::elements`
+
+The name `view::elements<N>` denotes a range adaptor object. Let `X` be an expression such that
+`T` is `decltype((X))`. Then, the expression `view::elements<N>(X)` is expression-equivalent to:
+
+1. `elements_view<all_view<T>, N>{X}` if `T` models `InputRange`, `range_value_t<T>` is tuple-like,
+    and `N < tuple_size_v<range_value_t<T>>`.
+2. Otherwise `view::elements(X)` is ill-formed.
+
+<i>
+Editor's note: the term tuple-like is used in a similar fashion to [range.subrange]'s pair-like, but
+for tuple-like entities. No wording exists as present.
+</i>
+
+<pre class=biblio>
+{
+"P0789": {
+    "title": "Range Adaptors and Utilities",
+    "authors": ["Eric Niebler"],
+    "href": "https://wg21.link/p0789"
+},
+"P0836": {
+    "title": "P0836 Introduce Parallelism to the Ranges TS",
+    "authors": ["Gordon Brown", "Christopher Di Bella", "Michael Haidl", "Toomas Remmelg", "Ruyman Reyes", "Michel Steuwer", "Michael Wong"],
+    "href": "https://wg21.link/p0836"
+},
+"P1037": {
+    "title": "Deep Integration of the Ranges TS",
+    "authors": ["Eric Niebler", "Casey Carter"],
+    "href": "https://wg21.link/p1037"
+},
+"range-v3": {
+    "title": "range-v3",
+    "authors": ["Eric Niebler & others"],
+    "href": "https://github.com/ericniebler/range-v3"
+},
+"cmcstl2": {
+    "title": "cmcstl2/zip_view",
+    "authors": ["Casey Carter & others"],
+    "href": " https://github.com/caseycarter/cmcstl2/tree/zip_view"
+},
+"convolution": {
+    "title": "Convolution",
+    "authors": ["Wikipedia"],
+    "href": "https://en.wikipedia.org/wiki/Convolution_(computer_science)"
+},
+"iter.assoc.types.value_type": {
+   "title": "ISO/IEC TS 21425:2017 C++ Extensions for Ranges",
+   "authors": ["Eric Niebler", "Casey Carter"],
+   "href": "https://timsong-cpp.github.io/cppwp/ranges-ts/iterator.assoc.types.value_type"
+},
+"value_type": {
+    "title": "static_assert(not is_same_v<vector<int const>::value_type, vector<int const>::iterator::value_type>)",
+    "href": "https://godbolt.org/z/xkcREX"
+},
+"Boost.Range": {
+   "title": "Boost.Range",
+   "href": "https://www.boost.org/doc/libs/1_68_0/libs/range/doc/html/range/reference/adaptors/reference/map_values.html#range.reference.adaptors.reference.map_values.map_values_example"
+},
+"P0026": {
+   "title": "multi-range-based for loops",
+   "authors": "Matthew McAtamney-Greenwood",
+   "href": "https://wg21.link/p0026"
+},
+"EWG43": {
+   "title": "[tiny] simultaneous iteration with new-style for syntax",
+   "authors": "Gabriel Dos Reis",
+   "href": "https://cplusplus.github.io/EWG/ewg-active.html#43"
+}
+}
+</pre>   

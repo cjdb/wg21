@@ -1,0 +1,86 @@
+<pre class='metadata'>
+Title: Audience Tables
+Shortname: D1700
+Level: 0
+Status: D
+Group: wg21
+Editor: Christopher Di Bella, cjdb.ns@gmail.com
+Editor: JC van Winkel, jcvw@google.com
+URL: https://wg21.link/p1700
+Abstract: This proposal makes no direct changes to C++, but rather hopes to standardise a new form of communication between Individual Experts. Section 4.4 of [[P1362]] uses a form of table that identifies who the target audiences are for certain parts of coroutine usage. The authors believe that other proposals could drastically benefit from such tables to help communicate the teachability of proposals and what they believe beginners-through-experts should be using. We would like to see this practice adopted in other proposals.
+Audience: SG20
+Markup Shorthands: markdown yes
+Default Highlight: CPP
+Line Numbers: no
+Date: 2019-06-17
+</pre>
+
+# Motivation
+
+P1362 §4.4 discussses whether or not coroutines are an expert-only feature. It communicates this --
+in part -- by using a table that splits programmers into four categories, as shown in Table 1.
+
+<table>
+   <tr>
+      <th>Who</th>
+      <th>What</th>
+   </tr>
+   <tr>
+      <td>Everybody (millions)</td>
+      <td>
+         Uses coroutines via high level syntax powered by coroutine types and awaitables defined by
+         the standard library, boost and other high-quality libraries.
+      </td>
+   </tr>
+   <tr>
+      <td>Power user (10,000)</td>
+      <td>
+         Aware of <i>Awaitable</i> concept.<br />
+         <br />
+         Defines new awaitables to customize await for their environment using existing coroutine
+         types.
+      </td>
+   </tr>
+   <tr>
+      <td>Expert (1,000)</td>
+      <td>
+         Aware of <i>Awaitable</i> and <i>Coroutine Promise</i> concepts.<br />
+         <br />
+         Defines new coroutine types.
+      </td>
+   </tr>
+   <tr>
+      <td>Cream of the crop (200)</td>
+      <td>
+         Defines metafunctions, utilities and adapters that can help to compose awaitables, write
+         utility coroutine adapters, etc.
+      </td>
+   </tr>
+</table>
+
+The authors feel that this table outlining the target audiences for various users both:
+
+1. lets proposal readers distill both the teachability of a proposal and who its intended audience
+    actually are;
+2. encourages proposal authors to think about their features' target audience(s) and highlights any
+    latent 'expert friendliness' of a proposal.
+
+We want to consistently aim for a C++ that is easier to use (e.g. range-based `for`, `auto`, etc.),
+and -- as a whole -- want to lower the necessity to be an expert to use C++ (i.e. the millions).
+By lowering the barrier for determining who is expected to use a proposed feature, audience
+tables will bring us closer to that reality.
+
+# Proposal
+
+We strongly suggest that proposal authors begin to use these audience tables more frequently in
+proposals, just as authors have started to use before-and-after tables.
+
+<pre class=biblio>
+{
+"P1362": {
+   "title": "Incremental Approach: Coroutine TS + Core Coroutines",
+   "authors": "Gor  Nishanov",
+   "href": "https://wg21.link/p1362"
+}
+}
+</pre>

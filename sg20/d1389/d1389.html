@@ -1227,10 +1227,9 @@ Possible extra rowspan handling
       text-align: center;
     }
   </style>
-  <meta content="Bikeshed version 30dbdcf66519991ec52011cac10c49a7b5b449c5" name="generator">
+  <meta content="Bikeshed version 9c6ae748322940994300e90a77c34437364b40a6" name="generator">
   <link href="https://wg21.link/p1389" rel="canonical">
   <link href="https://isocpp.org/favicon.ico" rel="icon">
-  <meta content="3a44f752cd894976baeb0aa365a35532c66af932" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1450,6 +1449,8 @@ pre .property::before, pre .property::after {
       <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:cjdb.ns@gmail.com">Christopher Di Bella</a>
      <dd>
       <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:simon.brand@microsoft.com">Simon Brand</a>
+     <dd>
+      <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:mdadams@ece.uvic.ca">Michael Adams</a>
      <dt>Audience:
      <dd>SG20
      <dt>Project:
@@ -1514,7 +1515,8 @@ pre .property::before, pre .property::after {
        <a href="#style-style-practices"><span class="secno">2.4</span> <span class="content">[style] Style practices</span></a>
        <ol class="toc">
         <li><a href="#styleguide-use-a-style-guide"><span class="secno">2.4.1</span> <span class="content">[style.guide] Use a style guide</span></a>
-        <li><a href="#styleall_caps-avoid-all_caps-names"><span class="secno">2.4.2</span> <span class="content">[style.<code class="highlight"><c- n>ALL_CAPS</c-></code>] Avoid <code class="highlight"><c- n>ALL_CAPS</c-></code> names</span></a>
+        <li><a href="#stylenaming-use-consistent-set-of-naming-conventions-for-identifiers"><span class="secno">2.4.2</span> <span class="content">[style.naming] Use consistent set of naming conventions for identifiers</span></a>
+        <li><a href="#styleall_caps-avoid-all_caps-names"><span class="secno">2.4.3</span> <span class="content">[style.<code class="highlight"><c- n>ALL_CAPS</c-></code>] Avoid <code class="highlight"><c- n>ALL_CAPS</c-></code> names</span></a>
        </ol>
       <li><a href="#projects-projects"><span class="secno">2.5</span> <span class="content">[projects] Projects</span></a>
       <li>
@@ -1832,7 +1834,7 @@ as there is no use-case. Similarly, raw arrays, pointers, and even references ar
 members of [basic.types], as students will not appreciate them.</p>
    <h4 class="heading settled" data-level="2.3.1" id="delayreferences-references"><span class="secno">2.3.1. </span><span class="content">[delay.references] References</span><a class="self-link" href="#delayreferences-references"></a></h4>
     The author has found multiple resources that introduce pointers or references in the following
-fashion: 
+fashion:
 <pre class="language-cpp highlight"><c- c1>// replicated introduction, not from an actual source</c->
 <c- b>int</c-> <c- n>i</c-> <c- o>=</c-> <c- mi>0</c-><c- p>;</c->
 <c- b>int</c-><c- o>&amp;</c-> <c- n>r</c-> <c- o>=</c-> <c- n>i</c-><c- p>;</c->
@@ -1900,7 +1902,16 @@ that <code class="highlight"><c- n>a</c-> <c- o>==</c-> <c- n>b</c-></code> and 
      <p>See also: <a href="#toolslinter-use-linters">Use a linter</a></p>
    </ul>
    <p>TODO (why?)</p>
-   <h4 class="heading settled" data-level="2.4.2" id="styleall_caps-avoid-all_caps-names"><span class="secno">2.4.2. </span><span class="content">[style.<code class="highlight"><c- n>ALL_CAPS</c-></code>] Avoid <code class="highlight"><c- n>ALL_CAPS</c-></code> names</span><a class="self-link" href="#styleall_caps-avoid-all_caps-names"></a></h4>
+   <h4 class="heading settled" data-level="2.4.2" id="stylenaming-use-consistent-set-of-naming-conventions-for-identifiers"><span class="secno">2.4.2. </span><span class="content">[style.naming] Use consistent set of naming conventions for identifiers</span><a class="self-link" href="#stylenaming-use-consistent-set-of-naming-conventions-for-identifiers"></a></h4>
+    (e.g., names of variables, types, etc.)
+   <p>To whatever extent is possible, a consistent set of naming conventions
+for identifiers should be employed.  This practice helps to greatly
+improve the readability of code, amongst other things.  Many popular
+naming conventions exist, and there are likely equally many opinions
+as to which one is best.  Therefore, no attempt is made to advocate
+a particular one here.  For examples of naming conventions that could
+be used, please refer to some of the popular style guides.</p>
+   <h4 class="heading settled" data-level="2.4.3" id="styleall_caps-avoid-all_caps-names"><span class="secno">2.4.3. </span><span class="content">[style.<code class="highlight"><c- n>ALL_CAPS</c-></code>] Avoid <code class="highlight"><c- n>ALL_CAPS</c-></code> names</span><a class="self-link" href="#styleall_caps-avoid-all_caps-names"></a></h4>
    <p>The use of <code class="highlight"><c- n>ALL_CAPS</c-></code> is commonly reserved for macros. Developer tools, such as compilers and IDEs
 are able to quickly detect when a programmer is trying to write to something that is read-only (e.g.
 a constant).</p>
@@ -1922,30 +1933,65 @@ Style). </i></p>
    <h3 class="heading settled" data-level="2.5" id="projects-projects"><span class="secno">2.5. </span><span class="content">[projects] Projects</span><a class="self-link" href="#projects-projects"></a></h3>
    <p>TODO (what?, why?, how?, where?, when?, how many?)</p>
    <h3 class="heading settled" data-level="2.6" id="tools-tools"><span class="secno">2.6. </span><span class="content">[tools] Tools</span><a class="self-link" href="#tools-tools"></a></h3>
+   <p>Students should be introduced to a variety of basic tools for code development
+relatively early in the learning process (not later as an afterthought).
+The effective use of tools is important because this can make many tasks
+much easier, from formatting source code to testing and debugging.
+Not introducing at least some basic tools to the student will make their
+programming experience unnecessarily difficult and discourage the
+student from learning.</p>
    <h4 class="heading settled" data-level="2.6.1" id="toolscompilers-use-an-up-to-date-compiler"><span class="secno">2.6.1. </span><span class="content">[tools.compilers] Use an up-to-date compiler</span><a class="self-link" href="#toolscompilers-use-an-up-to-date-compiler"></a></h4>
-   <p>... even if you are not teaching the latest C++</p>
+   <p>The C++ language and standard library have been evolving rapidly in
+recent years.  In order to ensure that newer language and library
+features are available, an up-to-date compiler is essential.
+Even if all of the latest language/library features are not
+needed for a course, using an up-to-date compiler is important for
+another reason.
+In particular, modern compilers have significantly improved error messages,
+making it easier for novices to find and correct their errors.</p>
+   <p>At the time of this writing, the most recent versions of several
+popular compilers are as follows:</p>
    <ul>
     <li data-md>
-     <p>Most recent GCC: version 8</p>
+     <p>GCC: version 8</p>
     <li data-md>
-     <p>Most recent Clang: version 7</p>
+     <p>Clang: version 7</p>
     <li data-md>
-     <p>Most recent MSVC: version 2017 (with updates)</p>
+     <p>MSVC: version 2017 (with updates)</p>
    </ul>
-   <p>Modern compilers have significantly improved error messages, making it easier for novices to find and correct their errors.</p>
    <h5 class="heading settled" data-level="2.6.1.1" id="toolsmultiplecompilers-use-two-or-more-competing-compilers"><span class="secno">2.6.1.1. </span><span class="content">[tools.multiple.compilers] Use two or more competing compilers</span><a class="self-link" href="#toolsmultiplecompilers-use-two-or-more-competing-compilers"></a></h5>
-   <p>TODO (why?)</p>
+   <p>No compiler is perfect.  Some provide better diagnostics for certain
+types of problems than others.  Giving the student the ability to
+use more than one compiler can be helpful when the error message from
+one compiler is not as enlightening as one would like.
+Also, some tools may only be available for a particular compiler.
+Therefore, in order to best utilize various tools, it is helpful for
+the student to be comfortable using more than one compiler.</p>
    <h4 class="heading settled" data-level="2.6.2" id="toolscompilerwarnings-use-a-high-level-of-warnings-and-enable-warnings-as-error-mode"><span class="secno">2.6.2. </span><span class="content">[tools.compiler.warnings] Use a high level of warnings and enable 'warnings as error' mode</span><a class="self-link" href="#toolscompilerwarnings-use-a-high-level-of-warnings-and-enable-warnings-as-error-mode"></a></h4>
+   <p>Students should be taught to understand that the compiler is their friend.
+It can catch many problems in their code.
+Compiler warnings are one way in which the compiler can help the student
+to find problems in their code (such as a function with a missing
+return statement).</p>
+   <p>For example, one might use the following compiler flags:</p>
    <ul>
     <li data-md>
      <p>Minimum for GCC and Clang: <code class="highlight"><c- o>-</c-><c- n>Wall</c-> <c- o>-</c-><c- n>Wextra</c-> <c- o>-</c-><c- n>pedantic</c-> <c- o>-</c-><c- n>Werror</c-></code></p>
     <li data-md>
      <p>Minimum for MSVC: <code class="highlight"><c- o>/</c-><c- n>W3</c-> <c- o>/</c-><c- n>WX</c-></code></p>
    </ul>
-   <p>TODO (why?)</p>
    <h4 class="heading settled" data-level="2.6.3" id="toolstesting-introduce-a-testing-framework"><span class="secno">2.6.3. </span><span class="content">[tools.testing] Introduce a testing framework</span><a class="self-link" href="#toolstesting-introduce-a-testing-framework"></a></h4>
    <p>Examples: <a href="https://github.com/catchorg/Catch2">Catch2</a>, <a href="https://github.com/google/googletest">Google Test</a></p>
-   <p>TODO (why?)</p>
+   <p>Testing code is often viewed as tedious and boring by students, which
+discourages students from investing the time to properly test code.  By
+using a testing framework, some of the monotony of testing can be
+reduced by eliminating the need for students to repeat boilerplate code
+that would be automatically provided by a test framework.   By making
+testing less tedious to perform, students will be more motivated to do
+it well.  Moreover, if a test framework that is popular in industry is
+chosen for teaching purposes, students will be further motivated by the
+knowledge that they are learning a useful tool in addition to developing
+their testing skills.</p>
    <h4 class="heading settled" data-level="2.6.4" id="toolsdebugger-introduce-a-debugger-early"><span class="secno">2.6.4. </span><span class="content">[tools.debugger] Introduce a debugger early</span><a class="self-link" href="#toolsdebugger-introduce-a-debugger-early"></a></h4>
    <p>Examples: Visual Studio Debugger, GDB, LLDB</p>
    <p>The ability to step through running code and examine execution state will enable students to
@@ -1972,25 +2018,54 @@ necessary hardware and software to support the canonical environment and provide
 or you need to do a considerable amount of work to produce the necessary build instructions. Just
 use a build system.</p>
    <h4 class="heading settled" data-level="2.6.7" id="toolsonlinecompiler-introduce-online-compilers"><span class="secno">2.6.7. </span><span class="content">[tools.online.compiler] Introduce online compilers</span><a class="self-link" href="#toolsonlinecompiler-introduce-online-compilers"></a></h4>
-   <p>Examples: <a href="https://godbolt.org/">Compiler Explorer</a>, <a href="https://wandbox.org/">Wandbox</a>, <a href="http://coliru.stacked-crooked.com/">Coliru</a></p>
+   <p>Examples:</p>
+   <ul>
+    <li data-md>
+     <p><a href="https://godbolt.org/">Compiler Explorer</a></p>
+    <li data-md>
+     <p><a href="https://wandbox.org/">Wandbox</a></p>
+    <li data-md>
+     <p><a href="http://coliru.stacked-crooked.com/">Coliru</a></p>
+    <li data-md>
+     <p><a href="https://cppinsights.io/">C++ Insights</a></p>
+   </ul>
    <p>Online compilers are invaluable tools for communicating about small snippets of code. Depending on
 the tool, they let the user compile programs using multiple toolchains, check the output of their
 code, and share the snippets with others.</p>
    <p>Compiler Explorer’s live updates can be particularly useful when experimenting with new features.
 The assembly view could overwhelm students however, so care should be taken when introducing this
 tool.</p>
+   <p>C++ Insights is a source-code transformation tool that can be
+particularly useful for helping the student to understand how the
+compiler views various types of code constructs in the language.
+For example, source code containing a lambda expression can be transformed
+by the tool into new (equivalent) source code that shows the closure type
+generated by the lambda expression.
+Many other code constructs are also handled by the tool
+(such as range-based for loops and structured bindings).</p>
    <h4 class="heading settled" data-level="2.6.8" id="toolscodeformatter-use-a-code-formatter"><span class="secno">2.6.8. </span><span class="content">[tools.code.formatter] Use a code formatter</span><a class="self-link" href="#toolscodeformatter-use-a-code-formatter"></a></h4>
-   <p>Examples: clang-format</p>
+   <p>Examples: <a href="https://clang.llvm.org/docs/ClangFormat.html">Clang Format</a></p>
    <p>Choosing a code formatter and picking a canonical style (it doesn’t really matter which one) will
 avoid some code style arguments and improve uniformity among student’s code. The latter will make
 marking and comparing solutions easier.</p>
    <h4 class="heading settled" data-level="2.6.9" id="toolslinter-use-linters"><span class="secno">2.6.9. </span><span class="content">[tools.linter] Use linters</span><a class="self-link" href="#toolslinter-use-linters"></a></h4>
-   <p>Example: clang-tidy</p>
-   <p>TODO (why?)</p>
+   <p>Example: <a href="http://clang.llvm.org/extra/clang-tidy/">Clang Tidy</a></p>
+   <p>Static analysis tools are extremely useful for finding certain types of
+bugs or other problems in code.
+Students should be introduced to at least some basic static analysis tools
+(such as linters, like Clang Tidy)
+in order to instill the basic principle of finding bugs early
+(i.e., at compile time).</p>
    <h4 class="heading settled" data-level="2.6.10" id="toolsruntimeanalysis-use-run-time-analysers-especially-when-teaching-free-store"><span class="secno">2.6.10. </span><span class="content">[tools.runtime.analysis] Use run-time analysers, especially when teaching free store</span><a class="self-link" href="#toolsruntimeanalysis-use-run-time-analysers-especially-when-teaching-free-store"></a></h4>
-   <p>Examples: <code class="highlight"><c- n>AddressSanitizer</c-></code>, <code class="highlight"><c- n>UndefinedBehaviorSanitizer</c-></code></p>
-   <p>Notes: WSL does not play nicely with asan, but a Docker image running inside WSL does.</p>
-   <p>TODO (why?)</p>
+   <p>Examples: <a href="https://github.com/google/sanitizers/wiki/AddressSanitizer">Address Sanitizer (ASan)</a>, <a href="https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html">Undefined Behavior Sanitizer (UBSan)</a></p>
+   <p>Dynamic analysis tools can greatly improve the rigor with which code can be
+tested and also help to isolate bugs more quickly.
+Student should be introduced to basic dynamic analysis tools (such as
+ASan and UBSan) as such tools will help the student to more easily
+find problems in their code and also perhaps teach them that code
+that appears to run correctly can still have serious bugs that can be
+caught by such tools.</p>
+   <p>Notes: WSL does not play nicely with ASan, but a Docker image running inside WSL does.</p>
    <h3 class="heading settled" data-level="2.7" id="appreciation-appreciation-for-c"><span class="secno">2.7. </span><span class="content">[appreciation] Appreciation for C++</span><a class="self-link" href="#appreciation-appreciation-for-c"></a></h3>
    <h4 class="heading settled" data-level="2.7.1" id="appreciationhistory-history"><span class="secno">2.7.1. </span><span class="content">[appreciation.history] History</span><a class="self-link" href="#appreciationhistory-history"></a></h4>
    <p>Do not introduce historical aspects of C++ in the forefront of C++ education. This includes:</p>

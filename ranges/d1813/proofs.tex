@@ -1,0 +1,72 @@
+\infannex{proof}{Proofs}
+\rSec1[proof.adjacent.difference]{Adjacent difference is the inverse of partial sum}
+\rSec2[proof.adjacent.difference.defn]{Defining adjacent difference}
+
+Let $(S, +)$ model a loop for some set $S$, where $+$ denotes an arbitrary operation, and $-$
+denotes its inverse. Let $\mathbf{in}$ be an ordered sequence of elements of the set $S$. There
+exists a function $d: ([S], \mathbb{Z}^+) \rightarrow S$, such that:
+
+$$d(\mathbf{in}, k) =
+   \begin{cases}
+      \mathbf{in}_1 & \text{when } k = 1 \\
+      \mathbf{in}_k - \mathbf{in}_{k - 1} & \text{when } k > 1 \\
+   \end{cases}
+$$
+
+There also exists an ordered sequence $\mathbf{o}$, such that $$\mathbf{o}_n = d(\mathbf{in}, n).$$
+We define $\mathbf{o}$ as the \textit{adjacent difference} of $\mathbf{in}$.
+
+\rSec2[proof.adjacent.difference.theorem]{Theorem}
+
+Suppose that $\mathbf{a}$ is an ordered sequence of elements of the set $S$, and that $\mathbf{s}$
+is its partial sum, with respect to $+$. The ajdacent difference of $\mathbf{p}$ is equivalent to
+$\textbf{a}$; that is, for all ordered sequences of length $n$, the adjacent difference of a partial
+sum of an ordered sequence yields identity.
+
+\rSec2[proof.adjacent.difference.proof]{Proof}
+
+\begin{tabular}{lll}
+   \textbf{Case} $n = 0$: & Since $\mathbf{s}_0$ and $\mathbf{o}_0$ are not defined, the proof is
+                           trivial.\\
+   \textbf{Case} $n = 1$: & $\textbf{s}_1 = \mathbf{a}_1$ and $\mathbf{o}_1 = d(\mathbf{s}, 1) =
+                           \mathbf{a}_1$, so the proof is trivial.\\
+   \textbf{Case} $n > 1$: & \\
+\end{tabular}
+\begin{align}
+   \mathbf{s}_n &= \mathbf{a}_1 + \mathbf{a}_2 + ... + \mathbf{a}_n\\
+   \mathbf{o} &= [d(\mathbf{s}_1), d(\mathbf{s}_2), ..., d(\mathbf{s}_n)]\\
+              &= [\mathbf{a}_1,
+                  (\mathbf{a}_1 + \mathbf{a}_2) - \mathbf{a}_1,
+                  ...,
+                  (\mathbf{a}_1 + \mathbf{a}_2 + ... + \mathbf{a}_n) -
+                     (\mathbf{a}_1 + \mathbf{a}_2 + ... + \mathbf{a}_{n - 1})]\\
+              &= [\mathbf{a}_1, \mathbf{a}_2, ..., \mathbf{a}_n]\\
+              &= \mathbf{a}.
+\end{align}
+
+Given that the theorem is true for $n = 0$, $n = 1$, and $n > 1$, the theorem is true for all
+natural numbers $n$.
+
+\rSec1[proof.identity]{Proof for uniqueness of a two-sided identity element}
+
+Let $(S, \cdot)$ be a magma. If there exist elements $l, r$ in $S$, where for all other elements $x$
+in $S$, $l \cdot x = x$ and $x \cdot r = x$, then $l = r$.
+
+\rSec2[proof.identity.proof]{Proof (by contradiction)}
+
+Let us first suppose that $l$ and $r$ are distinct. Then, $l \cdot r = r$, since $l$ is a
+left-identity. But $l \cdot r = l$, since $r$ is a right-identity. This is a contradiction.
+
+Therefore, $l = r$, and the proof is complete.
+
+\rSec1[proof.zero]{Proof for uniqueness of a two-sided zero element}
+
+Let $(S, \cdot)$ be a magma. If there exist elements $l, r$ in $S$, where for all other elements $x$
+in $S$, $l \cdot x = l$ and $x \cdot r = r$, then $l = r$.
+
+\rSec2[proof.identity.proof]{Proof (by contradiction)}
+
+Let us first suppose that $l$ and $r$ are distinct. Then, $l \cdot r = l$, since $l$ is a
+left-zero. But $l \cdot r = r$, since $r$ is a right-zero. This is a contradiction.
+
+Therefore, $l = r$, and the proof is complete.
