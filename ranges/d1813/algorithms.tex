@@ -112,7 +112,7 @@ produce a single result: \tcode{T\{\}}. The reasons for why this is not desirabl
 
 By instead choosing an appropriate way to represent an operation's identity element,
 \tcode{accumulate(r, bop, proj)} becomes a viable candidate to add to our overload set. An
-\textit{identity element} $id$ is an element in aset $S$, where $x \cdot id$ is equivalent to $x$,
+\textit{identity element} $id$ is an element in a set $S$, where $x \cdot id$ is equivalent to $x$,
 or $id \cdot x$ is equivalent to $x$. $x \cdot id$ is called a \textit{right-identity}, because $id$
 is on the right-hand-side of $x$, and $id \cdot x$ is called a \textit{left-identity}. When $id$ is
 both a left-identity and a right-identity, we call it a \textit{two-sided identity} (mathematicians
@@ -169,7 +169,7 @@ $k$th evaluation of \tcode{accumulate} to an output range. The interface is extr
 that of \tcode{accumulate}.
 
 \begin{codeblock}
-template<input_iterator I, sentinel_for<I> S1, weakly_incrementalbe O, sentinel_for<O> S2,
+template<input_iterator I, sentinel_for<I> S1, weakly_incrementable O, sentinel_for<O> S2,
          class Proj = identity,
          indirect_magma<projected<I, Proj>, projected<I, Proj>, O> BOp = ranges::plus>
   requires indirectly_copyable_storable<I, O>
@@ -195,7 +195,7 @@ a cache\cxxiref{alg.req.ind.copy}.
    The above paragraph is poorly worded. Input on how to rephrase is appreciated.
 }
 
-To minimise the likelidhood of writing to an beyond an output range that is smaller than the input
+To minimise the likelihood of writing to a beyond an output range that is smaller than the input
 range, both overloads have been slightly altered to take two full ranges instead of a
 range-and-a-half. The range-and-a-half overloads can be emulated using \tcode{unreachable_t}.
 
@@ -206,7 +206,7 @@ to compute the inverse of a \tcode{partial_sum} \iref{proof.adjacent.difference}
 interesting properties about \tcode{adjacent_difference}'s requirements, as shown below.
 
 \begin{itemdecl}
-template<input_iterator I, sentinel_for<I> S1, weakly_incrementalbe O, sentinel_for<O> S2,
+template<input_iterator I, sentinel_for<I> S1, weakly_incrementable O, sentinel_for<O> S2,
          class Proj = identity,
          indirect_loop<projected<I, Proj>, projected<I, Proj>, O> BOp = ranges::minus>
   requires requires indirectly_copyable_storable<I, O>

@@ -73,7 +73,7 @@ The following quote has also been extracted from N3351.
 The ways in which requirements are specified has a direct impact on the design of the concepts
 used to express them, and (as always) there are direct consequences of that choice. For example,
 we could choose to state template requirements in terms of the exact syntax requirements of the
-template. This leads to concept designs that have large numbers of small yntactic predicates (e.g.
+template. This leads to concept designs that have large numbers of small syntactic predicates (e.g.
 \tcode{HasPlus}, \tcode{HasComma}, etc.). The benefit of this style of constraint is that templates
 are more broadly adaptable: there are potentially more conforming types with which the template will
 interoperate. On the downside, exact requirements tend to be more verbose, decreasing the
@@ -123,3 +123,8 @@ in this document have slightly diverged, but not to the point where the author i
 design has become un-implementable.
 
 The author also hopes to implement this in range-v3 for broader coverage.
+
+\rSec1[intro.acknowledgements]{Acknowledgements}
+The author would like to thank Andrew Sutton, Ben Deane, and Steve Downey reviewing this document, and
+providing valuable feedback. The author would also like to thank Arien Judge for reviewing the proofs
+in \ref{proof}.

@@ -39,78 +39,72 @@ If both $x \cdot id = x$ and $id \cdot x = x$ hold, then $id$ is unique (\ref{pr
 
 \begin{itemdecl}
 namespace std {
-  template<class BOp, class T, class U = T>
-  requires magma<BOp, T, U>
+  template<class BOp>
   struct left_identity {};
 
-  template<class BOp, class T, class U>
-  left_identity(BOp&&, T&&, U&&)
-    -> left_identity<remove_cvref_t<BOp>, remove_cvref_t<T>, remove_cvref_t<U>>;
-
   template<class BOp, class T, class U = T>
-  using left_identity_t = decltype(declval<left_identity<BOp, T, U>>()());
+  using left_identity_t = decltype(left_identity<BOp>{}(declval<T&>(), declval<U&>()));
 }
 \end{itemdecl}
 \begin{itemdescr}
    \pnum
-   Specialisation of \tcode{left_identity}'s first parameter is permitted, but specialising the
-   latter two parameters is ill-formed, no diagnostic required. All specialisations must take the
-   form:
-
-   \begin{codeblock}
+   A program may specialise \tcode{left_identity}, as described in the example below. No diagnostic is
+   required for specialisations that do not follow this implementation.
+\begin{example}
+\begin{codeblock}
 struct binary_op {
   int operator()(int, int) const;
 };
 
 namespace std {
-  template<class T, class U>
-  requires magma<binary_op, T, U>
-  struct left_identity<binary_op, T, U> {
-    constexpr explicit left_identity(const binary_op&, const T&, const U&) {}
-    constexpr common_type_t<T, U> operator()() const { /* implementation-defined */ }
+  template<>
+  struct left_identity<binary_op> {
+    template<class T, class U>
+    requires magma<binary_op, T, U>
+    constexpr common_type_t<T, U> operator()(T&& t, U&& u) const
+    { /* implementation-defined */ }
   };
 }
-   \end{codeblock}
+\end{codeblock}
+\end{example}
+
 \end{itemdescr}
 
 \rSec3[support.traits.identity.right]{Right identity}
 
+\pnum
 \tcode{right_identity} is a type that represents the notion of a \textit{right-identity}.
 
 \begin{itemdecl}
 namespace std {
-  template<class BOp, class T, class U = T>
-  requires magma<BOp, T, U>
+  template<class BOp>
   struct right_identity {};
 
-  template<class BOp, class T, class U>
-  right_identity(BOp&&, T&&, U&&)
-    -> right_identity<remove_cvref_t<BOp>, remove_cvref_t<T>, remove_cvref_t<U>>;
-
   template<class BOp, class T, class U = T>
-  using right_identity_t = decltype(declval<right_identity<BOp, T, U>>()());
+  using right_identity_t = decltype(right_identity<BOp>{}(declval<T&>(), declval<U&>()));
 }
 \end{itemdecl}
 \begin{itemdescr}
    \pnum
-   Specialisation of \tcode{right_identity}'s first parameter is permitted, but specialising the
-   latter two parameters is ill-formed, no diagnostic required. All specialisations must take the
-   form:
-
-   \begin{codeblock}
+   A program may specialise \tcode{right_identity}, as described in the example below. No diagnostic
+   is required for specialisations that do not follow this implementation.
+\begin{example}
+\begin{codeblock}
 struct binary_op {
   int operator()(int, int) const;
 };
 
 namespace std {
-  template<class T, class U>
-  requires magma<binary_op, T, U>
-  struct right_identity<binary_op, T, U> {
-    constexpr explicit right_identity(const binary_op&, const T&, const U&) {}
-    constexpr common_type_t<T, U> operator()() const { /* implementation-defined */ }
+  template<>
+  struct right_identity<binary_op> {
+    template<class T, class U>
+    requires magma<binary_op, T, U>
+    constexpr common_type_t<T, U> operator()(T&& t, U&& u) const
+    { /* implementation-defined */ }
   };
 }
-   \end{codeblock}
+\end{codeblock}
+\end{example}
 \end{itemdescr}
 
 \rSec3[support.traits.identity.two.sided]{Two-sided identity}
@@ -124,38 +118,31 @@ namespace std {
   concept @\placeholder{has-two-sided-identity}@ = // \expos
     requires(BOp bop, const T& t, const U& u) {
        typename left_identity_t<BOp, T, U>;
-       typename left_identity_t<BOp, U, T>;
        typename right_identity_t<BOp, T, U>;
-       typename right_identity_t<BOp, U, T>;
-
-       requires same_as<left_identity_t<BOp, T, U>, left_identity_t<BOp, U, T>>;
-       requires same_as<right_identity_t<BOp, T, U>, right_identity_t<BOp, U, T>>;
        requires same_as<left_identity_t<BOp, T, U>, right_identity_t<BOp, T, U>>;
     };
 }
 \end{itemdecl}
 \begin{itemdescr}
    \pnum
-   Let \tcode{left1} be an object of type \tcode{left_identity<BOp, T, U>}, \tcode{left2} be an
-   object of type \tcode{left_identity<BOp, U, T>}, \tcode{right1} be an object of type
-   \tcode{right_identity<BOp, T, U>}, and \tcode{right2} be an object of type
-   \tcode{right_identity<BOp, U, T>}.
+   Let \tcode{left} be an object of type \tcode{left_identity<BOp>}, and \tcode{right} be an object of
+   type \tcode{right_identity<BOp>}.
 
    \pnum
-   The expressions \tcode{left1() == left2()}, \tcode{right1() == right2()}, and
-   \tcode{left1() == right1()} are all \tcode{true}.
+   The expressions \tcode{left(t, u) == left(u, t)}, \tcode{right(t, u) == right(u, t)}, and
+   \tcode{left(t, u) == right(u, t)} are all \tcode{true}.
 
    \pnum
-   If \tcode{t != left1()} is \tcode{true} and \tcode{u != right1()} is
-   \tcode{true}, then the expressions \tcode{t == invoke(bop, t, right())} and
-   \tcode{u == invoke(bop, left(), u)} are both \tcode{true}.
+   If \tcode{t != left(t, u)} is \tcode{true} and \tcode{u != right(t, u)} is \tcode{true}, then the
+   expressions \tcode{u == invoke(bop, left(t, u), u)} and \tcode{t == invoke(bop, t, right(t, u))}
+   are both \tcode{true}.
 \end{itemdescr}
 
 \begin{itemdecl}
   struct two_sided_identity {
      template<class T, class U, magma<T, U> BOp>
      requires @\placeholder{has-two-sided-identity}@<BOp, T, U>
-     constexpr auto operator()(BOp bop, const T& t, const U& u) const;
+     constexpr auto operator()(BOp bop, T&& t, U&& u) const;
   };
 
   template<class BOp, class T, class U>
@@ -166,16 +153,16 @@ namespace std {
 \begin{itemdecl}
 template<class T, class U, magma<T, U> BOp>
 requires @\placeholder{has-two-sided-identity}@<BOp, T, U>
-constexpr auto operator()(BOp bop, const T& t, const U& u) const;
+constexpr auto operator()(BOp bop, T&& t, U&& u) const;
 \end{itemdecl}
 \begin{itemdescr}
    \pnum
-   \expects \tcode{left_identity\{bop, t, u\}() == right_identity\{bop, t, u\}()} is \tcode{true}.
+   \expects \tcode{left_identity<BOp>{}(t, u) == right_identity<BOp>(t, u)} is \tcode{true}.
 
    \pnum
    \effects Equivalent to:
    \begin{codeblock}
-      return static_cast<std::common_type_t<T, U>>(left_identity{bop, t, u}());}
+      return left_identity<BOp>(std::forward<T>(t), std::forward<U>(u));}
    \end{codeblock}
 \end{itemdescr}
 
@@ -195,78 +182,72 @@ If both $x \cdot z = z$ and $z \cdot x = z$ hold, then $z$ is unique (\ref{proof
 
 \begin{itemdecl}
 namespace std {
-  template<class BOp, class T, class U = T>
-  requires magma<BOp, T, U>
+  template<class BOp>
   struct left_zero {};
 
-  template<class BOp, class T, class U>
-  left_zero(BOp&&, T&&, U&&)
-    -> left_zero<remove_cvref_t<BOp>, remove_cvref_t<T>, remove_cvref_t<U>>;
-
   template<class BOp, class T, class U = T>
-  using left_zero_t = decltype(declval<left_zero<BOp, T, U>>()());
+  using left_zero_t = decltype(left_zero<BOp>{}(declval<T&>(), declval<U&>()));
 }
 \end{itemdecl}
 \begin{itemdescr}
    \pnum
-   Specialisation of \tcode{left_zero}'s first parameter is permitted, but specialising the
-   latter two parameters is ill-formed, no diagnostic required. All specialisations must take the
-   form:
-
-   \begin{codeblock}
+   A program may specialise \tcode{left_zero}, as described in the example below. No diagnostic is
+   required for specialisations that do not follow this implementation.
+\begin{example}
+\begin{codeblock}
 struct binary_op {
   int operator()(int, int) const;
 };
 
 namespace std {
-  template<class T, class U>
-  requires magma<binary_op, T, U>
-  struct left_zero<binary_op, T, U> {
-    constexpr explicit left_zero(const binary_op&, const T&, const U&) {}
-    constexpr common_type_t<T, U> operator()() const { /* implementation-defined */ }
+  template<>
+  struct left_zero<binary_op> {
+    template<class T, class U>
+    requires magma<binary_op, T, U>
+    constexpr common_type_t<T, U> operator()(T&& t, U&& u) const
+    { /* implementation-defined */ }
   };
 }
-   \end{codeblock}
+\end{codeblock}
+\end{example}
+
 \end{itemdescr}
 
 \rSec3[support.traits.zero.right]{Right zero}
 
+\pnum
 \tcode{right_zero} is a type that represents the notion of a \textit{right-zero}.
 
 \begin{itemdecl}
 namespace std {
-  template<class BOp, class T, class U = T>
-  requires magma<BOp, T, U>
+  template<class BOp>
   struct right_zero {};
 
-  template<class BOp, class T, class U>
-  right_zero(BOp&&, T&&, U&&)
-    -> right_zero<remove_cvref_t<BOp>, remove_cvref_t<T>, remove_cvref_t<U>>;
-
   template<class BOp, class T, class U = T>
-  using right_zero_t = decltype(declval<right_zero<BOp, T, U>>()());
+  using right_zero_t = decltype(right_zero<BOp>{}(declval<T&>(), declval<U&>()));
 }
 \end{itemdecl}
 \begin{itemdescr}
    \pnum
-   Specialisation of \tcode{right_zero}'s first parameter is permitted, but specialising the
-   latter two parameters is ill-formed, no diagnostic required. All specialisations must take the
-   form:
-
-   \begin{codeblock}
+   A program may specialise \tcode{right_zero}, as described in the example below. No diagnostic
+   is required for specialisations that do not follow this implementation.
+\begin{example}
+\begin{codeblock}
 struct binary_op {
   int operator()(int, int) const;
 };
 
 namespace std {
-  template<class T, class U>
-  requires magma<binary_op, T, U>
-  struct right_zero<binary_op, T, U> {
-    constexpr explicit right_zero(const binary_op&, const T&, const U&) {}
-    constexpr common_type_t<T, U> operator()() const { /* implementation-defined */ }
+  template<>
+  struct right_zero<binary_op> {
+    template<class T, class U>
+    requires magma<binary_op, T, U>
+    constexpr common_type_t<T, U> operator()(T&& t, U&& u) const
+    { /* implementation-defined */ }
   };
 }
-   \end{codeblock}
+\end{codeblock}
+\end{example}
 \end{itemdescr}
 
 \rSec3[support.traits.zero.two.sided]{Two-sided zero}
@@ -280,38 +261,31 @@ namespace std {
   concept @\placeholder{has-two-sided-zero}@ = // \expos
     requires(BOp bop, const T& t, const U& u) {
        typename left_zero_t<BOp, T, U>;
-       typename left_zero_t<BOp, U, T>;
        typename right_zero_t<BOp, T, U>;
-       typename right_zero_t<BOp, U, T>;
-
-       requires same_as<left_zero_t<BOp, T, U>, left_zero_t<BOp, U, T>>;
-       requires same_as<right_zero_t<BOp, T, U>, right_zero_t<BOp, U, T>>;
        requires same_as<left_zero_t<BOp, T, U>, right_zero_t<BOp, T, U>>;
     };
 }
 \end{itemdecl}
 \begin{itemdescr}
    \pnum
-   Let \tcode{left1} be an object of type \tcode{left_zero<BOp, T, U>}, \tcode{left2} be an
-   object of type \tcode{left_zero<BOp, U, T>}, \tcode{right1} be an object of type
-   \tcode{right_zero<BOp, T, U>}, and \tcode{right2} be an object of type
-   \tcode{right_zero<BOp, U, T>}.
+   Let \tcode{left} be an object of type \tcode{left_zero<BOp>}, and \tcode{right} be an object of
+   type \tcode{right_zero<BOp>}.
 
    \pnum
-   The expressions \tcode{left1() == left2()}, \tcode{right1() == right2()}, and
-   \tcode{left1() == right1()} are all \tcode{true}.
+   The expressions \tcode{left(t, u) == left(u, t)}, \tcode{right(t, u) == right(u, t)}, and
+   \tcode{left(t, u) == right(u, t)} are all \tcode{true}.
 
    \pnum
-   If \tcode{t != left1()} is \tcode{true} and \tcode{u != right1()} is
-   \tcode{true}, then the expressions \tcode{right1() == invoke(bop, t, right1())} and
-   \tcode{left1() == invoke(bop, left1(), u)} are both \tcode{true}.
+   If \tcode{t != left(t, u)} is \tcode{true} and \tcode{u != right(t, u)} is \tcode{true}, then the
+   expressions \tcode{left(t, u) == invoke(bop, left(t, u), u)} and
+   \tcode{right(t, u) == invoke(bop, t, right(t, u))} are both \tcode{true}.
 \end{itemdescr}
 
 \begin{itemdecl}
   struct two_sided_zero {
      template<class T, class U, magma<T, U> BOp>
      requires @\placeholder{has-two-sided-zero}@<BOp, T, U>
-     constexpr auto operator()(BOp bop, const T& t, const U& u) const;
+     constexpr auto operator()(BOp bop, T&& t, U&& u) const;
   };
 
   template<class BOp, class T, class U>
@@ -322,16 +296,16 @@ namespace std {
 \begin{itemdecl}
 template<class T, class U, magma<T, U> BOp>
 requires @\placeholder{has-two-sided-zero}@<BOp, T, U>
-constexpr auto operator()(BOp bop, const T& t, const U& u) const;
+constexpr auto operator()(BOp bop, T&& t, U&& u) const;
 \end{itemdecl}
 \begin{itemdescr}
    \pnum
-   \expects \tcode{left_zero\{bop, t, u\}() == right_zero\{bop, t, u\}()} is \tcode{true}.
+   \expects \tcode{left_zero<BOp>{}(t, u) == right_zero<BOp>(t, u)} is \tcode{true}.
 
    \pnum
    \effects Equivalent to:
    \begin{codeblock}
-      return static_cast<std::common_type_t<T, U>>(left_zero{bop, t, u}());}
+      return left_zero<BOp>(std::forward<T>(t), std::forward<U>(u));}
    \end{codeblock}
 \end{itemdescr}
 
@@ -356,7 +330,7 @@ domain, where the returned object is the mathematical inverse operation of the i
 struct plus;
 struct minus;
 
-namesapce std {
+namespace std {
   template<>
   struct inverse_traits<plus> {
      using type = minus;
@@ -604,7 +578,7 @@ two-sided identity element.
 
 \begin{itemdecl}
   template<class BOp, class T, class U>
-  concept monoid = quasigroup<BOp, T, U> && requires {
+  concept loop = quasigroup<BOp, T, U> && requires {
     typename two_sided_identity_t<BOp, remove_cvref_t<T>, remove_cvref_t<U>>;
   };
 \end{itemdecl}
@@ -1072,23 +1046,19 @@ namespace std::ranges {
     { return U{1}; }
   };
 
-  template<class T, class U>
-  requires magma<times, T, U>
-  struct left_zero<times, T, U> {
-    constexpr explicit left_zero(const times&, const T&, const U&)
-    {}
-
-    constexpr auto operator()() const
+  template<>
+  struct left_zero<times> {
+    template<class T, class U>
+    requires magma<times, T, U>
+    constexpr common_type_t<T, U> operator()() const
     { return T{}; }
   };
 
-  template<class T, class U>
-  requires magma<times, T, U>
-  struct right_zero<times, T, U> {
-    constexpr explicit right_zero(const times&, const T&, const U&)
-    {}
-
-    constexpr auto operator()() const
+  template<>
+  struct right_zero<times> {
+    template<class T, class U>
+    requires magma<times, T, U>
+    constexpr common_type_t<T, U> operator()() const
     { return U{}; }
   };
 
