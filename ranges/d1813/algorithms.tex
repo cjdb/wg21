@@ -7,7 +7,7 @@ completely, and readably. If we can specify algorithms well, our concepts and th
 mechanisms we use to specify the concepts are adequate. If not, no amount of sophistication in
 language mechanisms will help us.''
 \begin{flushright}
-\textemdash \textit{N3351, §2}
+\textemdash \textit{N3351, \S{}2}
 \end{flushright}
 \end{quote}
 
@@ -68,11 +68,11 @@ as \tcode{bop(bop(x, y), z)}, and \tcode{bop(x, y)} does not need to return the 
 
 \tcode{accumulate} is an algorithm that performs a fold operation, or in other words, takes a
 sequence of values and reduces them into a single value according to some operation. This is a
-generalisation of a summation.  The algorithm -- modelled after what's currently in the
-International Standard -- has a fairly straightforward declaration.
+generalisation of a summation.  The algorithm --- modelled after what's currently in the
+International Standard --- has a fairly straightforward declaration.
 
 \begin{itemdecl}
-template<input_iterator I, sentinel_for<I>, movable T, class Proj = identity,
+template<input_iterator I, sentinel_for<I> S, movable T, class Proj = identity,
          indirect_magma<const T*, projected<I, Proj>, T*> BOp = ranges::plus>
 constexpr accumulate_result<I, T>
   accumulate(I first, S last, T init, BOp bop = {}, Proj proj = {});
@@ -101,22 +101,24 @@ match.
 \end{itemdescr}
 
 It might also be nice to use \tcode{accumulate} without an initial value, similarly to \Cpp{}17's
-\tcode{std::reduce}. It would certainly be convenient to use \tcode{accumulate(r)} or even
-\tcode{accumulate(r, ranges::times\{\})}, where \tcode{r} is an arbitrary range, and
+\tcode{std::reduce}\cxxiref{reduce}. It would certainly be convenient to use \tcode{accumulate(r)} or
+even \tcode{accumulate(r, ranges::times\{\})}, where \tcode{r} is an arbitrary range, and
 \tcode{ranges::times} is a modernisation of \tcode{std::multiplies}. The former is fairly trivial
 to do: we can default \tcode{init = T\{\}} and call it a day, just as \tcode{std::reduce} has, but
 the author feels that this is lacking. An \textit{ideal} \tcode{init}-less \tcode{accumulate} should
 permit the caller to specify a range, optionally an operation, and optionally a projection. This
 requires great care, because \tcode{accumulate(r, times\{\})} when \tcode{init = T\{\}} would always
-produce a single result: \tcode{T\{\}}. The reasons for why this is not desirable should be obvious.
+produce a single result: \tcode{T\{\}} (recall that \tcode{T\{\}} is equivalent to zero for
+fundamental types). The reasons for why this is not desirable should be obvious.
 
 By instead choosing an appropriate way to represent an operation's identity element,
 \tcode{accumulate(r, bop, proj)} becomes a viable candidate to add to our overload set. An
 \textit{identity element} $id$ is an element in a set $S$, where $x \cdot id$ is equivalent to $x$,
 or $id \cdot x$ is equivalent to $x$. $x \cdot id$ is called a \textit{right-identity}, because $id$
 is on the right-hand-side of $x$, and $id \cdot x$ is called a \textit{left-identity}. When $id$ is
-both a left-identity and a right-identity, we call it a \textit{two-sided identity} (mathematicians
-should note that \tcode{std::identity} is a function object\cxxiref{func.identity}).
+both a left-identity and a right-identity, we call it a
+\textit{two-sided identity}\cite{wikipedia_identity} (mathematicians should note that
+\tcode{std::identity} is a function object\cxxiref{func.identity}).
 
 \pnum
 \begin{example}
@@ -240,9 +242,9 @@ constexpr adjacent_difference_result<safe_iterator_t<R>, safe_iterator_t<O>>
          requires its binary operation model
          \tcode{invocable}\cxxiref{concept.invocable}\cxxiref{indirectcallable.indirectinvocable}.
       \item[Varying implementation]
-         \tcode{transform} applies its operands in the order of left-to-right, à la
+         \tcode{transform} applies its operands in the order of left-to-right, \`{a} la
          \tcode{op(*first1, *first2)}, while \tcode{adjacent_difference} applies its operands in the
-         \textit{opposite} order, à la \tcode{bop(prev, *first)}.
+         \textit{opposite} order, \`{a} la \tcode{bop(prev, *first)}.
    \end{description}
 \end{itemdescr}
 
@@ -282,7 +284,7 @@ constexpr inner_product_result<safe_iterator_t<R1>, safe_iterator_t<R2>, T>
    A \tcode{weak_magmaring} is an extreme generalisation of the well-known semiring algebraic
    structure that establishes a relationship between two magmas. Specifically, it describes that a
    magma \tcode{BOp2} is \textit{distributive} over \tcode{BOp1}. Given three objects of possibly
-   distinct -- but related -- types, \tcode{x}, \tcode{y}, and \tcode{z}, the expression
+   distinct --- but related --- types, \tcode{x}, \tcode{y}, and \tcode{z}, the expression
    \tcode{bop2(x, bop1(y, z))} is equivalent to \tcode{bop1(bop2(x, y), bop2(x, z))}.
 
    \pnum
@@ -316,8 +318,8 @@ auto words_to_ints = [](string_view const word) -> int {
 auto const data1 = vector{"one"s, "two"s, "three"s, "four"s, "five"s};
 auto const data2 = vector{"six"s, "seven"s, "eigth"s, "nine"s, "ten"s};
 return inner_product(data1, data2, 0, ranges::plus{}, words_to_ints);
-// error: words_to_ints doesn't model magma<string, string>, since
-//        common<invoke_result_t<words_to_ints, string, string>, int> is false.
+// error: \tcode{words_to_ints} doesn't model \tcode{magma<string, string>}, since
+//        \tcode{common_with<invoke_result_t<words_to_ints, string, string>, int>} is false.
 \end{codeblock}
 
 A user that wants to perform this operation should instead use the following:
@@ -377,7 +379,7 @@ the set, the result of the operation is the annihliating element. It is the comp
 identity element.
 
 \begin{example}
-   For example, scalar multiplication's annihilating element is $0$: $0x = 0$ and $x0 = 0$.
+   Scalar multiplication's annihilating element is $0$: $0x = 0$ and $x0 = 0$.
 \end{example}
 
 Semigroup theory refers to annihilating elements as the \textit{zero element}, as there is only one
@@ -418,7 +420,7 @@ their operations be both associative and commutative.
 similar to that of \tcode{accumulate}, except for the refinements introduced by this section.
 
 \begin{codeblock}
-template<input_iterator I, sentinel_for<I>, movable T, class Proj = identity,
+template<input_iterator I, sentinel_for<I> S, movable T, class Proj = identity,
          indirect_commutative_semigroup<const T*, projected<I, Proj>, T*> BOp = ranges::plus>
 constexpr reduce_result<I, T>
   reduce(I first, S last, T init, BOp bop = {}, Proj proj = {});

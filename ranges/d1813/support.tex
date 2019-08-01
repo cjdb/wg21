@@ -374,7 +374,7 @@ namespace std {
 \rSec1[support.concepts]{Algebraic concepts}
 
 This section describes the concepts required by the numeric algorithms, and are not included in the
-\Cpp standard library.
+\Cpp{}20 standard library.
 
 \rSec2[support.concepts.commutative.op]{Concept commutative operation}
 
@@ -428,9 +428,7 @@ A \textit{magma} is a set $S$ associated with a binary operation $\cdot$, such t
 
 \reviewernote{
    The term \textit{semigroupoid} is an older name for the notion of a magma, but this seems to have
-   been co-opted by category theory. An less attractive alternative to \tcode{magma} is
-   \tcode{closed_operation}, but the author does not recommend this name (it probably conveys as
-   much information to non-mathematicians as \tcode{magma}).
+   been co-opted by category theory.
 }
 
 \begin{itemdecl}
@@ -466,8 +464,8 @@ should not model \tcode{magma<int, vector<int{>}>}.
 
 \reviewernote{
   This implies that the author is not a fan of $+$ as a way of concatenating strings. It's not
-  ideal, but since this is already a standard practice, the author has chosen not to -- probably
-  fruitlessly -- wage war on this specific case.
+  ideal, but since this is already a standard practice, the author has chosen not to --- probably
+  fruitlessly --- wage war on this specific case.
 }
 
 Similarly, if the result type is not related to its parameters, the operation lacks the ability to
@@ -780,10 +778,10 @@ Just as the P0896 redesigned the comparison function objects, P1813 seeks to red
 operation function objects. This will allow us to:
 
 \begin{itemize}
-   \item Forget about -- and hopefully -- one day eliminate the arithmetic function objects in
+   \item Forget about --- and hopefully --- one day eliminate the arithmetic function objects in
          namespace \tcode{std}.
    \item Apply requirements to each operation to ensure that they're semantically sound (what does
-         it `mean' to evaluate \tcode{1 + vector\{1, 2, 3\}}?)
+         it `mean' to evaluate \tcode{1 + vector\{1, 2, 3\}}?).
 \end{itemize}
 
 \rSec2[support.arithmetic.plus]{Plus}
@@ -805,10 +803,16 @@ namespace std::ranges {
     };
 }
 \end{itemdecl}
+\begin{itemdescr}
+  \pnum
+  The expression \tcode{t + u} is expression-equivalent to \tcode{u + t}.
+
+  \pnum
+  The expressions \tcode{t + T\{\} == t}, \tcode{u + T\{\} == common_type_t<T, U>\{\}}, and
+  \tcode{t + U\{\} == common\_type\_t<T, U>\{\}} are all \tcode{true}.
+\end{itemdescr}
 \reviewernote{
-   This is not the same as the dreaded \tcode{has_plus}; it's more of a \tcode{has_plus+}. There
-   should also probably be some axioms, but the author hasn't yet figured out how to describe them.
-   (All other arithmetic function objects have explicit axioms.)
+   This is not the same as the dreaded \tcode{has_plus}; it's more of a \tcode{has_plus+}.
 }
 
 \begin{itemdecl}
@@ -821,31 +825,25 @@ namespace std::ranges {
     using is_transparent = std::true_type;
   };
 
-  template<class T, class U>
-  requires magma<ranges::plus, T, U>
-  struct left_identity<ranges::plus, T, U> {
-    constexpr explicit left_identity(ranges::plus, const T&, const U&)
-    {}
-
-    constexpr common_type_t<T, U> operator()() const
-    { return T{}; }
+  template<>
+  requires magma<ranges::plus>
+  struct left_identity<ranges::plus> {
+    template<class T, class U>
+    requires magma<ranges::plus, T, U>
+    constexpr common_type_t<T, U> operator()(T&&, U&&) const { return T{}; }
   };
 
-  template<class T, class U>
-  requires magma<ranges::plus, T, U>
-  struct right_identity<ranges::plus, T, U> {
-    constexpr explicit right_identity(ranges::plus, const T&, const U&)
-    {}
-
-    constexpr common_type_t<T, U> operator()() const
-    { return U{}; }
+  template<>
+  struct right_identity<ranges::plus> {
+    template<class T, class U>
+    requires magma<ranges::plus, T, U>
+    constexpr common_type_t<T, U> operator()(const T&, const U&) const { return U{}; }
   };
 
   template<>
   struct inverse_traits {
     using type = minus;
-    constexpr type operator()() const noexcept
-    { return type{}; }
+    constexpr type operator()() const noexcept { return type{}; }
   };
 }
 \end{itemdecl}
@@ -856,19 +854,38 @@ namespace std::ranges {
 namespace std::ranges {
   template<class T>
   concept @\placeholder{negatable}@ = // \expos
+    @\placeholder{summable-with}@<T, T> &&
+    totally_ordered<T> &&
     requires(T&& t) {
       { -std::forward<T>(t) } -> common_with<T>;
     };
 \end{itemdecl}
 \begin{itemdescr}
    \pnum
-   Let \tcode{t} be an object of type \tcode{T}.
-
-   \pnum
-   The expression \tcode{-t != t} is \tcode{true}.
+   Let \tcode{t}, \tcode{t1}, and \tcode{t2} objects of type \tcode{T}.
 
    \pnum
    \tcode{-(-t)} is expression-equivalent to \tcode{t}.
+
+   \pnum
+   The expression \tcode{-t == t} is \tcode{true} if, and only if, \tcode{t == T\{\}} is also
+   \tcode{true}.
+
+   \pnum
+   The expression \tcode{-t < t} is \tcode{true} if, and only if, \tcode{T\{\} < t} is also
+   \tcode{true}.
+
+   \pnum
+   The expression \tcode{t + -t} is expression-equivalent to \tcode{T\{\}}.
+
+   \pnum
+   If \tcode{t1 < t2} is \tcode{true} and \tcode{T\{\} < t2} is \tcode{true}, then
+   \begin{itemize}
+      \item \tcode{t1 + -t2 < t1} is \tcode{true},
+      \item \tcode{t1 + -t2 > -t2} is \tcode{true},
+      \item \tcode{-t1 + t2 < t2} is \tcode{true}, and
+      \item \tcode{-t1 + t2 > t1} is \tcode{true}.
+   \end{itemize}
 \end{itemdescr}
 
 \begin{itemdecl}
@@ -889,10 +906,6 @@ namespace std::ranges {
    type \tcode{negate}.
 }
 
-\reviewernote{
-  Should a type that models \placeholder{negatable} also model \tcode{totally_ordered}?
-}
-
 \rSec2[support.arithmetic.minus]{Minus}
 
 \begin{itemdecl}
@@ -902,6 +915,7 @@ namespace std::ranges {
     @\placeholder{summable-with}@<T, U> &&
     @\placeholder{negatable}@<T> &&
     @\placeholder{negatable}@<U> &&
+    totally_ordered_with<T, U> &&
     requires(T&& t, U&& u) {
       { std::forward<T>(t) - std::forward<T>(t) } -> common_with<T>;
       { std::forward<U>(u) - std::forward<U>(u) } -> common_with<U>;
@@ -939,8 +953,7 @@ namespace std::ranges {
 \end{itemdescr}
 
 \reviewernote{
-  If \placeholder{negatable} is refined to require \tcode{totally_ordered}, it stands to reason that
-  \placeholder{differenceable-with} requires \tcode{totally_ordered_with}.
+  TODO: add semantics for subtraction and ordering.
 }
 
 \begin{itemdecl}
@@ -953,17 +966,15 @@ namespace std::ranges {
     using is_transparent = std::true_type;
   };
 
-  template<class T, class U>
-  requires magma<ranges::minus, T, U>
-  struct right_identity<ranges::minus, T, U> : private right_identity<ranges::plus, T, U> {
-    using right_identity<ranges::plus, T, U>::value;
+  template<>
+  struct right_identity<ranges::minus> : private right_identity<ranges::plus> {
+    using right_identity<ranges::plus>::operator();
   };
 
   template<>
   struct inverse_traits<minus> {
      using type = ranges::plus;
-     constexpr type operator()() const noexcept
-     { return type{}; }
+     constexpr type operator()() const noexcept { return type{}; }
   }
 }
 \end{itemdecl}
@@ -971,7 +982,7 @@ namespace std::ranges {
 \rSec2[support.arithmetic.times]{Times}
 
 \reviewernote{
-   The term \tcode{multiplies} is -- in the author's opinion -- not the best name, and so the author
+   The term \tcode{multiplies} is --- in the author's opinion --- not the best name, and so the author
    would like to take the opportunity of rename this function object so that one can more
    naturally describe the computation.\\
    \\
@@ -985,8 +996,8 @@ namespace std::ranges {
   template<class T, class U>
   concept @\placeholder{multiplicable-with}@ = // \expos
     @\placeholder{summable-with}@<T, U> &&
-    constructible_from<remove_cvref_t<T>, int> && // specifically T{0} and T{1}
-    constructible_from<remove_cvref_t<T>, int> && // specifically U{0} and U{1}
+    constructible_from<remove_cvref_t<T>, int> && // specifically T\{0\} and T\{1\}
+    constructible_from<remove_cvref_t<T>, int> && // specifically U\{0\} and U\{1\}
     common_reference_with<T, U> &&
     requires(T&& t, U&& u) {
       { std::forward<T>(t) * std::forward<T>(t) } -> common_with<T>;
@@ -994,7 +1005,7 @@ namespace std::ranges {
       { std::forward<T>(t) * std::forward<U>(u) } -> common_with<T>;
       { std::forward<U>(u) * std::forward<T>(t) } -> common_with<U>;
       requires same_as<decltype(std::forward<T>(t) * std::forward<U>(u)),
-                       decltype(std::forward<U>(u) * std::forward<T>(t))>;;
+                       decltype(std::forward<U>(u) * std::forward<T>(t))>;
     };
 \end{itemdecl}
 \begin{itemdescr}
@@ -1002,71 +1013,69 @@ namespace std::ranges {
    \tcode{T\{0\}} is equivalent to \tcode{T\{\}}, and \tcode{U\{0\}} is equivalent to \tcode{U\{\}}.
 
    \pnum
-   The expressions \tcode{t * T\{\} == T\{\}}, \tcode{u * U\{\} == U\{\}},
-   \tcode{t * U\{\} == U\{\}}, and \tcode{u * T\{\} == T\{\}} are all \tcode{true}.
+   The expressions
+   \begin{itemize}
+      \item \tcode{t * T\{\} == T\{\}},
+      \item \tcode{u * U\{\} == U\{\}},
+      \item \tcode{t * U\{\} == U\{\}}, and
+      \item \tcode{u * T\{\} == T\{\}}
+   \end{itemize}
+   are all \tcode{true}.
 
    \pnum
-   The expressions \tcode{t * T\{1\} == t}, \tcode{T\{1\} * t == t}, \tcode{u * U\{1\} == u},
-   \tcode{U\{1\} * u == u}, \tcode{u * T\{1\} == u}, \tcode{T\{1\} * u == u},
-   \tcode{t * U\{1\} == t}, and \tcode{U\{1\} * t == t} are all \tcode{true}.
-
-\reviewernote{
-   TODO: state that \tcode{t1 * t2} is equivalent to a summation of itself in a way that doesn't
-   unnecessarily restrict matrices and other mathematical objects.
-}
+   The expressions
+   \begin{itemize}
+      \item \tcode{t * T\{1\} == t},
+      \item \tcode{T\{1\} * t == t},
+      \item \tcode{u * U\{1\} == u},
+      \item \tcode{U\{1\} * u == u},
+      \item \tcode{u * T\{1\} == u},
+      \item \tcode{T\{1\} * u == u},
+      \item \tcode{t * U\{1\} == t}, and
+      \item \tcode{U\{1\} * t == t}
+   \end{itemize}
+   are all \tcode{true}.
 \end{itemdescr}
 
 \begin{itemdecl}
   struct times {
     template<class T, @\placeholder{multiplicable-with}@<T> U>
-    constexpr decltype(auto) operator()(T&& t, U&& u) const {
-      return std::forward<T>(t) * std::forward<U>(u);
-    }
+    constexpr decltype(auto) operator()(T&& t, U&& u) const
+    { return std::forward<T>(t) * std::forward<U>(u); }
 
     using is_transparent = std::true_type;
   };
 
-  template<class T, class U>
-  requires magma<times, T, U>
-  struct left_identity<times, T, U> {
-    constexpr explicit left_identity(const times&, const T&, const U&)
-    {}
-
-    constexpr auto operator()() const
-    { return T{1}; }
+  struct left_identity<times> {
+    template<class T, class U>
+    requires magma<times, T, U>
+    constexpr common_type_t<T, U> operator()(T&&, U&&) const { return T{1}; }
   };
 
-  template<class T, class U>
-  requires magma<times, T, U>
-  struct right_identity<times, T, U> {
-    constexpr explicit right_identity(const times&, const T&, const U&)
-    {}
-
-    constexpr auto operator()() const
-    { return U{1}; }
+  struct right_identity<times> {
+    template<class T, class U>
+    requires magma<times, T, U>
+    constexpr common_type_t<T, U> operator()(T&&, U&&) const { return U{1}; }
   };
 
   template<>
   struct left_zero<times> {
     template<class T, class U>
     requires magma<times, T, U>
-    constexpr common_type_t<T, U> operator()() const
-    { return T{}; }
+    constexpr common_type_t<T, U> operator()(T&&, U&&) const { return T{}; }
   };
 
   template<>
   struct right_zero<times> {
     template<class T, class U>
     requires magma<times, T, U>
-    constexpr common_type_t<T, U> operator()() const
-    { return U{}; }
+    constexpr common_type_t<T, U> operator()(T&&, U&&) const { return U{}; }
   };
 
   template<>
   struct inverse_traits<times> {
      using type = divided_by;
-     constexpr type operator()() const noexcept
-     { return type{}; }
+     constexpr type operator()() const noexcept { return type{}; }
   };
 }
 \end{itemdecl}
@@ -1117,38 +1126,29 @@ namespace std::ranges {
 
    \pnum
    The expressions \tcode{T\{\} / t2 == T\{\}}, \tcode{U\{\} / u2 == U\{\}},
-   \tcode{T\{\} / u2 == common_type_t<T, U>\{\}}, \tcode{U\{\} / t2 == common_type_t<T, U>\{\}} are
-   all \tcode{true}.
+   \tcode{T\{\} / u2 == common_type_t<T, U>\{\}}, and \tcode{U\{\} / t2 == common_type_t<T, U>\{\}}
+   are all \tcode{true}.
 
-\reviewernote{
-   TODO: insert requirement that specifies division is repeated subtraction.
-}
 \end{itemdescr}
 
 \begin{itemdecl}
   struct divided_by {
     template<class T, @\placeholder{divisible-with}@<T> U>
-    constexpr decltype(auto) operator()(T&& t, U&& u) const {
-      return std::forward<T>(t) / std::forward<U>(u);
-    }
+    constexpr decltype(auto) operator()(T&& t, U&& u) const
+    { return std::forward<T>(t) / std::forward<U>(u); }
   };
 
-  template<class T, class U>
-  requires magma<divided_by, T, U>
-  struct right_identity<divided_by, T, U> {
-    constexpr explicit right_identity(divided_by, const T&, const U&)
-    {}
-
-    constexpr auto value() const {
-      return U{1};
-    }
+  template<>
+  struct right_identity<divided_by> {
+    template<class T, class U>
+    requires magma<divided_by, T, U>
+    constexpr common_type_t<T, U> operator()(T&&, U&&) const { return U{1}; }
   };
 
   template<>
   struct inverse_traits<divided_by> {
     using type = times;
-    constexpr type operator()() const noexcept
-    { return type{}; }
+    constexpr type operator()() const noexcept { return type{}; }
   };
 }
 \end{itemdecl}
@@ -1181,19 +1181,15 @@ namespace std::ranges {
 \begin{itemdecl}
   struct modulus {
     template<class T, @\placeholder{modulo-with}@<T> U>
-    constexpr decltype(auto) operator()(T&& t, U&& u) const {
-      return std::forward<T>(t) % std::forward<U>(u);
-    }
+    constexpr decltype(auto) operator()(T&& t, U&& u) const
+    { return std::forward<T>(t) % std::forward<U>(u); }
   };
 
-  template<class T, class U>
-  requires magma<modulus, T, U>
-  struct left_zero<modulus, T, U> {
-    constexpr explicit left_zero(modulus, const T&, const U&)
-    {}
-
-    constexpr auto operator()() const
-    { return T{0}; }
+  template<>
+  struct left_zero<modulus> {
+    template<class T, class U>
+    requires magma<modulus, T, U>
+    constexpr common_type_t<T, U> operator()(T&&, U&&) const { return T{}; }
   };
 }
 \end{itemdecl}
