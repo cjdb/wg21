@@ -153,51 +153,40 @@ The table below recommends these as the primary types for beginners.
 <table>
    <tr>
       <th>Abstract type</th>
-      <th><center>Pre-C++20 type</center></th>
-      <th><center>Post-C++20 type</center></th>
+      <th><center>C++ type</center></th>
    </tr>
    <tr>
       <td>Integer</td>
-      <td><center><code>int</code></center></td>
       <td><center><code>int</code></center></td>
    </tr>
    <tr>
       <td>Floating-point</td>
       <td><center><code>double</code></center></td>
-      <td><center><code>double</code></center></td>
    </tr>
    <tr>
       <td>Boolean</td>
-      <td><center><code>bool</code></center></td>
       <td><center><code>bool</code></center></td>
    </tr>
    <tr>
       <td>Character</td>
       <td><center><code>char</code></center></td>
-      <td><center><code>char8_t</code></center></td>
    </tr>
    <tr>
       <td>String</td>
       <td><center><code>std::string</code></center></td>
-      <td><center><code>std::u8string</code></center></td>
    </tr>
    <tr>
       <td>Sequence container</td>
-      <td><center><code>std::vector</code></center></td>
       <td><center><code>std::vector</code></center></td>
    </tr>
    <tr>
       <td>Associative container</td>
       <td><center><code>std::map</code></center></td>
-      <td><center><code>std::map</code></center></td>
    </tr>
 </table>
 
-The distinction between pre-C++20 and C++20 is simply the acknowledgement of UTF-8. This is not to
-suggest that students should be introduced to the details of UTF-8 any earlier, but rather to get
-the idea of UTF-8 support on their radar, so that when they need to care about locales, they won't
-need to shift from thinking about why `char` is insufficient in the current programming world: they
-can just start using what they are already familiar with.
+It may worth to warn the students that the support for non-English locales may
+vary depends on the specific platform.
 
 #### [types.basic.conversions] Conversions
 
