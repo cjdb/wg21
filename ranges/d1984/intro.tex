@@ -1,0 +1,10 @@
+\rSec0[motivation]{Changing the return types for ranges algorithms with alias return types}
+
+This proposal resolves GB316 and GBxxx
+
+Each algorithm should have its own result type (that might be derived from some common
+exposition-only type). It will be probably be confusing for a diagnostic to report
+\tcode{copy_result} as the return type when a user is using \tcode{move_backward}, or for
+\tcode{mismatch_result} to appear when a user is using \tcode{swap_ranges}!
+
+LEWG approved to move this to LWG in Belfast.

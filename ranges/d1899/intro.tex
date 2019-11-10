@@ -1,0 +1,65 @@
+\rSec0[motivation]{Motivation}
+
+The ability to use algorithms over an evenly-spaced subset of a range has been missed in the STL for
+a quarter of a century. This is, in part, due to the complexity required to use an iterator that can
+safely describe such a range. It also means that the following examples cannot be transformed from
+raw loops into algorithms, due to a lacking iterator.
+
+\begin{codeblock}
+for (auto i = 0; i < ssize(v); i += 2) {
+  v[i] = 42; // fill
+}
+
+for (auto i = 0; i < ssize(v); i += 3) {
+  v[i] = f(); // transform
+}
+
+for (auto i = 0; i < ssize(v); i += 3) {
+  for (auto j = i; j < ssize(v); i += 3) {
+    if (v[j] < v[i]) {
+      ranges::swap(v[i], v[j]); // selection sort, but hopefully the idea is conveyed
+    }
+  }
+}
+\end{codeblock}
+
+Boost introduced a range adaptor called \tcode{strided}, and range-v3's equivalent is
+\tcode{stride\_view}, both of which make striding far easier than when using iterators:
+
+\begin{codeblock}
+ranges::fill(v | views::stride(2), 42);
+
+auto strided_v = v | views::stride(3);
+ranges::transform(strided_v, ranges::begin(strided_v) f);
+
+ranges::stable_sort(strided_v); // order restored!
+\end{codeblock}
+
+Given that there's no way to compose a strided range adaptor in C++20, this should be one of the
+earliest range adaptors put into C++23.
+
+\subsection{Risk of not having \tcode{stride\_view}}
+
+Although it isn't possible to compose \tcode{stride\_view} in C++20, someone inexperienced with the
+ranges design space might mistake \tcode{filter\_view} as a suitable way to ``compose''
+\tcode{stride\_view}:
+
+\begin{codeblock}
+auto bad_stride = [](auto const step) {
+  return views::filter([n = 0, step](auto&&) mutable {
+    return n++ % step == 0;
+  });
+};
+\end{codeblock}
+
+This implementation is broken for two reasons:
+
+\begin{enumerate}
+  \item \tcode{filter\_view} expects a \tcode{predicate} as its input, but the lambda we have
+        provided does not model \tcode{predicate} (a call to \tcode{invoke} on a \tcode{predicate}
+        mustn't modify the function object, yet we clearly are).
+  \item The lambda provided doesn't account for moving backward, so despite \textit{satisfying}
+        \tcode{bidirectional_iterator}, it does not model the concept.
+\end{enumerate}
+
+For these reasons, the author regrets not proposing this in the C++20 design space.

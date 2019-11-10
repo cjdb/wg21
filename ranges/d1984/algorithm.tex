@@ -1,0 +1,542 @@
+%!TEX root = D1984.tex
+\rSec0[proposed.wording]{Proposed wording}
+
+\rSec1[alg.syn]{Header \tcode{<algorithm>} synopsis}
+
+\begin{codeblock}
+namespace std {
+  // [alg.nonmodifying], non-modifying sequence operations
+  @\dots@
+  // [alg.modifying.operations], mutating sequence operations
+  // [alg.copy], copy
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using copy_n_result = copy_result<I, O>;}@
+    @\added{struct copy_n_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator copy_n_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator copy_n_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using copy_if_result = copy_result<I, O>;}@
+    @\added{struct copy_if_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator copy_if_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator copy_if_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using copy_backward_result = copy_result<I1, I2>;}@
+    @\added{struct copy_backward_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator copy_backward_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator copy_backward_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+  // [alg.move], move
+  @\dots@
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using move_result = copy_result<I, O>;}@
+    @\added{struct move_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator move_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator move_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using move_backward_result = copy_result<I, O>;}@
+    @\added{struct move_backward_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator move_backward_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator move_backward_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using swap_ranges_result = copy_result<I, O>;}@
+    @\added{struct swap_ranges_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator swap_ranges_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator swap_ranges_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using reverse_copy_result = copy_result<I, O>;}@
+    @\added{struct reverse_copy_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator reverse_copy_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator reverse_copy_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using replace_copy_result = copy_result<I, O>;}@
+    @\added{struct replace_copy_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator replace_copy_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator replace_copy_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using replace_copy_if_result = copy_result<I, O>;}@
+    @\added{struct replace_copy_if_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator replace_copy_if_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator replace_copy_if_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using remove_copy_result = copy_result<I, O>;}@
+    @\added{struct remove_copy_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator remove_copy_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator remove_copy_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using remove_copy_if_result = copy_result<I, O>;}@
+    @\added{struct remove_copy_if_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator remove_copy_if_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator remove_copy_if_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using unique_copy_result = copy_result<I, O>;}@
+    @\added{struct unique_copy_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator unique_copy_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator unique_copy_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using reverse_copy_result = copy_result<I, O>;}@
+    @\added{struct reverse_copy_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator reverse_copy_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator reverse_copy_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using rotate_copy_result = copy_result<I, O>;}@
+    @\added{struct rotate_copy_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator rotate_copy_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator rotate_copy_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using partial_sort_copy_result = copy_result<I, O>;}@
+    @\added{struct partial_sort_copy_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator partial_sort_copy_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator partial_sort_copy_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using merge_result = copy_result<I, O>;}@
+    @\added{struct merge_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator merge_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator merge_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using set_union_result = copy_result<I, O>;}@
+    @\added{struct set_union_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator set_union_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator set_union_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using set_intersection_result = copy_result<I, O>;}@
+    @\added{struct set_intersection_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator set_intersection_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator set_intersection_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using set_difference_result = copy_result<I, O>;}@
+    @\added{struct set_difference_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator set_difference_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator set_difference_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using set_symmetric_difference_result = copy_result<I, O>;}@
+    @\added{struct set_symmetric_difference_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator set_symmetric_difference_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator set_symmetric_difference_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using minmax_element_result = copy_result<I, O>;}@
+    @\added{struct minmax_element_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator minmax_element_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator minmax_element_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+
+  namespace ranges {
+    template<class I, class O>
+    @\removed{using prev_permutation_result = copy_result<I, O>;}@
+    @\added{struct prev_permutation_result \{}@
+      @\added{[[no_unique_address]] I in;}@
+      @\added{[[no_unique_address]] O out;}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<const I\&, I2> \&\& convertible_to<const O\&, O2>}@
+        @\added{operator prev_permutation_result<I2, O2>() const \& \{}@
+          @\added{return \{in, out\};}@
+        @\added{\}}@
+
+      @\added{template<class I2, class O2>}@
+        @\added{requires convertible_to<I, I2> \&\& convertible_to<O, O2>}@
+        @\added{operator prev_permutation_result<I2, O2>() \&\& \{}@
+          @\added{return \{std::move(in), std::move(out)\};}@
+        @\added{\}}@
+    @\added{\};}@
+    @\dots@
+  }
+
+  @\dots@
+}
+\end{codeblock}
