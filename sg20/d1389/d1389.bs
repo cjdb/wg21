@@ -339,6 +339,8 @@ TODO (why?)
 ### [style.naming] Use consistent set of naming conventions for identifiers
 (e.g., names of variables, types, etc.)
 
+Examples: [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines), [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html)
+
 To whatever extent is possible, a consistent set of naming conventions
 for identifiers should be employed.  This practice helps to greatly
 improve the readability of code, amongst other things.  Many popular
@@ -494,7 +496,7 @@ Many other code constructs are also handled by the tool
 
 ### [tools.code.formatter] Use a code formatter
 
-Examples: [Clang Format](https://clang.llvm.org/docs/ClangFormat.html)
+Examples: [Clang Format](https://clang.llvm.org/docs/ClangFormat.html), [Artistic Style](http://astyle.sourceforge.net/)
 
 Choosing a code formatter and picking a canonical style (it doesn't really matter which one) will
 avoid some code style arguments and improve uniformity among student's code. The latter will make
@@ -502,7 +504,7 @@ marking and comparing solutions easier.
 
 ### [tools.linter] Use linters
 
-Example: [Clang Tidy](http://clang.llvm.org/extra/clang-tidy/)
+Example: [Clang Tidy](http://clang.llvm.org/extra/clang-tidy/), [Cppcheck](https://github.com/danmar/cppcheck)
 
 Static analysis tools are extremely useful for finding certain types of
 bugs or other problems in code.
