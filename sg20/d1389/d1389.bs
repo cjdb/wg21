@@ -203,8 +203,8 @@ i = c; // okay, promotion
 c = i; // not okay, implicitly narrows
 
 i = static_cast<int>(c); // okay, but superfluous
-c = static_cast<int>(i); // okay, explicit narrowing
-c = gsl::narrow_cast<int>(i); // better, explicit narrowing with a description
+c = static_cast<char>(i); // okay, explicit narrowing
+c = gsl::narrow_cast<char>(i); // better, explicit narrowing with a description
 ```
 
 ### [types.const] Constness
@@ -393,9 +393,9 @@ making it easier for novices to find and correct their errors.
 
 At the time of this writing, the most recent versions of several
 popular compilers are as follows:
-* GCC: version 8
-* Clang: version 7
-* MSVC: version 2017 (with updates)
+* GCC: version 9
+* Clang: version 9
+* MSVC: version 2019 (with updates)
 
 #### [tools.multiple.compilers] Use two or more competing compilers
 
@@ -469,11 +469,7 @@ use a build system.
 
 ### [tools.online.compiler] Introduce online compilers
 
-Examples:
-* [Compiler Explorer](https://godbolt.org/)
-* [Wandbox](https://wandbox.org/)
-* [Coliru](http://coliru.stacked-crooked.com/)
-* [C++ Insights](https://cppinsights.io/)
+Examples: [Compiler Explorer](https://godbolt.org/), [Wandbox](https://wandbox.org/), [Coliru](http://coliru.stacked-crooked.com/), [C++ Insights](https://cppinsights.io/)
 
 Online compilers are invaluable tools for communicating about small snippets of code. Depending on
 the tool, they let the user compile programs using multiple toolchains, check the output of their
