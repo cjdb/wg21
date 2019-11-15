@@ -288,9 +288,15 @@ listed in a meaningful order; instead, they are listed so that the table is even
 			No topic suggestions at present.
 		</td>
 		<td>
-			<b>Interop with C</b>
-			<br />
-			No topic suggestions at present.
+			<b>Interop and ABI</b>
+			<ul>
+				<li>bindings for other languages</li>
+				<li>C++ features on a binary level</li>
+				<li>dynamic libraries</li>
+				<li>hourglass interfaces</li>
+				<li>interop with C</li>
+				<li>writing ABI-stable libraries</li>
+			</ul>
 		</td>
 		<td>
 			<b>Undefined behaviour</b>
