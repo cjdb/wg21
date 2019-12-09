@@ -23,7 +23,7 @@ ideas behind a set of topic 'modules' where stages are embedded into a module. T
 guidelines having sets of topics as opposed to sets of stages is that teachers will be able to
 formulate their own curricula more easily.
 
-P1389R0 stated that that a student should be able to meet all of the objectives and satisfy all of
+P1389R0 stated that a student should be able to meet all of the objectives and satisfy all of
 the outcomes in Stage 1 before they are ready to progress to Stage 2, and so on. This means that
 there are some unrelated topics that are coupled together. In hindsight, the author of P1389 also
 acknowledges that the sets of stages is closer to a prescibed curriculum than intended. For example,
@@ -83,7 +83,7 @@ any document published by SG20.</b>
     </dl></td>
   </tr>
   <tr>
-    <td>2. knowledge and understanding about why testing is an important for software development</td>
+    <td>2. knowledge and understanding about why testing is important for software development</td>
     <td><dl>
       <dt>P2.1</dt>
       <dd>designs unit-tests to validate that the individual components of their are correct</dd>
@@ -112,7 +112,7 @@ any document published by SG20.</b>
     <td>5. skills in the C++ programming language</td>
     <td><dl>
       <dt>P5.1</dt>
-      <dd>wirtes programs that correctly sovle the problem using C++</dd>
+      <dd>wirtes programs that correctly solve the problem using C++</dd>
       <dt>P5.2</dt>
       <dd>writes programs that take advantage of modern C++ programming techniques</dd>
       <dt>P5.3</dt>
@@ -221,7 +221,7 @@ listed in a meaningful order; instead, they are listed so that the table is even
 				<li>derived types</li>
 				<li>destructors</li>
 				<li>friends</li>
-				<li>interface inhertiance</li>
+				<li>interface inheritance</li>
 				<li>member functions</li>
 				<li><code>optional</code> and <code>variant</code> as sum types</li>
 				<li>rule-of-five</li>
