@@ -112,7 +112,7 @@ any document published by SG20.</b>
     <td>5. skills in the C++ programming language</td>
     <td><dl>
       <dt>P5.1</dt>
-      <dd>wirtes programs that correctly solve the problem using C++</dd>
+      <dd>writes programs that correctly solve the problem using C++</dd>
       <dt>P5.2</dt>
       <dd>writes programs that take advantage of modern C++ programming techniques</dd>
       <dt>P5.3</dt>
@@ -126,7 +126,7 @@ any document published by SG20.</b>
   </tr>
 </table>
 
-# A non-exhausive list of modules
+# A non-exhaustive list of modules
 
 Table 2 outlines a non-exhaustive list of modules and their related topics. The modules are not
 listed in a meaningful order; instead, they are listed so that the table is evenly formatted.
